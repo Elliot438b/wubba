@@ -26,7 +26,7 @@ ACTION wubba::serverseed( uint64_t roundId, checksum256 encodeSeed)
     auto existing = roundstable.find(roundId );
     eosio_assert( existing != roundstable.end(), "roundId not exists when save server seed" );
 
-    roundstable.emplace( _self, [&]( auto& s ) {
+    roundstable.modify( existing, _self , [&]( auto& s ) {
        s.serverseed        = encodeSeed;
     });
 }
@@ -37,7 +37,7 @@ ACTION wubba::playerbet( uint64_t roundId, bool bet)
     auto existing = roundstable.find(roundId );
     eosio_assert( existing != roundstable.end(), "roundId not exists when palyer bet" );
 
-    roundstable.emplace( _self, [&]( auto& s ) {
+    roundstable.modify( existing, _self, [&]( auto& s ) {
        s.bet        = bet;
     });
 
@@ -94,7 +94,7 @@ ACTION wubba::reveal(uint64_t roundId)
     if(limitNum >= 5)
 	    result = true;
     
-    roundstable.emplace( _self, [&]( auto& s ) {
+    roundstable.modify( existing, _self, [&]( auto& s ) {
        if(existing->bet == result)
        	  s.result       = "win";
        else
