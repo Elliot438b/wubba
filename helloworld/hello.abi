@@ -1,0 +1,43 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Jan 18 17:02:11 2019",
+    "version": "eosio::abi/1.1",
+    "structs": [
+        {
+            "name": "check",
+            "base": "",
+            "fields": [
+                {
+                    "name": "nm",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "hi",
+            "base": "",
+            "fields": [
+                {
+                    "name": "nm",
+                    "type": "name"
+                }
+            ]
+        }
+    ],
+    "types": [],
+    "actions": [
+        {
+            "name": "check",
+            "type": "check",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "hi",
+            "type": "hi",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "abi_extensions": []
+}
