@@ -1,0 +1,161 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Jan 18 18:56:07 2019",
+    "version": "eosio::abi/1.1",
+    "structs": [
+        {
+            "name": "dealerseed",
+            "base": "",
+            "fields": [
+                {
+                    "name": "roundId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "encodeSeed",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "playerbet",
+            "base": "",
+            "fields": [
+                {
+                    "name": "roundId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "bet",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "reveal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "roundId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "round_stats",
+            "base": "",
+            "fields": [
+                {
+                    "name": "roundId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "flag",
+                    "type": "uint64"
+                },
+                {
+                    "name": "bet",
+                    "type": "bool"
+                },
+                {
+                    "name": "dealerseed",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "serverseed",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "result",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "serverseed",
+            "base": "",
+            "fields": [
+                {
+                    "name": "roundId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "encodeSeed",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "verdealeseed",
+            "base": "",
+            "fields": [
+                {
+                    "name": "roundId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "seed",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "verserveseed",
+            "base": "",
+            "fields": [
+                {
+                    "name": "roundId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "seed",
+                    "type": "string"
+                }
+            ]
+        }
+    ],
+    "types": [],
+    "actions": [
+        {
+            "name": "dealerseed",
+            "type": "dealerseed",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "playerbet",
+            "type": "playerbet",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "reveal",
+            "type": "reveal",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "serverseed",
+            "type": "serverseed",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "verdealeseed",
+            "type": "verdealeseed",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "verserveseed",
+            "type": "verserveseed",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "round",
+            "type": "round_stats",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "abi_extensions": []
+}
