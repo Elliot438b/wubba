@@ -13,68 +13,68 @@
 #include <string>
 #include <cstdlib>
 
-
 using namespace eosio;
 using namespace std;
 using std::string;
 
-   CONTRACT wubba : public contract {
-      public:
-       using contract::contract;
+CONTRACT wubba : public contract
+{
+  public:
+    using contract::contract;
 
-	wubba( name receiver, name code, datastream<const char*> ds )
-         : contract(receiver, code, ds), roundstable(receiver, receiver.value) {}
-        // wubba( name um ):contract(um){}
+    wubba(name receiver, name code, datastream<const char *> ds)
+        : contract(receiver, code, ds), roundstable(receiver, receiver.value) {}
+    // wubba( name um ):contract(um){}
 
-         ACTION dealerseed( uint64_t roundId, checksum256 encodeSeed);
+    ACTION dealerseed(uint64_t roundId, checksum256 encodeSeed);
 
-         ACTION serverseed( uint64_t roundId, checksum256 encodeSeed);
+    ACTION serverseed(uint64_t roundId, checksum256 encodeSeed);
 
-         ACTION playerbet( uint64_t roundId, bool bet);
-      
-         ACTION verdealeseed(uint64_t roundId, string seed);
+    ACTION playerbet(uint64_t roundId, bool bet);
 
-	 	 ACTION verserveseed(uint64_t roundId, string seed);
-         
-         ACTION reveal(uint64_t roundId);
+    ACTION verdealeseed(uint64_t roundId, string seed);
 
+    ACTION verserveseed(uint64_t roundId, string seed);
 
-	 
-	    TABLE round_stats {
-			 uint64_t          roundId;
-			 uint64_t	    flag;
-	     	 bool  	    bet;
-             checksum256 	    dealerseed;
-             checksum256      serverseed;
-	    	 string          result;
+    ACTION reveal(uint64_t roundId);
 
-            uint64_t primary_key()const { return roundId; }
-         };
+    TABLE round_stats
+    {
+        uint64_t roundId;
+        uint64_t flag;
+        bool bet;
+        checksum256 dealerseed;
+        checksum256 serverseed;
+        string result;
 
-         typedef eosio::multi_index< "round"_n, wubba::round_stats> round_t;
+        uint64_t primary_key() const { return roundId; }
+    };
 
-struct WBRNG {
-    unsigned long next;
+    typedef eosio::multi_index<"round"_n, wubba::round_stats> round_t;
 
-    void srand(unsigned int seed) {
-        next = seed;
-    }
+    struct WBRNG
+    {
+        unsigned long next;
 
-    int rand() {
-        next = next * 1103515245 + 12345;
-        return (unsigned int)(next / 65536) % 32768;
-    }
-};
+        void srand(unsigned int seed)
+        {
+            next = seed;
+        }
 
-	using dealerseed_action = action_wrapper<"dealerseed"_n, &wubba::dealerseed>;
-	using serverseed_action = action_wrapper<"serverseed"_n, &wubba::serverseed>;
-	using playerbet_action = action_wrapper<"playerbet"_n, &wubba::playerbet>;
-	using verdealeseed_action = action_wrapper<"verdealeseed"_n, &wubba::verdealeseed>;
-	using verserveseed_action = action_wrapper<"verserveseed"_n, &wubba::verserveseed>;
-	using reveal_action = action_wrapper<"reveal"_n, &wubba::reveal>;
+        int rand()
+        {
+            next = next * 1103515245 + 12345;
+            return (unsigned int)(next / 65536) % 32768;
+        }
+    };
 
-	round_t roundstable;
+    using dealerseed_action = action_wrapper<"dealerseed"_n, &wubba::dealerseed>;
+    using serverseed_action = action_wrapper<"serverseed"_n, &wubba::serverseed>;
+    using playerbet_action = action_wrapper<"playerbet"_n, &wubba::playerbet>;
+    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &wubba::verdealeseed>;
+    using verserveseed_action = action_wrapper<"verserveseed"_n, &wubba::verserveseed>;
+    using reveal_action = action_wrapper<"reveal"_n, &wubba::reveal>;
+
+    round_t roundstable;
     WBRNG wbrng;
-   };
-
-
+};

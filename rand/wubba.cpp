@@ -5,61 +5,57 @@
 
 #include "wubba.hpp"
 
-
-ACTION wubba::dealerseed( uint64_t roundId, checksum256 encodeSeed)
+ACTION wubba::dealerseed(uint64_t roundId, checksum256 encodeSeed)
 {
 
-//    round_t roundstable( _self, _self );
-    auto existing = roundstable.find(roundId );
-    eosio_assert( existing == roundstable.end(), "roundId already exists when save dealer seed" );
+    //    round_t roundstable( _self, _self );
+    auto existing = roundstable.find(roundId);
+    eosio_assert(existing == roundstable.end(), "roundId already exists when save dealer seed");
 
-    roundstable.emplace( _self, [&]( auto& s ) {
-       s.roundId           = roundId;
-       s.dealerseed        = encodeSeed;
+    roundstable.emplace(_self, [&](auto &s) {
+        s.roundId = roundId;
+        s.dealerseed = encodeSeed;
     });
 }
 
-
-ACTION wubba::serverseed( uint64_t roundId, checksum256 encodeSeed)
+ACTION wubba::serverseed(uint64_t roundId, checksum256 encodeSeed)
 {
-//    round_t roundstable( _self, _self );
-    auto existing = roundstable.find(roundId );
-    eosio_assert( existing != roundstable.end(), "roundId not exists when save server seed" );
+    //    round_t roundstable( _self, _self );
+    auto existing = roundstable.find(roundId);
+    eosio_assert(existing != roundstable.end(), "roundId not exists when save server seed");
 
-    roundstable.modify( existing, _self , [&]( auto& s ) {
-       s.serverseed        = encodeSeed;
+    roundstable.modify(existing, _self, [&](auto &s) {
+        s.serverseed = encodeSeed;
     });
 }
 
-ACTION wubba::playerbet( uint64_t roundId, bool bet)
+ACTION wubba::playerbet(uint64_t roundId, bool bet)
 {
-  //  round_t roundstable( _self, _self );
-    auto existing = roundstable.find(roundId );
-    eosio_assert( existing != roundstable.end(), "roundId not exists when palyer bet" );
+    //  round_t roundstable( _self, _self );
+    auto existing = roundstable.find(roundId);
+    eosio_assert(existing != roundstable.end(), "roundId not exists when palyer bet");
 
-    roundstable.modify( existing, _self, [&]( auto& s ) {
-       s.bet        = bet;
+    roundstable.modify(existing, _self, [&](auto &s) {
+        s.bet = bet;
     });
-
 }
 
 ACTION wubba::verdealeseed(uint64_t roundId, string seed)
 {
     //round_t roundstable( _self, _self );
-    auto existing = roundstable.find(roundId );
-    eosio_assert( existing != roundstable.end(), "roundId not exists when verify dealer seed" );
+    auto existing = roundstable.find(roundId);
+    eosio_assert(existing != roundstable.end(), "roundId not exists when verify dealer seed");
 
-    assert_sha256( seed.c_str(), seed.size(), ((*existing).dealerseed) );
+    assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerseed));
 }
 
 ACTION wubba::verserveseed(uint64_t roundId, string seed)
 {
-   // round_t roundstable( _self, _self );
-    auto existing = roundstable.find(roundId );
-    eosio_assert( existing != roundstable.end(), "roundId not exists when verify dealer seed" );
+    // round_t roundstable( _self, _self );
+    auto existing = roundstable.find(roundId);
+    eosio_assert(existing != roundstable.end(), "roundId not exists when verify dealer seed");
 
-    assert_sha256( seed.c_str(), seed.size(), ((*existing).serverseed) );
-
+    assert_sha256(seed.c_str(), seed.size(), ((*existing).serverseed));
 }
 
 unsigned int SDBMHash(char *str)
@@ -78,28 +74,28 @@ unsigned int SDBMHash(char *str)
 ACTION wubba::reveal(uint64_t roundId)
 {
     //round_t roundstable( _self, _self );
-    auto existing = roundstable.find(roundId );
-    eosio_assert( existing != roundstable.end(), "roundId not exists when reveal" );
+    auto existing = roundstable.find(roundId);
+    eosio_assert(existing != roundstable.end(), "roundId not exists when reveal");
 
     //uint64_t randSeed = existing->dealerseed + existing->serverseed;
     constexpr size_t max_stack_buffer_size = 512;
-    char* buffer = (char*)( malloc(max_stack_buffer_size) );
+    char *buffer = (char *)(malloc(max_stack_buffer_size));
 
-    datastream<char*> ds( buffer, max_stack_buffer_size );
+    datastream<char *> ds(buffer, max_stack_buffer_size);
     ds << existing->dealerseed << existing->serverseed;
     wbrng.srand(SDBMHash(buffer));
 
-    uint64_t limitNum = wbrng.rand()%10;
+    uint64_t limitNum = wbrng.rand() % 10;
     bool result = false;
-    if(limitNum >= 5)
-	    result = true;
-    
-    roundstable.modify( existing, _self, [&]( auto& s ) {
-       if(existing->bet == result)
-       	  s.result       = "win";
-       else
-          s.result       = "lose";
+    if (limitNum >= 5)
+        result = true;
+
+    roundstable.modify(existing, _self, [&](auto &s) {
+        if (existing->bet == result)
+            s.result = "win";
+        else
+            s.result = "lose";
     });
 }
 
-EOSIO_DISPATCH( wubba, (dealerseed)(serverseed)(playerbet)(verdealeseed)(verserveseed)(reveal) )
+EOSIO_DISPATCH(wubba, (dealerseed)(serverseed)(playerbet)(verdealeseed)(verserveseed)(reveal))
