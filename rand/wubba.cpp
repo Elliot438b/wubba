@@ -5,14 +5,16 @@
 
 #include "wubba.hpp"
 
-ACTION wubba::newtable(uint64_t tableId)
+ACTION wubba::newtable(uint64_t tableId, name dealer)
 {
+    require_auth(dealer);
     auto existing = roundstable.find(tableId );
     eosio_assert( existing == roundstable.end(), "tableId already exists when newtable" );
 
     roundstable.emplace( _self, [&]( auto& s ) {
         s.tableId           = tableId;
         s.tableStatus       = "end";
+        s.dealer            = dealer;
     });
 }
 ACTION wubba::dealerseed( uint64_t tableId, checksum256 encodeSeed)
@@ -22,6 +24,7 @@ ACTION wubba::dealerseed( uint64_t tableId, checksum256 encodeSeed)
     auto existing = roundstable.find(tableId );
     eosio_assert( existing != roundstable.end(), "tableId not exists when save dealer seed" );
     eosio_assert( existing->tableStatus == "end", "tableStatus != end" );
+    require_auth(existing->dealer);
 
     roundstable.modify( existing, _self, [&]( auto& s ) {
         s.dealerseed        = encodeSeed;
@@ -34,6 +37,8 @@ ACTION wubba::dealerseed( uint64_t tableId, checksum256 encodeSeed)
 ACTION wubba::serverseed( uint64_t tableId, checksum256 encodeSeed)
 {
 //    round_t roundstable( _self, _self );
+    require_auth("useraaaaaaah"_n);
+
     auto existing = roundstable.find(tableId );
     eosio_assert( existing != roundstable.end(), "roundId not exists when save server seed" );
     eosio_assert( existing->tableStatus == "start", "tableStatus != start" );
@@ -71,9 +76,11 @@ ACTION wubba::endbet(uint64_t tableId)
     });
 }
 
-ACTION wubba::playerbet( uint64_t tableId, uint64_t bet)
+ACTION wubba::playerbet( uint64_t tableId, uint64_t bet, name player)
 {
     //  round_t roundstable( _self, _self );
+    require_auth(player);
+
     auto existing = roundstable.find(tableId );
     eosio_assert( existing != roundstable.end(), "roundId not exists when palyer bet" );
     eosio_assert( existing->tableStatus == "bet", "tableStatus != bet" );
@@ -89,8 +96,10 @@ ACTION wubba::playerbet( uint64_t tableId, uint64_t bet)
 ACTION wubba::verdealeseed(uint64_t tableId, string seed)
 {
     //round_t roundstable( _self, _self );
+
     auto existing = roundstable.find(tableId );
     eosio_assert( existing != roundstable.end(), "roundId not exists when verify dealer seed" );
+    require_auth(existing->dealer);
     eosio_assert( existing->tableStatus == "reveal", "tableStatus != reveal" );
     eosio_assert((now() - existing->time) > 30, "It's not time to verify dealer seed yet.");
 
@@ -107,6 +116,8 @@ ACTION wubba::verdealeseed(uint64_t tableId, string seed)
 ACTION wubba::verserveseed(uint64_t tableId, string seed)
 {
     // round_t roundstable( _self, _self );
+    require_auth("useraaaaaaah"_n);
+
     auto existing = roundstable.find( tableId );
     eosio_assert( existing != roundstable.end(), "roundId not exists when verify dealer seed" );
     eosio_assert( existing->tableStatus == "reveal", "tableStatus != reveal" );

@@ -18,12 +18,12 @@ using namespace eosio;
 using namespace std;
 using std::string;
 
-//typedef enum {
-//    START = 0,
-//    BET,
-//    REVEAL,
-//    END
-//} TABLE_STATUS;
+typedef enum {
+    START = 0,
+    BET,
+    REVEAL,
+    END
+} TABLE_STATUS;
 
 CONTRACT wubba : public contract {
 public:
@@ -33,7 +33,7 @@ wubba( name receiver, name code, datastream<const char*> ds )
 : contract(receiver, code, ds), roundstable(receiver, receiver.value) {}
 // wubba( name um ):contract(um){}
 
-ACTION newtable(uint64_t tableId);
+ACTION newtable(uint64_t tableId, name dealer);
 
 ACTION dealerseed( uint64_t tableId, checksum256 encodeSeed);
 
@@ -41,7 +41,7 @@ ACTION serverseed( uint64_t tableId, checksum256 encodeSeed);
 
 ACTION endbet(uint64_t tableId);
 
-ACTION playerbet( uint64_t tableId, uint64_t bet);
+ACTION playerbet( uint64_t tableId, uint64_t bet, name player);
 
 ACTION verdealeseed(uint64_t tableId, string seed);
 
@@ -61,7 +61,9 @@ TABLE round_stats {
         bool              sSeedVerity;
         string            result;
         string            tableStatus;
-
+        name              dealer;
+        name              player;
+        //TABLE_STATUS      testStatus;
 //        round_stats()
 //        {
 //            tableStatus = "end";
