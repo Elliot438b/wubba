@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Mon Jan 21 10:59:44 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Jan 22 16:44:10 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -7,7 +7,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "roundId",
+                    "name": "tableId",
                     "type": "uint64"
                 },
                 {
@@ -17,25 +17,35 @@
             ]
         },
         {
-            "name": "playerbet",
+            "name": "endbet",
             "base": "",
             "fields": [
                 {
-                    "name": "roundId",
+                    "name": "tableId",
                     "type": "uint64"
-                },
-                {
-                    "name": "bet",
-                    "type": "bool"
                 }
             ]
         },
         {
-            "name": "reveal",
+            "name": "newtable",
             "base": "",
             "fields": [
                 {
-                    "name": "roundId",
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "playerbet",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "bet",
                     "type": "uint64"
                 }
             ]
@@ -45,27 +55,39 @@
             "base": "",
             "fields": [
                 {
-                    "name": "roundId",
+                    "name": "tableId",
                     "type": "uint64"
                 },
                 {
-                    "name": "flag",
+                    "name": "time",
                     "type": "uint64"
                 },
                 {
                     "name": "bet",
-                    "type": "bool"
+                    "type": "uint64"
                 },
                 {
                     "name": "dealerseed",
                     "type": "checksum256"
                 },
                 {
+                    "name": "dSeedVerity",
+                    "type": "bool"
+                },
+                {
                     "name": "serverseed",
                     "type": "checksum256"
                 },
                 {
+                    "name": "sSeedVerity",
+                    "type": "bool"
+                },
+                {
                     "name": "result",
+                    "type": "string"
+                },
+                {
+                    "name": "tableStatus",
                     "type": "string"
                 }
             ]
@@ -75,7 +97,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "roundId",
+                    "name": "tableId",
                     "type": "uint64"
                 },
                 {
@@ -89,7 +111,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "roundId",
+                    "name": "tableId",
                     "type": "uint64"
                 },
                 {
@@ -103,7 +125,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "roundId",
+                    "name": "tableId",
                     "type": "uint64"
                 },
                 {
@@ -121,13 +143,18 @@
             "ricardian_contract": ""
         },
         {
-            "name": "playerbet",
-            "type": "playerbet",
+            "name": "endbet",
+            "type": "endbet",
             "ricardian_contract": ""
         },
         {
-            "name": "reveal",
-            "type": "reveal",
+            "name": "newtable",
+            "type": "newtable",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "playerbet",
+            "type": "playerbet",
             "ricardian_contract": ""
         },
         {
