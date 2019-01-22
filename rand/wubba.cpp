@@ -53,19 +53,24 @@ ACTION wubba::serverseed( uint64_t tableId, checksum256 encodeSeed)
     //todo:defer 30 ,bet->reveal
     eosio::transaction txn{};
     txn.actions.emplace_back(
-            eosio::permission_level(_self, "active"_n),
+            permission_level{_self, "active"_n},
             _self,
             "endbet"_n,
             std::make_tuple(tableId));
     txn.delay_sec = 30;//defer 30s
+    uint128_t deferred_id = (uint128_t(tableId) << 64);
+    cancel_deferred( deferred_id );
+    txn.send( deferred_id, _self );
     //txn.send(0xffffffffffffffff, _self, true);
     //txn.send( (uint128_t("eosio"_n) << 64), _self, true);
+
 }
 
 ACTION wubba::endbet(uint64_t tableId)
 {
     auto existing = roundstable.find(tableId);
     eosio_assert( existing != roundstable.end(), "roundId not exists when endbet" );
+
     eosio_assert( existing->tableStatus == "bet", "tableStatus != bet" );
     uint32_t useTime = now() - existing->time;
     print_f("use time is %\n", useTime);
