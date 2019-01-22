@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Jan 22 16:44:10 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Jan 22 17:24:20 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -33,6 +33,10 @@
                 {
                     "name": "tableId",
                     "type": "uint64"
+                },
+                {
+                    "name": "dealer",
+                    "type": "name"
                 }
             ]
         },
@@ -47,6 +51,10 @@
                 {
                     "name": "bet",
                     "type": "uint64"
+                },
+                {
+                    "name": "player",
+                    "type": "name"
                 }
             ]
         },
@@ -89,6 +97,14 @@
                 {
                     "name": "tableStatus",
                     "type": "string"
+                },
+                {
+                    "name": "dealer",
+                    "type": "name"
+                },
+                {
+                    "name": "player",
+                    "type": "name"
                 }
             ]
         },
