@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Jan 22 17:58:58 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Jan 22 20:50:21 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -59,7 +59,7 @@
             ]
         },
         {
-            "name": "round_stats",
+            "name": "serverseed",
             "base": "",
             "fields": [
                 {
@@ -67,15 +67,29 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "time",
+                    "name": "encodeSeed",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "table_stats",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
                     "type": "uint64"
                 },
                 {
-                    "name": "bet",
+                    "name": "betStartTime",
                     "type": "uint64"
                 },
                 {
-                    "name": "dealerseed",
+                    "name": "betType",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dealerSeed",
                     "type": "checksum256"
                 },
                 {
@@ -83,7 +97,7 @@
                     "type": "bool"
                 },
                 {
-                    "name": "serverseed",
+                    "name": "serverSeed",
                     "type": "checksum256"
                 },
                 {
@@ -105,20 +119,6 @@
                 {
                     "name": "player",
                     "type": "name"
-                }
-            ]
-        },
-        {
-            "name": "serverseed",
-            "base": "",
-            "fields": [
-                {
-                    "name": "tableId",
-                    "type": "uint64"
-                },
-                {
-                    "name": "encodeSeed",
-                    "type": "checksum256"
                 }
             ]
         },
@@ -191,8 +191,8 @@
     ],
     "tables": [
         {
-            "name": "round",
-            "type": "round_stats",
+            "name": "tablesinfo",
+            "type": "table_stats",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
