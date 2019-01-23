@@ -37,9 +37,18 @@ CONTRACT wubba : public contract
     struct player_bet_info
     {
         name player;
-        uint64_t betType;
+        uint32_t betType;
         uint64_t betAmount;
         string playerResult;
+
+        enum class bet_type_fields : uint32_t
+        {
+            BET_BANK = 11,
+            BET_PLAYER = 12,
+            BET_PUSH = 13,
+            BET_BANK_PAIR = 14,
+            BET_PLAYER_PAIR = 15
+        };
 
         EOSLIB_SERIALIZE(player_bet_info, (player)(betType)(betAmount)(playerResult))
     };
@@ -62,10 +71,12 @@ CONTRACT wubba : public contract
 
         enum class status_fields : uint32_t
         {
-            START = 1,  // 0001
-            BET = 2,    // 0010
-            REVEAL = 4, // 0100
-            END = 0     // 0000
+            ROUND_START = 1,
+            ROUND_BET = 2,
+            ROUND_REVEAL = 4,
+            ROUND_END = 0,
+            PAUSED = 3, // must be changed under ROUND_END status.
+            CLOSED = 5
         };
 
         EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(playerInfo))

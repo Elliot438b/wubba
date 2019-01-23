@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Jan 23 16:26:16 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Jan 23 17:35:43 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -50,7 +50,7 @@
                 },
                 {
                     "name": "betType",
-                    "type": "uint64"
+                    "type": "uint32"
                 },
                 {
                     "name": "betAmount",
