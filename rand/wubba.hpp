@@ -17,13 +17,6 @@ using namespace eosio;
 using namespace std;
 using std::string;
 
-// typedef enum {
-//     START = 0,
-//     BET,
-//     REVEAL,
-//     END
-// } TABLE_STATUS;
-
 CONTRACT wubba : public contract
 {
   public:
@@ -41,31 +34,31 @@ CONTRACT wubba : public contract
     ACTION verserveseed(uint64_t tableId, string seed);
     void reveal(uint64_t tableId);
 
-    /**
-     * @brief multi_P
-     * 
-     * struct player_bet_info{
-     *      name player;
-     *      uint64_t betType;
-     *      uint64_t betAmount;
-     * }
-     */
-
     TABLE table_stats
     {
         uint64_t tableId;
         uint64_t betStartTime;
-        uint64_t betType;
+        uint32_t betType;
         checksum256 dealerSeed;
         bool dSeedVerity;
         checksum256 serverSeed;
         bool sSeedVerity;
         string result;
-        string tableStatus;
+        uint32_t tableStatus;
         name dealer;
         name player;
 
         uint64_t primary_key() const { return tableId; }
+
+        enum class status_fields : uint32_t
+        {
+            START = 1,  // 0001
+            BET = 2,    // 0010
+            REVEAL = 4, // 0100
+            END = 0     // 0000
+        };
+
+        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(betType)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(player))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats> singletable_t;

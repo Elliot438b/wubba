@@ -13,7 +13,7 @@ ACTION wubba::newtable(uint64_t tableId, name dealer)
 
     tableround.emplace(_self, [&](auto &s) {
         s.tableId = tableId;
-        s.tableStatus = "end";
+        s.tableStatus = (uint32_t)table_stats::status_fields::END;
         s.dealer = dealer;
     });
 }
@@ -21,12 +21,12 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when save dealer seed");
-    eosio_assert(existing->tableStatus == "end", "tableStatus != end");
+    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::END, "tableStatus != end");
     require_auth(existing->dealer);
     checksum256 hash;
     tableround.modify(existing, _self, [&](auto &s) {
         s.dealerSeed = encodeSeed;
-        s.tableStatus = "start";
+        s.tableStatus = (uint32_t)table_stats::status_fields::START;
         s.betStartTime = 0;
         s.betType = 0;
         s.dSeedVerity = 0;
@@ -44,11 +44,11 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
 
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when save server seed");
-    eosio_assert(existing->tableStatus == "start", "tableStatus != start");
+    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::START, "tableStatus != start");
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.serverSeed = encodeSeed;
-        s.tableStatus = "bet";
+        s.tableStatus = (uint32_t)table_stats::status_fields::BET;
         s.betStartTime = now();
         // print_f("start time is %\n", s.betStartTime);
     });
@@ -72,13 +72,13 @@ ACTION wubba::endbet(uint64_t tableId)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when endbet");
 
-    eosio_assert(existing->tableStatus == "bet", "tableStatus != bet");
+    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::BET, "tableStatus != bet");
     uint32_t useTime = now() - existing->betStartTime;
     print_f("use time is %\n", useTime);
     eosio_assert(useTime > 30, "time <=30, it is not time to change tableStatus to reveal");
 
     tableround.modify(existing, _self, [&](auto &s) {
-        s.tableStatus = "reveal";
+        s.tableStatus = (uint32_t)table_stats::status_fields::REVEAL;
     });
 }
 
@@ -87,7 +87,7 @@ ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player)
     require_auth(player);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when palyer bet");
-    eosio_assert(existing->tableStatus == "bet", "tableStatus != bet");
+    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::BET, "tableStatus != bet");
     eosio_assert((now() - existing->betStartTime) < 30, "bet already timeout");
     eosio_assert(existing->betType == 0, "you have beted");
 
@@ -102,7 +102,7 @@ ACTION wubba::verdealeseed(uint64_t tableId, string seed)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when verify dealer seed");
     require_auth(existing->dealer);
-    eosio_assert(existing->tableStatus == "reveal", "tableStatus != reveal");
+    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::REVEAL, "tableStatus != reveal");
     eosio_assert((now() - existing->betStartTime) > 30, "It's not time to verify dealer seed yet.");
     assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerSeed));
 
@@ -119,7 +119,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     require_auth("useraaaaaaah"_n);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when verify dealer seed");
-    eosio_assert(existing->tableStatus == "reveal", "tableStatus != reveal");
+    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::REVEAL, "tableStatus != reveal");
     eosio_assert((now() - existing->betStartTime) > 30, "It's not time verify server seed yet.");
     assert_sha256(seed.c_str(), seed.size(), ((*existing).serverSeed));
     tableround.modify(existing, _self, [&](auto &s) {
@@ -176,7 +176,7 @@ void wubba::reveal(uint64_t tableId)
             else
                 s.result = "win";
         }
-        s.tableStatus = "end";
+        s.tableStatus = (uint32_t)table_stats::status_fields::END;
     });
 }
 
