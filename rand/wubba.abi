@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Jan 23 13:49:50 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Jan 23 15:01:18 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -41,6 +41,28 @@
             ]
         },
         {
+            "name": "player_bet_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "player",
+                    "type": "name"
+                },
+                {
+                    "name": "betType",
+                    "type": "uint64"
+                },
+                {
+                    "name": "betAmount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "playerResult",
+                    "type": "string"
+                }
+            ]
+        },
+        {
             "name": "playerbet",
             "base": "",
             "fields": [
@@ -55,6 +77,10 @@
                 {
                     "name": "player",
                     "type": "name"
+                },
+                {
+                    "name": "betAmount",
+                    "type": "uint64"
                 }
             ]
         },
@@ -85,10 +111,6 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "betType",
-                    "type": "uint32"
-                },
-                {
                     "name": "dealerSeed",
                     "type": "checksum256"
                 },
@@ -117,8 +139,8 @@
                     "type": "name"
                 },
                 {
-                    "name": "player",
-                    "type": "name"
+                    "name": "playerInfo",
+                    "type": "player_bet_info[]"
                 }
             ]
         },

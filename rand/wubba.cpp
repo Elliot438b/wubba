@@ -24,16 +24,16 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::END, "tableStatus != end");
     require_auth(existing->dealer);
     checksum256 hash;
+    std::vector<player_bet_info> tempVec;
     tableround.modify(existing, _self, [&](auto &s) {
-        s.dealerSeed = encodeSeed;
         s.tableStatus = (uint32_t)table_stats::status_fields::START;
         s.betStartTime = 0;
-        s.betType = 0;
+        s.dealerSeed = encodeSeed;
         s.dSeedVerity = 0;
         s.serverSeed = hash;
         s.sSeedVerity = 0;
         s.result = "";
-        s.player = ""_n;
+        s.playerInfo = tempVec;
     });
 }
 
@@ -82,18 +82,32 @@ ACTION wubba::endbet(uint64_t tableId)
     });
 }
 
-ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player)
+ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, uint64_t betAmount)
 {
     require_auth(player);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when palyer bet");
     eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::BET, "tableStatus != bet");
     eosio_assert((now() - existing->betStartTime) < 30, "bet already timeout");
-    eosio_assert(existing->betType == 0, "you have beted");
+
+    bool flag = false;
+    for (const auto& p: existing->playerInfo)
+    {
+        if(p.player == player)
+        {
+            flag = true;
+            break;
+        }
+    }
+    eosio_assert(!flag, "player have bet");
+
+    player_bet_info temp;
+    temp.player = player;
+    temp.betAmount = betAmount;
+    temp.betType = betType;
 
     tableround.modify(existing, _self, [&](auto &s) {
-        s.betType = betType;
-        s.player = player;
+        s.playerInfo.emplace_back(temp);
     });
 }
 
@@ -161,22 +175,29 @@ void wubba::reveal(uint64_t tableId)
     if (limitNum >= 5)
         result = true;
     print_f("result is %\n", result);
+    std::vector<player_bet_info> tempVec;
+
+    auto itr = (existing->playerInfo).begin();
+    for (; itr != (existing->playerInfo).end(); itr++) {
+        player_bet_info tempInfo;
+        tempInfo = (*itr);
+        if (result) {
+            if (itr->betType >= 5)
+                tempInfo.playerResult = "win";
+            else
+                tempInfo.playerResult = "lose";
+        } else {
+            if (itr->betType >= 5)
+                tempInfo.playerResult = "lose";
+            else
+                tempInfo.playerResult = "win";
+        }
+        tempVec.emplace_back(tempInfo);
+    }
     tableround.modify(existing, _self, [&](auto &s) {
-        if (result)
-        {
-            if (existing->betType >= 5)
-                s.result = "win";
-            else
-                s.result = "lose";
-        }
-        else
-        {
-            if (existing->betType >= 5)
-                s.result = "lose";
-            else
-                s.result = "win";
-        }
+        s.playerInfo = tempVec;
         s.tableStatus = (uint32_t)table_stats::status_fields::END;
+        s.result = "";//todo?
     });
 }
 

@@ -29,26 +29,35 @@ CONTRACT wubba : public contract
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION endbet(uint64_t tableId);
-    ACTION playerbet(uint64_t tableId, uint64_t bet, name player);
+    ACTION playerbet(uint64_t tableId, uint64_t bet, name player, uint64_t betAmount);
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
     void reveal(uint64_t tableId);
 
-    TABLE table_stats
-    {
-        uint64_t tableId;
-        uint64_t betStartTime;
-        uint32_t betType;
-        checksum256 dealerSeed;
-        bool dSeedVerity;
-        checksum256 serverSeed;
-        bool sSeedVerity;
-        string result;
-        uint32_t tableStatus;
-        name dealer;
-        name player;
+struct player_bet_info{
+    name player;
+    uint64_t betType;
+    uint64_t betAmount;
+    string playerResult;
 
-        uint64_t primary_key() const { return tableId; }
+    EOSLIB_SERIALIZE( player_bet_info, (player)(betType)(betAmount)(playerResult) )
+};
+
+        TABLE table_stats
+        {
+            uint64_t tableId;
+            uint64_t betStartTime;
+            checksum256 dealerSeed;
+            bool dSeedVerity;
+            checksum256 serverSeed;
+            bool sSeedVerity;
+            string result;
+            uint32_t tableStatus;
+            name dealer;
+
+            std::vector<player_bet_info> playerInfo;
+
+            uint64_t primary_key() const { return tableId; }
 
         enum class status_fields : uint32_t
         {
@@ -58,7 +67,7 @@ CONTRACT wubba : public contract
             END = 0     // 0000
         };
 
-        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(betType)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(player))
+        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(playerInfo))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats> singletable_t;
