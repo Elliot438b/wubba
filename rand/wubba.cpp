@@ -91,9 +91,9 @@ ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, uint64_
     eosio_assert((now() - existing->betStartTime) < 30, "bet already timeout");
 
     bool flag = false;
-    for (const auto& p: existing->playerInfo)
+    for (const auto &p : existing->playerInfo)
     {
-        if(p.player == player)
+        if (p.player == player)
         {
             flag = true;
             break;
@@ -178,15 +178,19 @@ void wubba::reveal(uint64_t tableId)
     std::vector<player_bet_info> tempVec;
 
     auto itr = (existing->playerInfo).begin();
-    for (; itr != (existing->playerInfo).end(); itr++) {
+    for (; itr != (existing->playerInfo).end(); itr++)
+    {
         player_bet_info tempInfo;
         tempInfo = (*itr);
-        if (result) {
+        if (result)
+        {
             if (itr->betType >= 5)
                 tempInfo.playerResult = "win";
             else
                 tempInfo.playerResult = "lose";
-        } else {
+        }
+        else
+        {
             if (itr->betType >= 5)
                 tempInfo.playerResult = "lose";
             else
@@ -197,7 +201,7 @@ void wubba::reveal(uint64_t tableId)
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo = tempVec;
         s.tableStatus = (uint32_t)table_stats::status_fields::END;
-        s.result = "";//todo?
+        s.result = ""; //todo?
     });
 }
 

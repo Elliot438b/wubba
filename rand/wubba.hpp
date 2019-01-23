@@ -34,30 +34,31 @@ CONTRACT wubba : public contract
     ACTION verserveseed(uint64_t tableId, string seed);
     void reveal(uint64_t tableId);
 
-struct player_bet_info{
-    name player;
-    uint64_t betType;
-    uint64_t betAmount;
-    string playerResult;
+    struct player_bet_info
+    {
+        name player;
+        uint64_t betType;
+        uint64_t betAmount;
+        string playerResult;
 
-    EOSLIB_SERIALIZE( player_bet_info, (player)(betType)(betAmount)(playerResult) )
-};
+        EOSLIB_SERIALIZE(player_bet_info, (player)(betType)(betAmount)(playerResult))
+    };
 
-        TABLE table_stats
-        {
-            uint64_t tableId;
-            uint64_t betStartTime;
-            checksum256 dealerSeed;
-            bool dSeedVerity;
-            checksum256 serverSeed;
-            bool sSeedVerity;
-            string result;
-            uint32_t tableStatus;
-            name dealer;
+    TABLE table_stats
+    {
+        uint64_t tableId;
+        uint64_t betStartTime;
+        checksum256 dealerSeed;
+        bool dSeedVerity;
+        checksum256 serverSeed;
+        bool sSeedVerity;
+        string result;
+        uint32_t tableStatus;
+        name dealer;
 
-            std::vector<player_bet_info> playerInfo;
+        std::vector<player_bet_info> playerInfo;
 
-            uint64_t primary_key() const { return tableId; }
+        uint64_t primary_key() const { return tableId; }
 
         enum class status_fields : uint32_t
         {
