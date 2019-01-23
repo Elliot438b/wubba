@@ -23,10 +23,17 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     eosio_assert(existing != tableround.end(), "tableId not exists when save dealer seed");
     eosio_assert(existing->tableStatus == "end", "tableStatus != end");
     require_auth(existing->dealer);
-
+    checksum256 hash;
     tableround.modify(existing, _self, [&](auto &s) {
         s.dealerSeed = encodeSeed;
         s.tableStatus = "start";
+        s.betStartTime = 0;
+        s.betType = 0;
+        s.dSeedVerity = 0;
+        s.serverSeed = hash;
+        s.sSeedVerity = 0;
+        s.result = "";
+        s.player = ""_n;
     });
 }
 
@@ -56,7 +63,7 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
     txn.delay_sec = 30; //defer 30s
     uint128_t deferred_id = (uint128_t(tableId) << 64);
     cancel_deferred(deferred_id);
-    txn.send(deferred_id, _self, false);
+    // txn.send(deferred_id, _self, false);
 }
 
 ACTION wubba::endbet(uint64_t tableId)
@@ -68,7 +75,7 @@ ACTION wubba::endbet(uint64_t tableId)
     eosio_assert(existing->tableStatus == "bet", "tableStatus != bet");
     uint32_t useTime = now() - existing->betStartTime;
     print_f("use time is %\n", useTime);
-    eosio_assert((now() - existing->betStartTime) > 30, "time <=30, it is not time to change tableStatus to reveal");
+    eosio_assert(useTime > 30, "time <=30, it is not time to change tableStatus to reveal");
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = "reveal";
