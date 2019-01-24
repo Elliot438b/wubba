@@ -4,12 +4,17 @@
  */
 
 #include "wubba.hpp"
+#include "eosio.token.hpp"
 
-ACTION wubba::newtable(uint64_t tableId, name dealer)
+ACTION wubba::newtable(uint64_t tableId, name dealer, asset deposit)
 {
     require_auth(dealer);
     auto existing = tableround.find(tableId);
     eosio_assert(existing == tableround.end(), "tableId already exists when newtable");
+    INLINE_ACTION_SENDER(eosio::token, transfer)
+    (
+        "eosio.token"_n, {{dealer, "active"_n}},
+        {dealer, _self, deposit, std::string("deposit ") + dealer.to_string()});
 
     tableround.emplace(_self, [&](auto &s) {
         s.tableId = tableId;

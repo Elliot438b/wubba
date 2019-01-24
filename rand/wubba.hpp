@@ -7,6 +7,7 @@
 #include <eosiolib/asset.hpp>
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/crypto.h>
+#include <eosiolib/action.hpp>
 #include <eosiolib/transaction.hpp>
 #include <eosiolib/permission.hpp>
 #include <eosiolib/action.hpp>
@@ -25,7 +26,7 @@ CONTRACT wubba : public contract
     wubba(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value) {}
 
-    ACTION newtable(uint64_t tableId, name dealer);
+    ACTION newtable(uint64_t tableId, name dealer, asset deposit);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION endbet(uint64_t tableId);
@@ -120,7 +121,7 @@ CONTRACT wubba : public contract
     using trusteeship_action = action_wrapper<"trusteeship"_n, &wubba::trusteeship>;
     using exitruteship_action = action_wrapper<"exitruteship"_n, &wubba::exitruteship>;
     using disconnecthi_action = action_wrapper<"disconnecthi"_n, &wubba::disconnecthi>;
-    
+
     name serveraccount = "useraaaaaaah"_n;
     singletable_t tableround;
     WBRNG wbrng;
