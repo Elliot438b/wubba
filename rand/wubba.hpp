@@ -32,7 +32,9 @@ CONTRACT wubba : public contract
     ACTION playerbet(uint64_t tableId, uint64_t bet, name player, uint64_t betAmount);
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
-    void reveal(uint64_t tableId);
+    ACTION trusteeship(uint64_t tableId);
+    void reveal(uint64_t tableId, bool trusteeship);
+
 
     struct player_bet_info
     {
@@ -64,6 +66,8 @@ CONTRACT wubba : public contract
         string result;
         uint32_t tableStatus;
         name dealer;
+        bool trusteeship;
+        uint64_t dealerBalance;
 
         std::vector<player_bet_info> playerInfo;
 
@@ -106,6 +110,7 @@ CONTRACT wubba : public contract
     using playerbet_action = action_wrapper<"playerbet"_n, &wubba::playerbet>;
     using verdealeseed_action = action_wrapper<"verdealeseed"_n, &wubba::verdealeseed>;
     using verserveseed_action = action_wrapper<"verserveseed"_n, &wubba::verserveseed>;
+    using trusteeship_action = action_wrapper<"trusteeship"_n, &wubba::trusteeship>;
 
     singletable_t tableround;
     WBRNG wbrng;

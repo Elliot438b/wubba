@@ -123,9 +123,18 @@ ACTION wubba::verdealeseed(uint64_t tableId, string seed)
     tableround.modify(existing, _self, [&](auto &s) {
         s.dSeedVerity = true;
     });
+}
 
-    if (existing->dSeedVerity && existing->sSeedVerity)
-        reveal(tableId);
+ACTION wubba::trusteeship(uint64_t tableId)
+{
+    auto existing = tableround.find(tableId);
+    eosio_assert(existing != tableround.end(), "tableId not exists when trusteeship");
+    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
+    require_auth(existing->dealer);
+
+    tableround.modify(existing, _self, [&](auto &s) {
+        s.trusteeship = true;
+    });
 }
 
 ACTION wubba::verserveseed(uint64_t tableId, string seed)
@@ -140,22 +149,17 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
         s.sSeedVerity = true;
     });
 
-    if (existing->dSeedVerity && existing->sSeedVerity)
-        reveal(tableId);
-    /**
+   /**
      * @brief dealer disconnect/trusteeship
      * server eosjs controll: verserveseed action is 2' behind verdealeseed.
-     * 
-     * if (existing->trusteeship && existing->sSeedVerity)
-     *      reveal(tableId, true); // trusteeship：only use server seed to reveal.
-     * else if (existing->dSeedVerity && existing->sSeedVerity)
-     *      reveal(tableId, false); // use both server and dealer seed to reveal.
-     * else if(!existing->dSeedVerity && existing->sSeedVerity)
-     *      reveal(tableId, true); // disconnected：only use server seed to reveal.
-     * 
-     * hpp:
-     * void reveal(uint64_t tableId, bool trusteeship);
-     */
+     * */
+     if (existing->trusteeship && existing->sSeedVerity)
+          reveal(tableId, true); // trusteeship：only use server seed to reveal.
+     else if (existing->dSeedVerity && existing->sSeedVerity)
+          reveal(tableId, false); // use both server and dealer seed to reveal.
+     else if(!existing->dSeedVerity && existing->sSeedVerity)
+          reveal(tableId, true); // disconnected：only use server seed to reveal.
+
 }
 
 // char to int
@@ -170,7 +174,7 @@ unsigned int SDBMHash(char *str)
     return (hash & 0x7FFFFFFF);
 }
 
-void wubba::reveal(uint64_t tableId)
+void wubba::reveal(uint64_t tableId, bool trusteeship)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when reveal");
@@ -219,4 +223,4 @@ void wubba::reveal(uint64_t tableId)
     });
 }
 
-EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(reveal))
+EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(reveal))

@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Jan 23 17:35:43 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Jan 24 11:46:20 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -139,8 +139,26 @@
                     "type": "name"
                 },
                 {
+                    "name": "trusteeship",
+                    "type": "bool"
+                },
+                {
+                    "name": "dealerBalance",
+                    "type": "uint64"
+                },
+                {
                     "name": "playerInfo",
                     "type": "player_bet_info[]"
+                }
+            ]
+        },
+        {
+            "name": "trusteeship",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
                 }
             ]
         },
@@ -198,6 +216,11 @@
         {
             "name": "serverseed",
             "type": "serverseed",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "trusteeship",
+            "type": "trusteeship",
             "ricardian_contract": ""
         },
         {
