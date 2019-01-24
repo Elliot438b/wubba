@@ -13,7 +13,7 @@ ACTION wubba::newtable(uint64_t tableId, name dealer)
 
     tableround.emplace(_self, [&](auto &s) {
         s.tableId = tableId;
-        s.tableStatus = (uint32_t)table_stats::status_fields::ROUND_END;
+        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
         s.dealer = dealer;
     });
 }
@@ -21,37 +21,57 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when save dealer seed");
-    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
-    require_auth(existing->dealer);
-    checksum256 hash;
-    std::vector<player_bet_info> tempVec;
-    tableround.modify(existing, _self, [&](auto &s) {
-        s.tableStatus = (uint32_t)table_stats::status_fields::ROUND_START;
-        s.betStartTime = 0;
-        s.dealerSeed = encodeSeed;
-        s.dSeedVerity = 0;
-        s.serverSeed = hash;
-        s.sSeedVerity = 0;
-        s.result = "";
-        s.playerInfo = tempVec;
-    });
+    if (!existing->trusteeship)
+    {
+        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
+        require_auth(existing->dealer);
+        checksum256 hash;
+        std::vector<player_bet_info> tempVec;
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
+            s.betStartTime = 0;
+            s.dealerSeed = encodeSeed;
+            s.dSeedVerity = 0;
+            s.serverSeed = hash;
+            s.sSeedVerity = 0;
+            s.result = "";
+            s.playerInfo = tempVec;
+        });
+    }
 }
 
 ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
 {
     name serveraccount = "useraaaaaaah"_n;
     require_auth(serveraccount);
-
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when save server seed");
-    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::ROUND_START, "tableStatus != start");
-
-    tableround.modify(existing, _self, [&](auto &s) {
-        s.serverSeed = encodeSeed;
-        s.tableStatus = (uint32_t)table_stats::status_fields::ROUND_BET;
-        s.betStartTime = now();
-        // print_f("start time is %\n", s.betStartTime);
-    });
+    if (existing->trusteeship)
+    {
+        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round not end!");
+        checksum256 hash;
+        std::vector<player_bet_info> tempVec;
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
+            s.betStartTime = now();
+            s.dealerSeed = hash;
+            s.dSeedVerity = 0;
+            s.serverSeed = encodeSeed;
+            s.sSeedVerity = 0;
+            s.result = "";
+            s.playerInfo = tempVec;
+        });
+    }
+    else
+    {
+        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_START, "Dealer haven't started a new round yet!");
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.serverSeed = encodeSeed;
+            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
+            s.betStartTime = now();
+            // print_f("start time is %\n", s.betStartTime);
+        });
+    }
 
     //todo:defer 30 ,bet->reveal
     // eosio::transaction txn;
@@ -66,19 +86,18 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
     // txn.send(deferred_id, _self, false);
 }
 
+// server defer action
 ACTION wubba::endbet(uint64_t tableId)
 {
     require_auth("useraaaaaaah"_n);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when endbet");
-
-    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
-    uint32_t useTime = now() - existing->betStartTime;
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
+    uint64_t useTime = now() - existing->betStartTime;
     print_f("use time is %\n", useTime);
-    eosio_assert(useTime > 30, "time <=30, it is not time to change tableStatus to reveal");
-
+    eosio_assert(useTime > 30, "time <=30, it's bet time now.");
     tableround.modify(existing, _self, [&](auto &s) {
-        s.tableStatus = (uint32_t)table_stats::status_fields::ROUND_REVEAL;
+        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_REVEAL;
     });
 }
 
@@ -87,7 +106,7 @@ ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, uint64_
     require_auth(player);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when palyer bet");
-    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     eosio_assert((now() - existing->betStartTime) < 30, "bet already timeout");
 
     bool flag = false;
@@ -116,77 +135,55 @@ ACTION wubba::verdealeseed(uint64_t tableId, string seed)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when verify dealer seed");
     require_auth(existing->dealer);
-    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
-    eosio_assert((now() - existing->betStartTime) > 30, "It's not time to verify dealer seed yet.");
-    assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerSeed));
-
-    tableround.modify(existing, _self, [&](auto &s) {
-        s.dSeedVerity = true;
-    });
+    if (!existing->trusteeship)
+    {
+        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
+        eosio_assert((now() - existing->betStartTime) > 30, "It's not time to verify dealer seed yet.");
+        assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerSeed));
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.dSeedVerity = true;
+        });
+    }
 }
 
 ACTION wubba::trusteeship(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when trusteeship");
-    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
-    require_auth(existing->dealer);
-
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
+    require_auth(existing->dealer); // dealer trusteeship server.
     tableround.modify(existing, _self, [&](auto &s) {
         s.trusteeship = true;
     });
 }
 
+// Server push defer 3' action, once got ROUND_REVEAL.
 ACTION wubba::verserveseed(uint64_t tableId, string seed)
 {
     require_auth("useraaaaaaah"_n);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when verify dealer seed");
-    eosio_assert(existing->tableStatus == (uint32_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
     eosio_assert((now() - existing->betStartTime) > 30, "It's not time verify server seed yet.");
     assert_sha256(seed.c_str(), seed.size(), ((*existing).serverSeed));
     tableround.modify(existing, _self, [&](auto &s) {
         s.sSeedVerity = true;
     });
-
-   /**
-     * @brief dealer disconnect/trusteeship
-     * server eosjs controll: verserveseed action is 2' behind verdealeseed.
-     * */
-     if (existing->trusteeship && existing->sSeedVerity)
-          reveal(tableId, true); // trusteeship：only use server seed to reveal.
-     else if (existing->dSeedVerity && existing->sSeedVerity)
-          reveal(tableId, false); // use both server and dealer seed to reveal.
-     else if(!existing->dSeedVerity && existing->sSeedVerity)
-          reveal(tableId, true); // disconnected：only use server seed to reveal.
-
+    if (existing->sSeedVerity)
+        reveal(tableId);
 }
 
-// char to int
-unsigned int SDBMHash(char *str)
-{
-    unsigned int hash = 0;
-    while (*str)
-    {
-        // equivalent to: hash = 65599*hash + (*str++);
-        hash = (*str++) + (hash << 6) + (hash << 16) - hash;
-    }
-    return (hash & 0x7FFFFFFF);
-}
-
-void wubba::reveal(uint64_t tableId, bool trusteeship)
+void wubba::reveal(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when reveal");
     constexpr size_t max_stack_buffer_size = 128;
     char *buffer = (char *)(malloc(max_stack_buffer_size));
     datastream<char *> ds(buffer, max_stack_buffer_size);
-    if (!existing->dSeedVerity)
-        print_f("connet is wrong");
-    else
-        ds << existing->dealerSeed;
-
+    eosio_assert(existing->sSeedVerity, "Illegal server seed info!");
     ds << existing->serverSeed;
+    if (!existing->trusteeship && existing->dSeedVerity) // dealer online and not trusteeship
+        ds << existing->dealerSeed;
     wbrng.srand(SDBMHash(buffer));
     uint64_t limitNum = wbrng.rand() % 10;
     bool result = false;
@@ -218,7 +215,7 @@ void wubba::reveal(uint64_t tableId, bool trusteeship)
     }
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo = tempVec;
-        s.tableStatus = (uint32_t)table_stats::status_fields::ROUND_END;
+        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
         s.result = ""; //todo?
     });
 }

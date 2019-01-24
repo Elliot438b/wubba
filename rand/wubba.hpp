@@ -33,17 +33,16 @@ CONTRACT wubba : public contract
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
     ACTION trusteeship(uint64_t tableId);
-    void reveal(uint64_t tableId, bool trusteeship);
-
+    void reveal(uint64_t tableId);
 
     struct player_bet_info
     {
         name player;
-        uint32_t betType;
+        uint64_t betType;
         uint64_t betAmount;
         string playerResult;
 
-        enum class bet_type_fields : uint32_t
+        enum class bet_type_fields : uint64_t
         {
             BET_BANK = 11,
             BET_PLAYER = 12,
@@ -64,16 +63,12 @@ CONTRACT wubba : public contract
         checksum256 serverSeed;
         bool sSeedVerity;
         string result;
-        uint32_t tableStatus;
+        uint64_t tableStatus;
         name dealer;
         bool trusteeship;
-        uint64_t dealerBalance;
-
         std::vector<player_bet_info> playerInfo;
-
         uint64_t primary_key() const { return tableId; }
-
-        enum class status_fields : uint32_t
+        enum class status_fields : uint64_t
         {
             ROUND_START = 1,
             ROUND_BET = 2,
@@ -82,8 +77,7 @@ CONTRACT wubba : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-
-        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(playerInfo))
+        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(trusteeship)(playerInfo))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats> singletable_t;
@@ -102,6 +96,18 @@ CONTRACT wubba : public contract
             return (unsigned int)(next / 65536) % 32768;
         }
     };
+
+    // char to int
+    unsigned int SDBMHash(char *str)
+    {
+        unsigned int hash = 0;
+        while (*str)
+        {
+            // equivalent to: hash = 65599*hash + (*str++);
+            hash = (*str++) + (hash << 6) + (hash << 16) - hash;
+        }
+        return (hash & 0x7FFFFFFF);
+    }
 
     using newtable_action = action_wrapper<"newtable"_n, &wubba::newtable>;
     using dealerseed_action = action_wrapper<"dealerseed"_n, &wubba::dealerseed>;

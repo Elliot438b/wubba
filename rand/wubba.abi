@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Jan 24 11:46:20 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Jan 24 13:59:13 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -50,7 +50,7 @@
                 },
                 {
                     "name": "betType",
-                    "type": "uint32"
+                    "type": "uint64"
                 },
                 {
                     "name": "betAmount",
@@ -132,7 +132,7 @@
                 },
                 {
                     "name": "tableStatus",
-                    "type": "uint32"
+                    "type": "uint64"
                 },
                 {
                     "name": "dealer",
@@ -141,10 +141,6 @@
                 {
                     "name": "trusteeship",
                     "type": "bool"
-                },
-                {
-                    "name": "dealerBalance",
-                    "type": "uint64"
                 },
                 {
                     "name": "playerInfo",
