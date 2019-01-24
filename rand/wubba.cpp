@@ -17,6 +17,7 @@ ACTION wubba::newtable(uint64_t tableId, name dealer)
         s.dealer = dealer;
     });
 }
+
 ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 {
     auto existing = tableround.find(tableId);
@@ -42,7 +43,6 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 
 ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
 {
-    name serveraccount = "useraaaaaaah"_n;
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when save server seed");
@@ -89,7 +89,7 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
 // server defer action
 ACTION wubba::endbet(uint64_t tableId)
 {
-    require_auth("useraaaaaaah"_n);
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when endbet");
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
@@ -146,21 +146,10 @@ ACTION wubba::verdealeseed(uint64_t tableId, string seed)
     }
 }
 
-ACTION wubba::trusteeship(uint64_t tableId)
-{
-    auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), "tableId not exists when trusteeship");
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
-    require_auth(existing->dealer); // dealer trusteeship server.
-    tableround.modify(existing, _self, [&](auto &s) {
-        s.trusteeship = true;
-    });
-}
-
 // Server push defer 3' action, once got ROUND_REVEAL.
 ACTION wubba::verserveseed(uint64_t tableId, string seed)
 {
-    require_auth("useraaaaaaah"_n);
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when verify dealer seed");
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
@@ -169,21 +158,22 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     tableround.modify(existing, _self, [&](auto &s) {
         s.sSeedVerity = true;
     });
-    if (existing->sSeedVerity)
-        reveal(tableId);
-}
-
-void wubba::reveal(uint64_t tableId)
-{
-    auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), "tableId not exists when reveal");
+    eosio_assert(existing->sSeedVerity, "Illegal server seed info!");
     constexpr size_t max_stack_buffer_size = 128;
     char *buffer = (char *)(malloc(max_stack_buffer_size));
     datastream<char *> ds(buffer, max_stack_buffer_size);
-    eosio_assert(existing->sSeedVerity, "Illegal server seed info!");
     ds << existing->serverSeed;
-    if (!existing->trusteeship && existing->dSeedVerity) // dealer online and not trusteeship
+    if (!existing->dSeedVerity && !existing->trusteeship)
+    { // dealer disconnect
+        INLINE_ACTION_SENDER(wubba, disconnecthi)
+        (
+            _self, {{serveraccount, "active"_n}},
+            {existing->dealer, existing->tableId});
+    }
+    else if (existing->dSeedVerity && !existing->trusteeship)
+    { // dealer online and not trusteeship
         ds << existing->dealerSeed;
+    }
     wbrng.srand(SDBMHash(buffer));
     uint64_t limitNum = wbrng.rand() % 10;
     bool result = false;
@@ -220,4 +210,35 @@ void wubba::reveal(uint64_t tableId)
     });
 }
 
-EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(reveal))
+ACTION wubba::trusteeship(uint64_t tableId)
+{
+    auto existing = tableround.find(tableId);
+    eosio_assert(existing != tableround.end(), "tableId not exists when trusteeship");
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
+    require_auth(existing->dealer); // dealer trusteeship server.
+    tableround.modify(existing, _self, [&](auto &s) {
+        s.trusteeship = true;
+    });
+}
+
+ACTION wubba::exitruteship(uint64_t tableId)
+{
+    auto existing = tableround.find(tableId);
+    eosio_assert(existing != tableround.end(), "tableId not exists when trusteeship");
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
+    require_auth(existing->dealer); // dealer trusteeship server.
+    tableround.modify(existing, _self, [&](auto &s) {
+        s.trusteeship = false;
+    });
+}
+
+ACTION wubba::disconnecthi(name informed, uint64_t tableId)
+{
+    require_auth(serveraccount);
+    auto existing = tableround.find(tableId);
+    eosio_assert(existing != tableround.end(), "tableId not exists when trusteeship");
+    eosio_assert(existing->dealer == informed, "People informed is not the dealer of table!");
+    print_f("SC disconnecthi has already informed %\n", informed.to_string());
+}
+
+EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship))

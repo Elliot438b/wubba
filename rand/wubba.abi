@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Jan 24 13:59:13 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Jan 24 16:24:37 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -17,7 +17,31 @@
             ]
         },
         {
+            "name": "disconnecthi",
+            "base": "",
+            "fields": [
+                {
+                    "name": "informed",
+                    "type": "name"
+                },
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "endbet",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "exitruteship",
             "base": "",
             "fields": [
                 {
@@ -195,8 +219,18 @@
             "ricardian_contract": ""
         },
         {
+            "name": "disconnecthi",
+            "type": "disconnecthi",
+            "ricardian_contract": ""
+        },
+        {
             "name": "endbet",
             "type": "endbet",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "exitruteship",
+            "type": "exitruteship",
             "ricardian_contract": ""
         },
         {

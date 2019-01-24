@@ -33,7 +33,8 @@ CONTRACT wubba : public contract
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
     ACTION trusteeship(uint64_t tableId);
-    void reveal(uint64_t tableId);
+    ACTION exitruteship(uint64_t tableId);
+    ACTION disconnecthi(name informed, uint64_t tableId);
 
     struct player_bet_info
     {
@@ -117,7 +118,10 @@ CONTRACT wubba : public contract
     using verdealeseed_action = action_wrapper<"verdealeseed"_n, &wubba::verdealeseed>;
     using verserveseed_action = action_wrapper<"verserveseed"_n, &wubba::verserveseed>;
     using trusteeship_action = action_wrapper<"trusteeship"_n, &wubba::trusteeship>;
-
+    using exitruteship_action = action_wrapper<"exitruteship"_n, &wubba::exitruteship>;
+    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &wubba::disconnecthi>;
+    
+    name serveraccount = "useraaaaaaah"_n;
     singletable_t tableround;
     WBRNG wbrng;
 };
