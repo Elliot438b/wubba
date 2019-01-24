@@ -241,4 +241,4 @@ ACTION wubba::disconnecthi(name informed, uint64_t tableId)
     print_f("SC disconnecthi has already informed %\n", informed.to_string());
 }
 
-EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship))
+EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi))
