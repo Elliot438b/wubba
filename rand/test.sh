@@ -4,7 +4,7 @@ cleos --wallet-url http://127.0.0.1:6666 system buyram useraaaaaaai useraaaaaaaa
 cleos --wallet-url http://127.0.0.1:6666 set contract useraaaaaaaa ./ wubba.wasm wubba.abi
 
 cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaab active '{"threshold":1,"keys":[{"key":"EOS7yBtksm8Kkg85r4in4uCbfN77uRwe82apM8jjbhFVDgEgz3w8S","weight":1}],"accounts":[{"permission":{"actor":"useraaaaaaaa","permission":"eosio.code"},"weight":1}]}' owner -p useraaaaaaab
-cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa newtable '['119',useraaaaaaab,"5 SYS"]' -p useraaaaaaab
+cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa newtable '['119',useraaaaaaab,"5.0000 SYS"]' -p useraaaaaaab
 	
 for((num=1;num<=1;num++));
 do
