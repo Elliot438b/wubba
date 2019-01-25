@@ -1,0 +1,58 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Jan 25 17:48:33 2019",
+    "version": "eosio::abi/1.1",
+    "structs": [
+        {
+            "name": "testaccount",
+            "base": "",
+            "fields": [
+                {
+                    "name": "money",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "testreverse",
+            "base": "",
+            "fields": [
+                {
+                    "name": "money",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "testtransfer",
+            "base": "",
+            "fields": [
+                {
+                    "name": "money",
+                    "type": "asset"
+                }
+            ]
+        }
+    ],
+    "types": [],
+    "actions": [
+        {
+            "name": "testaccount",
+            "type": "testaccount",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testreverse",
+            "type": "testreverse",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testtransfer",
+            "type": "testtransfer",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "abi_extensions": []
+}
