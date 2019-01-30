@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Jan 25 17:48:33 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Jan 30 14:33:00 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -11,6 +11,11 @@
                     "type": "asset"
                 }
             ]
+        },
+        {
+            "name": "testdispatch",
+            "base": "",
+            "fields": []
         },
         {
             "name": "testreverse",
@@ -38,6 +43,11 @@
         {
             "name": "testaccount",
             "type": "testaccount",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testdispatch",
+            "type": "testdispatch",
             "ricardian_contract": ""
         },
         {
