@@ -181,6 +181,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     }
     wbrng.srand(SDBMHash(buffer));
     uint64_t limitNum = wbrng.rand() % 10;
+    print_f("limitNum is %\n", limitNum);
     bool result = false;
     if (limitNum >= 5)
         result = true;
