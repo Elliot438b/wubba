@@ -1,5 +1,24 @@
 #include "tina.hpp"
 
+ACTION tina::erasingdata(uint64_t key)
+{
+    require_auth(_self);
+    if (key == -1)
+    {
+        auto itr = tinatable.begin();
+        while (itr != tinatable.end())
+        {
+            eosio::print("Removing data ", _self, ", key: ", key, ", itr: ", itr->balance);
+            itr = tinatable.erase(itr);
+        }
+    }
+    else
+    {
+        auto itr = tinatable.find(key);
+        tinatable.erase(itr);
+    }
+}
+
 ACTION tina::testmultidex(asset money)
 {
     print_f("testtransfer : %\n", money);
@@ -50,4 +69,4 @@ ACTION tina::testaccount(asset money)
         {accounta, accountb, money, std::string("money ")});
 }
 
-EOSIO_DISPATCH(tina, (testmultidex)(testdispatch)(testtransfer)(testreverse)(testaccount))
+EOSIO_DISPATCH(tina, (erasingdata)(testmultidex)(testdispatch)(testtransfer)(testreverse)(testaccount))
