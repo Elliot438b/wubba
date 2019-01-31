@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Jan 30 14:33:00 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Jan 31 17:11:30 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -18,6 +18,16 @@
             "fields": []
         },
         {
+            "name": "testmultidex",
+            "base": "",
+            "fields": [
+                {
+                    "name": "money",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
             "name": "testreverse",
             "base": "",
             "fields": [
@@ -33,6 +43,20 @@
             "fields": [
                 {
                     "name": "money",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "tina_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "balance",
                     "type": "asset"
                 }
             ]
@@ -51,6 +75,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "testmultidex",
+            "type": "testmultidex",
+            "ricardian_contract": ""
+        },
+        {
             "name": "testreverse",
             "type": "testreverse",
             "ricardian_contract": ""
@@ -61,7 +90,15 @@
             "ricardian_contract": ""
         }
     ],
-    "tables": [],
+    "tables": [
+        {
+            "name": "tina",
+            "type": "tina_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
     "ricardian_clauses": [],
     "variants": [],
     "abi_extensions": []
