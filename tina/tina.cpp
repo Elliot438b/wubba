@@ -1,5 +1,17 @@
 #include "tina.hpp"
-#include "eosio.token.hpp"
+
+ACTION tina::testmultidex(asset money)
+{
+    print_f("testtransfer : %\n", money);
+    INLINE_ACTION_SENDER(eosio::token, transfer)
+    (
+        "eosio.token"_n, {{owner, "active"_n}},
+        {owner, accounta, money, money.to_string()});
+    tinatable.emplace(_self, [&](auto &s) {
+        s.id = tinatable.available_primary_key();
+        s.balance = money;
+    });
+}
 
 ACTION tina::testdispatch()
 {
@@ -38,4 +50,4 @@ ACTION tina::testaccount(asset money)
         {accounta, accountb, money, std::string("money ")});
 }
 
-EOSIO_DISPATCH(tina, (testdispatch)(testtransfer)(testreverse)(testaccount))
+EOSIO_DISPATCH(tina, (testmultidex)(testdispatch)(testtransfer)(testreverse)(testaccount))
