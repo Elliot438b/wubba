@@ -26,11 +26,11 @@ CONTRACT wubba : public contract
     wubba(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value) {}
 
-    ACTION newtable(uint64_t tableId, name dealer, asset deposit);
+    ACTION newtable(name dealer, asset deposit);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION endbet(uint64_t tableId);
-    ACTION playerbet(uint64_t tableId, uint64_t bet, name player, uint64_t betAmount);
+    ACTION playerbet(uint64_t tableId, uint64_t bet, name player, asset betAmount);
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
     ACTION trusteeship(uint64_t tableId);
@@ -41,7 +41,7 @@ CONTRACT wubba : public contract
     {
         name player;
         uint64_t betType;
-        uint64_t betAmount;
+        asset betAmount;
         string playerResult;
 
         enum class bet_type_fields : uint64_t
@@ -68,8 +68,12 @@ CONTRACT wubba : public contract
         uint64_t tableStatus;
         name dealer;
         bool trusteeship;
+        asset dealerBalance;
+
         std::vector<player_bet_info> playerInfo;
         uint64_t primary_key() const { return tableId; }
+        uint64_t get_dealer() const { return dealer.value; }
+
         enum class status_fields : uint64_t
         {
             ROUND_START = 1,
@@ -79,11 +83,11 @@ CONTRACT wubba : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(trusteeship)(playerInfo))
+        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(trusteeship)(dealerBalance)(playerInfo))
     };
 
-    typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats> singletable_t;
-
+    //typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats> singletable_t;
+    typedef eosio::multi_index<"tablesinfoar"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
     // random
     struct WBRNG
     {
@@ -125,4 +129,12 @@ CONTRACT wubba : public contract
     name serveraccount = "useraaaaaaah"_n;
     singletable_t tableround;
     WBRNG wbrng;
+
+
+    static asset minPerBet;
+    static asset onceMax;
+    static asset minDeposit;// = minPerBet * onceMax;
+
+    static uint32_t betPeriod;
+    static uint32_t minRoundTimes;
 };

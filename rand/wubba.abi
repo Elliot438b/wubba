@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Jan 25 13:41:42 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Feb 12 13:31:52 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -55,10 +55,6 @@
             "base": "",
             "fields": [
                 {
-                    "name": "tableId",
-                    "type": "uint64"
-                },
-                {
                     "name": "dealer",
                     "type": "name"
                 },
@@ -82,7 +78,7 @@
                 },
                 {
                     "name": "betAmount",
-                    "type": "uint64"
+                    "type": "asset"
                 },
                 {
                     "name": "playerResult",
@@ -108,7 +104,7 @@
                 },
                 {
                     "name": "betAmount",
-                    "type": "uint64"
+                    "type": "asset"
                 }
             ]
         },
@@ -169,6 +165,10 @@
                 {
                     "name": "trusteeship",
                     "type": "bool"
+                },
+                {
+                    "name": "dealerBalance",
+                    "type": "asset"
                 },
                 {
                     "name": "playerInfo",
@@ -270,7 +270,7 @@
     ],
     "tables": [
         {
-            "name": "tablesinfo",
+            "name": "tablesinfoar",
             "type": "table_stats",
             "index_type": "i64",
             "key_names": [],

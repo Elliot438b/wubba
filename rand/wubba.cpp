@@ -4,22 +4,33 @@
  */
 
 #include "wubba.hpp"
+
 #include "eosio.token.hpp"
 
-ACTION wubba::newtable(uint64_t tableId, name dealer, asset deposit)
+uint32_t wubba::betPeriod = 30;
+uint32_t wubba::minRoundTimes = 2;
+
+asset wubba::minPerBet = asset(20000, symbol(symbol_code("SYS"),4));
+asset wubba::onceMax = asset(100000, symbol(symbol_code("SYS"),4));
+asset wubba::minDeposit = wubba::onceMax * wubba::minRoundTimes;
+
+ACTION wubba::newtable(name dealer, asset deposit)
 {
     require_auth(dealer);
-    auto existing = tableround.find(tableId);
-    eosio_assert(existing == tableround.end(), "tableId already exists when newtable");
+    //auto existing = tableround.find(tableId);
+    print_f("deposit %\n", deposit);
+    eosio_assert(deposit >= minDeposit, "deposit money not enought");
+
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         "eosio.token"_n, {{dealer, "active"_n}},
         {dealer, _self, deposit, std::string("deposit ") + dealer.to_string()});
 
     tableround.emplace(_self, [&](auto &s) {
-        s.tableId = tableId;
+        s.tableId = tableround.available_primary_key();
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
         s.dealer = dealer;
+        s.dealerBalance = deposit;
     });
 }
 
@@ -100,19 +111,22 @@ ACTION wubba::endbet(uint64_t tableId)
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     uint64_t useTime = now() - existing->betStartTime;
     print_f("use time is %\n", useTime);
-    eosio_assert(useTime > 30, "time <=30, it's bet time now.");
+    eosio_assert(useTime > betPeriod, "time <=30, it's bet time now.");
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_REVEAL;
     });
 }
 
-ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, uint64_t betAmount)
+ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, asset betAmount)
 {
     require_auth(player);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when palyer bet");
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
-    eosio_assert((now() - existing->betStartTime) < 30, "bet already timeout");
+    eosio_assert((now() - existing->betStartTime) < betPeriod, "bet already timeout");
+    eosio_assert(betAmount > minPerBet, "betAmount < minPerBet");
+
+    asset player_amount_sum = asset(0, symbol(symbol_code("SYS"),4));
 
     bool flag = false;
     for (const auto &p : existing->playerInfo)
@@ -120,10 +134,20 @@ ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, uint64_
         if (p.player == player)
         {
             flag = true;
-            break;
         }
+        player_amount_sum += p.betAmount;
     }
+
     eosio_assert(!flag, "player have bet");
+    player_amount_sum += betAmount;
+    print_f("player_sum %\n", player_amount_sum);
+    eosio_assert(player_amount_sum < onceMax, "all player bet sum more then onceMax");
+
+    INLINE_ACTION_SENDER(eosio::token, transfer)
+    (
+         "eosio.token"_n, {{player, "active"_n}},
+         {player, _self, betAmount, std::string("bet ") + player.to_string()}
+    );
 
     player_bet_info temp;
     temp.player = player;
@@ -143,7 +167,7 @@ ACTION wubba::verdealeseed(uint64_t tableId, string seed)
     if (!existing->trusteeship)
     {
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
-        eosio_assert((now() - existing->betStartTime) > 30, "It's not time to verify dealer seed yet.");
+        eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time to verify dealer seed yet.");
         assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerSeed));
         tableround.modify(existing, _self, [&](auto &s) {
             s.dSeedVerity = true;
@@ -158,7 +182,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), "tableId not exists when verify dealer seed");
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
-    eosio_assert((now() - existing->betStartTime) > 30, "It's not time verify server seed yet.");
+    eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time verify server seed yet.");
     assert_sha256(seed.c_str(), seed.size(), ((*existing).serverSeed));
     tableround.modify(existing, _self, [&](auto &s) {
         s.sSeedVerity = true;
@@ -188,6 +212,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     print_f("result is %\n", result);
     std::vector<player_bet_info> tempVec;
 
+    asset temp_balance = existing->dealerBalance;
     auto itr = (existing->playerInfo).begin();
     for (; itr != (existing->playerInfo).end(); itr++)
     {
@@ -207,12 +232,34 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
             else
                 tempInfo.playerResult = "win";
         }
+
+        asset win = tempInfo.betAmount*2;
+        //win.amount = tempInfo.betAmount.amount*2;
+        if(tempInfo.playerResult == "win")
+        {
+            INLINE_ACTION_SENDER(eosio::token, transfer)
+            (
+                 "eosio.token"_n, {{_self, "active"_n}},
+                 {_self, tempInfo.player, win, std::string("bet ") + tempInfo.player.to_string()}
+            );
+
+            temp_balance -= tempInfo.betAmount;
+        }
+        else
+        {
+            temp_balance += tempInfo.betAmount;
+        }
         tempVec.emplace_back(tempInfo);
     }
+
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo = tempVec;
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
-        s.result = ""; //todo?
+        if(existing->dealerBalance.amount > temp_balance.amount)
+            s.result = "dealer lose"; //todo?
+        else
+            s.result = "dealer win";
+        s.dealerBalance = temp_balance;
     });
 }
 
