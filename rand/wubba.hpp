@@ -69,6 +69,7 @@ CONTRACT wubba : public contract
         name dealer;
         bool trusteeship;
         asset dealerBalance;
+        // asset currRoundBetSum
 
         std::vector<player_bet_info> playerInfo;
         uint64_t primary_key() const { return tableId; }
@@ -86,8 +87,7 @@ CONTRACT wubba : public contract
         EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(trusteeship)(dealerBalance)(playerInfo))
     };
 
-    //typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats> singletable_t;
-    typedef eosio::multi_index<"tablesinfoar"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
+    typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
     // random
     struct WBRNG
     {
@@ -130,11 +130,12 @@ CONTRACT wubba : public contract
     singletable_t tableround;
     WBRNG wbrng;
 
-
     static asset minPerBet;
-    static asset onceMax;
-    static asset minDeposit;// = minPerBet * onceMax;
+    static asset oneRoundMaxTotalBet;
+    static asset minTableDeposit;// = minPerBet * oneRoundMaxTotalBet;
 
     static uint32_t betPeriod;
-    static uint32_t minRoundTimes;
+    static uint32_t minTableRounds;
+
+    const char* notableerr = "TableId isn't existing!";
 };
