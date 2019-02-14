@@ -10,8 +10,8 @@
 uint32_t wubba::betPeriod = 30;
 uint32_t wubba::minTableRounds = 2;
 
-asset wubba::minPerBet = asset(20000, symbol(symbol_code("SYS"),4));
-asset wubba::oneRoundMaxTotalBet = asset(100000, symbol(symbol_code("SYS"),4));
+asset wubba::minPerBet = asset(20000, symbol(symbol_code("SYS"), 4));
+asset wubba::oneRoundMaxTotalBet = asset(100000, symbol(symbol_code("SYS"), 4));
 asset wubba::minTableDeposit = wubba::oneRoundMaxTotalBet * wubba::minTableRounds;
 
 ACTION wubba::newtable(name dealer, asset deposit)
@@ -109,7 +109,7 @@ ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, asset b
     eosio_assert((now() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
     eosio_assert(betAmount > minPerBet, "betAmount < minPerBet");
 
-    asset player_amount_sum = asset(0, symbol(symbol_code("SYS"),4));// TODO:: put this param into multi_index.
+    asset player_amount_sum = existing->currRoundBetSum;
 
     bool flag = false;
     for (const auto &p : existing->playerInfo)
@@ -117,20 +117,18 @@ ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, asset b
         if (p.player == player)
         {
             flag = true;
-            // break;
+            break;
         }
-        player_amount_sum += p.betAmount; // *
     }
 
     eosio_assert(!flag, "player have bet");
-    player_amount_sum += betAmount; // *
+    player_amount_sum += betAmount;
     eosio_assert(player_amount_sum < oneRoundMaxTotalBet, "Over the peak of total bet amount of this round!");
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-         "eosio.token"_n, {{player, "active"_n}},
-         {player, _self, betAmount, std::string("playerbet")}
-    );
+        "eosio.token"_n, {{player, "active"_n}},
+        {player, _self, betAmount, std::string("playerbet")});
 
     player_bet_info temp;
     temp.player = player;
@@ -139,7 +137,7 @@ ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, asset b
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
-        // s.currRoundBetSum.emplace_back(s.currRoundBetSum + betAmount);
+        s.currRoundBetSum = player_amount_sum;
     });
 }
 
@@ -231,15 +229,14 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
                 tempInfo.playerResult = "win";
         }
 
-        asset win = tempInfo.betAmount*2;
+        asset win = tempInfo.betAmount * 2;
         //win.amount = tempInfo.betAmount.amount*2;
-        if(tempInfo.playerResult == "win")
+        if (tempInfo.playerResult == "win")
         {
             INLINE_ACTION_SENDER(eosio::token, transfer)
             (
-                 "eosio.token"_n, {{_self, "active"_n}},
-                 {_self, tempInfo.player, win, std::string("playerbet result")}
-            );
+                "eosio.token"_n, {{_self, "active"_n}},
+                {_self, tempInfo.player, win, std::string("playerbet result")});
 
             temp_balance -= tempInfo.betAmount;
         }
@@ -253,9 +250,9 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo = tempVec;
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
-        if(existing->dealerBalance.amount > temp_balance.amount)
+        if (existing->dealerBalance.amount > temp_balance.amount)
             s.result = "dealer lose"; //todo?
-        else if(existing->dealerBalance.amount == temp_balance.amount)
+        else if (existing->dealerBalance.amount == temp_balance.amount)
             s.result = "dealer tie";
         else
             s.result = "dealer win";
@@ -294,4 +291,24 @@ ACTION wubba::disconnecthi(name informed, uint64_t tableId)
     print_f("SC disconnecthi has already informed %\n", informed.to_string());
 }
 
-EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi))
+ACTION wubba::erasingdata(uint64_t key)
+{
+    require_auth(_self);
+    if (key == -1)
+    {
+        auto itr = tableround.begin();
+        while (itr != tableround.end())
+        {
+            eosio::print("Removing data ", _self, ", key: ", key, ", itr: ", itr->tableId, "\n");
+            itr = tableround.erase(itr);
+        }
+    }
+    else
+    {
+        auto itr = tableround.find(key);
+        eosio::print("Removing data ", _self, ", key: ", key, ", itr: ", itr->tableId);
+        tableround.erase(itr);
+    }
+}
+
+EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata))
