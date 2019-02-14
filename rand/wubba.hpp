@@ -134,7 +134,7 @@ CONTRACT wubba : public contract
 
     static asset minPerBet;
     static asset oneRoundMaxTotalBet;
-    static asset minTableDeposit; // = minPerBet * oneRoundMaxTotalBet;
+    static asset minTableDeposit;
 
     static uint32_t betPeriod;
     static uint32_t minTableRounds;
