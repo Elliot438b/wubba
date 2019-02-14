@@ -70,7 +70,7 @@ CONTRACT wubba : public contract
         name dealer;
         bool trusteeship;
         asset dealerBalance;
-        // asset currRoundBetSum
+        asset currRoundBetSum;
 
         std::vector<player_bet_info> playerInfo;
         uint64_t primary_key() const { return tableId; }
@@ -85,10 +85,10 @@ CONTRACT wubba : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(trusteeship)(dealerBalance)(playerInfo))
+        EOSLIB_SERIALIZE(table_stats, (tableId)(currRoundBetSum)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(trusteeship)(dealerBalance)(playerInfo))
     };
 
-    typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
+    typedef eosio::multi_index<"tablesinfoqq"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
     // random
     struct WBRNG
     {

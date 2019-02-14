@@ -109,7 +109,7 @@ ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, asset b
     eosio_assert((now() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
     eosio_assert(betAmount > minPerBet, "betAmount < minPerBet");
 
-    asset player_amount_sum = asset(0, symbol(symbol_code("SYS"), 4)); // TODO:: put this param into multi_index.
+    asset player_amount_sum = existing->currRoundBetSum;
 
     bool flag = false;
     for (const auto &p : existing->playerInfo)
@@ -119,11 +119,10 @@ ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, asset b
             flag = true;
             break;
         }
-        player_amount_sum += p.betAmount; // *
     }
 
     eosio_assert(!flag, "player have bet");
-    player_amount_sum += betAmount; // *
+    player_amount_sum += betAmount;
     eosio_assert(player_amount_sum < oneRoundMaxTotalBet, "Over the peak of total bet amount of this round!");
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
@@ -138,7 +137,7 @@ ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, asset b
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
-        // s.currRoundBetSum.emplace_back(s.currRoundBetSum + betAmount);
+        s.currRoundBetSum = player_amount_sum;
     });
 }
 
