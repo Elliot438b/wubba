@@ -26,11 +26,11 @@
 ```
 player_info
 {
-    betDealer = 100.0000 SYS
-    betPlayer = 0.0000 SYS
-    betTIe = 3.0000 SYS
-    betDealerPush = 4.0000 SYS
-    betPlayerPush = 3.0000 SYS
+    betDealer = "100.0000 SYS"
+    betPlayer = "0.0000 SYS"
+    betTie = "3.0000 SYS"
+    betDealerPush = "4.0000 SYS"
+    betPlayerPush = "3.0000 SYS"
 }
 ```
 ### (2) card boot
@@ -41,16 +41,16 @@ player_info
     - card number: the value of element.
     - Poker suit: 
 ```math
-suitcolor = (index+1)/13 \% 4
+suitcolor = (index+1)/13 % 4
 ```
 **result parser**:
 
-        flag | symbol | full name
-        ---|---|---
-        0 | S | Spades
-        1 | H | Hearts
-        2 | D | Diamonds
-        3 | C | Clubs
+flag | symbol | full name
+---|---|---
+0 | S | Spades
+1 | H | Hearts
+2 | D | Diamonds
+3 | C | Clubs
 
 ### (3) reveal
 - card apply, 4 cards, or 5 cards, or 6 cards? 
@@ -60,38 +60,39 @@ suitcolor = (index+1)/13 \% 4
 
 - who win? dealer, player, tie, dealerPush or playerPush? or multy win. 
 ```math
-points = sum of all cards \%10
+points = sum of all cards %10
 ```
 - odds token. 
 
-    type | odds
-    ---|---
-    dealer | 1:0.95
-    player | 1:1
-    tie | 1:8
-    dealerPush, playerPush | 1:11
+type | odds
+---|---
+dealer | 1:0.95
+player | 1:1
+tie | 1:8
+dealerPush, playerPush | 1:11
+
 ### (4) notices
 - Bet recall function is implemented on the server end, not SC. Server-end keep the bet cache.
 - All actions of SC need both operator and server account authority verification. 
 - Tie determined by the first two cards. 
 - Add conditions, delete **minPerBet**:
 ```
-oneRoundMaxTotalBet_BP; // max of banker and player total bet.
-minPerBet_BP; // min of per banker or player bet.
-oneRoundMaxTotalBet_Tie; // max of tie total bet.
-minPerBet_Tie; // min of per tie bet.
-oneRoundMaxTotalBet_Push; // max of push total bet.
-minPerBet_Push; // min of per push bet.
+    oneRoundMaxTotalBet_BP;   // max of banker and player total bet.
+    minPerBet_BP;             // min of per banker or player bet.
+    oneRoundMaxTotalBet_Tie;  // max of tie total bet.
+    minPerBet_Tie;            // min of per tie bet.
+    oneRoundMaxTotalBet_Push; // max of push total bet.
+    minPerBet_Push;           // min of per push bet.
 ```
 
 ```math
-oneRoundMaxTotalBet = oneRoundMaxTotalBet\_Push*11*2 + max(oneRoundMaxTotalBet\_BP*1, oneRoundMaxTotalBet\_Tie*8)
+oneRoundMaxTotalBet = oneRoundMaxTotalBet_Push*11*2 + max(oneRoundMaxTotalBet_BP*1, oneRoundMaxTotalBet_Tie*8)
 ```
 ```math
 minTableDeposit = oneRoundMaxTotalBet*minTableRounds
 ```
 - Add verification: verify if dealerBalance > oneRoundMaxTotalBet*2 is false, can't start a new round and call inline action::pausetable.
 - Add actions: 
-    - pausetable (can recover by continuetable)
-    - continuetable
-    - closetable (can't recover)
+    1. pausetable (can recover by continuetable)
+    1. continuetable
+    1. closetable (can't recover)
