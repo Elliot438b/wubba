@@ -12,9 +12,14 @@ cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaaa act
 cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa newtable '[useraaaaaaab,"20.0000 SYS"]' -p useraaaaaaab
 tableid=`cleos get table useraaaaaaaa useraaaaaaaa tablesinfoar -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
+#test second index
+echo "this test: second index (dealer)"
+cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa newtable '[useraaaaaaac,"20.0000 SYS"]' -p useraaaaaaac
+cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa newtable '[useraaaaaaab,"20.0000 SYS"]' -p useraaaaaaab
+cleos get table useraaaaaaaa useraaaaaaaa tablesinfoar --index 2 --key-type name -L useraaaaaaac -U useraaaaaaac
 
 #token test
-
+echo "this roundId test: token and flowcontrol"
 cleos --wallet-url http://127.0.0.1:6666 get currency balance eosio.token useraaaaaaaa
 cleos --wallet-url http://127.0.0.1:6666 get currency balance eosio.token useraaaaaaab
 cleos --wallet-url http://127.0.0.1:6666 get currency balance eosio.token useraaaaaaac
