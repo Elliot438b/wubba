@@ -17,14 +17,11 @@ asset wubba::minTableDeposit = wubba::oneRoundMaxTotalBet * wubba::minTableRound
 ACTION wubba::newtable(name dealer, asset deposit)
 {
     require_auth(dealer);
-    print_f("deposit %\n", deposit);
     eosio_assert(deposit >= minTableDeposit, "Table deposit is not enough!");
-
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         "eosio.token"_n, {{dealer, "active"_n}},
         {dealer, _self, deposit, std::string("tabledeposit")});
-
     tableround.emplace(_self, [&](auto &s) {
         s.tableId = tableround.available_primary_key();
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
@@ -50,6 +47,7 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
             s.dSeedVerity = 0;
             s.serverSeed = hash;
             s.sSeedVerity = 0;
+            s.currRoundBetSum = asset(0, symbol(symbol_code("SYS"), 4));
             s.result = "";
             s.playerInfo = tempVec;
         });
@@ -73,6 +71,7 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
             s.dSeedVerity = 0;
             s.serverSeed = encodeSeed;
             s.sSeedVerity = 0;
+            s.currRoundBetSum = asset(0, symbol(symbol_code("SYS"), 4));
             s.result = "";
             s.playerInfo = tempVec;
         });
