@@ -36,6 +36,7 @@ CONTRACT wubba : public contract
     ACTION trusteeship(uint64_t tableId);
     ACTION exitruteship(uint64_t tableId);
     ACTION disconnecthi(name informed, uint64_t tableId);
+    ACTION erasingdata(uint64_t key);
 
     struct player_bet_info
     {
@@ -69,6 +70,7 @@ CONTRACT wubba : public contract
         name dealer;
         bool trusteeship;
         asset dealerBalance;
+        asset currRoundBetSum;
 
         std::vector<player_bet_info> playerInfo;
         uint64_t primary_key() const { return tableId; }
@@ -83,11 +85,10 @@ CONTRACT wubba : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(trusteeship)(dealerBalance)(playerInfo))
+        EOSLIB_SERIALIZE(table_stats, (tableId)(currRoundBetSum)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(result)(tableStatus)(dealer)(trusteeship)(dealerBalance)(playerInfo))
     };
 
-    //typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats> singletable_t;
-    typedef eosio::multi_index<"tablesinfoar"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
+    typedef eosio::multi_index<"tablesinfoqq"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
     // random
     struct WBRNG
     {
@@ -111,7 +112,7 @@ CONTRACT wubba : public contract
         {
             // equivalent to: hash = 65599*hash + (*str++);
             hash = (*str++) + (hash << 6) + (hash << 16) - hash;
-        } 
+        }
         return (hash & 0x7FFFFFFF);
     }
 
@@ -125,16 +126,18 @@ CONTRACT wubba : public contract
     using trusteeship_action = action_wrapper<"trusteeship"_n, &wubba::trusteeship>;
     using exitruteship_action = action_wrapper<"exitruteship"_n, &wubba::exitruteship>;
     using disconnecthi_action = action_wrapper<"disconnecthi"_n, &wubba::disconnecthi>;
+    using erasingdata_action = action_wrapper<"erasingdata"_n, &wubba::erasingdata>;
 
     name serveraccount = "useraaaaaaah"_n;
     singletable_t tableround;
     WBRNG wbrng;
 
-
     static asset minPerBet;
-    static asset onceMax;
-    static asset minDeposit;// = minPerBet * onceMax;
+    static asset oneRoundMaxTotalBet;
+    static asset minTableDeposit; // = minPerBet * oneRoundMaxTotalBet;
 
     static uint32_t betPeriod;
-    static uint32_t minRoundTimes;
+    static uint32_t minTableRounds;
+
+    const char *notableerr = "TableId isn't existing!";
 };
