@@ -96,3 +96,18 @@ minTableDeposit = oneRoundMaxTotalBet*minTableRounds
     1. pausetable (can recover by continuetable)
     1. continuetable
     1. closetable (can't recover)
+
+## v0.5 target
+### random result uniform distribution
+- Need a big data analysis model by python script. 
+- Adjust variate of the solution to obtain a best result.
+- Seed source.
+
+## v0.6 target
+### commission flow
+- dealer
+- platform
+- agent
+
+## v0.6.1 target
+agent workflow.
