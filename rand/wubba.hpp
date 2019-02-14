@@ -36,6 +36,7 @@ CONTRACT wubba : public contract
     ACTION trusteeship(uint64_t tableId);
     ACTION exitruteship(uint64_t tableId);
     ACTION disconnecthi(name informed, uint64_t tableId);
+    ACTION erasingdata(uint64_t key);
 
     struct player_bet_info
     {
@@ -111,7 +112,7 @@ CONTRACT wubba : public contract
         {
             // equivalent to: hash = 65599*hash + (*str++);
             hash = (*str++) + (hash << 6) + (hash << 16) - hash;
-        } 
+        }
         return (hash & 0x7FFFFFFF);
     }
 
@@ -125,6 +126,7 @@ CONTRACT wubba : public contract
     using trusteeship_action = action_wrapper<"trusteeship"_n, &wubba::trusteeship>;
     using exitruteship_action = action_wrapper<"exitruteship"_n, &wubba::exitruteship>;
     using disconnecthi_action = action_wrapper<"disconnecthi"_n, &wubba::disconnecthi>;
+    using erasingdata_action = action_wrapper<"erasingdata"_n, &wubba::erasingdata>;
 
     name serveraccount = "useraaaaaaah"_n;
     singletable_t tableround;
@@ -132,10 +134,10 @@ CONTRACT wubba : public contract
 
     static asset minPerBet;
     static asset oneRoundMaxTotalBet;
-    static asset minTableDeposit;// = minPerBet * oneRoundMaxTotalBet;
+    static asset minTableDeposit; // = minPerBet * oneRoundMaxTotalBet;
 
     static uint32_t betPeriod;
     static uint32_t minTableRounds;
 
-    const char* notableerr = "TableId isn't existing!";
+    const char *notableerr = "TableId isn't existing!";
 };
