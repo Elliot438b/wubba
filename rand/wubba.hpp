@@ -147,6 +147,6 @@ CONTRACT wubba : public contract
     static uint32_t betPeriod;
     static uint32_t minTableRounds;
 
-    static uint16_t cardsNum;
+    static uint16_t decks;
     const char *notableerr = "TableId isn't existing!";
 };

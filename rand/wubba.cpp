@@ -7,20 +7,18 @@
 
 #include "eosio.token.hpp"
 
-
 uint32_t wubba::betPeriod = 30;
 uint32_t wubba::minTableRounds = 2;
-uint16_t wubba::cardsNum = 416;
+uint16_t wubba::decks = 8;
 
 asset wubba::minPerBet = asset(20000, symbol(symbol_code("SYS"), 4));
 asset wubba::oneRoundMaxTotalBet = asset(100000, symbol(symbol_code("SYS"), 4));
 asset wubba::minTableDeposit = wubba::oneRoundMaxTotalBet * wubba::minTableRounds;
 
-
 void wubba::shuffcards(std::vector<uint16_t> cardVec)
 {
     uint16_t tempNum = 0;
-    for(; tempNum < cardsNum; tempNum++)
+    for (; tempNum < decks * 52; tempNum++)
     {
         cardVec.emplace_back(tempNum);
     }
@@ -118,7 +116,7 @@ ACTION wubba::playerbet(uint64_t tableId, uint64_t bet, name player, asset betDe
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     eosio_assert((now() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
-   // eosio_assert(betAmount > minPerBet, "betAmount < minPerBet");
+    // eosio_assert(betAmount > minPerBet, "betAmount < minPerBet");
 
     asset player_amount_sum = existing->currRoundBetSum;
 
@@ -229,39 +227,39 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     auto itr = (existing->playerInfo).begin();
     for (; itr != (existing->playerInfo).end(); itr++)
     {
-//        player_bet_info tempInfo;
-//        tempInfo = (*itr);
-//        if (result)
-//        {
-//            if (itr->betType >= 5)
-//                tempInfo.playerResult = "win";
-//            else
-//                tempInfo.playerResult = "lose";
-//        }
-//        else
-//        {
-//            if (itr->betType >= 5)
-//                tempInfo.playerResult = "lose";
-//            else
-//                tempInfo.playerResult = "win";
-//        }
-//
-//        asset win = tempInfo.betAmount * 2;
-//        //win.amount = tempInfo.betAmount.amount*2;
-//        if (tempInfo.playerResult == "win")
-//        {
-//            INLINE_ACTION_SENDER(eosio::token, transfer)
-//            (
-//                "eosio.token"_n, {{_self, "active"_n}},
-//                {_self, tempInfo.player, win, std::string("playerbet result")});
-//
-//            temp_balance -= tempInfo.betAmount;
-//        }
-//        else
-//        {
-//            temp_balance += tempInfo.betAmount;
-//        }
-//        tempVec.emplace_back(tempInfo);
+        //        player_bet_info tempInfo;
+        //        tempInfo = (*itr);
+        //        if (result)
+        //        {
+        //            if (itr->betType >= 5)
+        //                tempInfo.playerResult = "win";
+        //            else
+        //                tempInfo.playerResult = "lose";
+        //        }
+        //        else
+        //        {
+        //            if (itr->betType >= 5)
+        //                tempInfo.playerResult = "lose";
+        //            else
+        //                tempInfo.playerResult = "win";
+        //        }
+        //
+        //        asset win = tempInfo.betAmount * 2;
+        //        //win.amount = tempInfo.betAmount.amount*2;
+        //        if (tempInfo.playerResult == "win")
+        //        {
+        //            INLINE_ACTION_SENDER(eosio::token, transfer)
+        //            (
+        //                "eosio.token"_n, {{_self, "active"_n}},
+        //                {_self, tempInfo.player, win, std::string("playerbet result")});
+        //
+        //            temp_balance -= tempInfo.betAmount;
+        //        }
+        //        else
+        //        {
+        //            temp_balance += tempInfo.betAmount;
+        //        }
+        //        tempVec.emplace_back(tempInfo);
     }
 
     tableround.modify(existing, _self, [&](auto &s) {

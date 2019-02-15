@@ -41,7 +41,7 @@ player_info
     - card number
     - Poker suit 
 ```math
-cardnumber = (index+1) % 4
+cardnumber = (index+1) % 13
 ```
 ```math
 suitcolor = (index+1)/13 % 4
