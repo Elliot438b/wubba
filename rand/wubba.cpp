@@ -7,12 +7,24 @@
 
 #include "eosio.token.hpp"
 
+
 uint32_t wubba::betPeriod = 30;
 uint32_t wubba::minTableRounds = 2;
+uint16_t wubba::cardsNum = 416;
 
 asset wubba::minPerBet = asset(20000, symbol(symbol_code("SYS"), 4));
 asset wubba::oneRoundMaxTotalBet = asset(100000, symbol(symbol_code("SYS"), 4));
 asset wubba::minTableDeposit = wubba::oneRoundMaxTotalBet * wubba::minTableRounds;
+
+
+void wubba::shuffcards(std::vector<uint16_t> cardVec)
+{
+    uint16_t tempNum = 0;
+    for(; tempNum < cardsNum; tempNum++)
+    {
+        cardVec.emplace_back(tempNum);
+    }
+}
 
 ACTION wubba::newtable(name dealer, asset deposit)
 {
@@ -22,6 +34,7 @@ ACTION wubba::newtable(name dealer, asset deposit)
     (
         "eosio.token"_n, {{dealer, "active"_n}},
         {dealer, _self, deposit, std::string("tabledeposit")});
+
     tableround.emplace(_self, [&](auto &s) {
         s.tableId = tableround.available_primary_key();
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
@@ -48,7 +61,7 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
             s.serverSeed = hash;
             s.sSeedVerity = 0;
             s.currRoundBetSum = asset(0, symbol(symbol_code("SYS"), 4));
-            s.result = "";
+            s.roundResult = "";
             s.playerInfo = tempVec;
         });
     }
@@ -72,7 +85,7 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
             s.serverSeed = encodeSeed;
             s.sSeedVerity = 0;
             s.currRoundBetSum = asset(0, symbol(symbol_code("SYS"), 4));
-            s.result = "";
+            s.roundResult = "";
             s.playerInfo = tempVec;
         });
     }
@@ -98,15 +111,14 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
     // cancel_deferred(deferred_id);
     // txn.send(deferred_id, _self, false);
 }
-
-ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, asset betAmount)
+ACTION wubba::playerbet(uint64_t tableId, uint64_t bet, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush)
 {
     require_auth(player);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     eosio_assert((now() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
-    eosio_assert(betAmount > minPerBet, "betAmount < minPerBet");
+   // eosio_assert(betAmount > minPerBet, "betAmount < minPerBet");
 
     asset player_amount_sum = existing->currRoundBetSum;
 
@@ -121,18 +133,24 @@ ACTION wubba::playerbet(uint64_t tableId, uint64_t betType, name player, asset b
     }
 
     eosio_assert(!flag, "player have bet");
-    player_amount_sum += betAmount;
-    eosio_assert(player_amount_sum < oneRoundMaxTotalBet, "Over the peak of total bet amount of this round!");
+    //player_amount_sum += betAmount;
+    //eosio_assert(player_amount_sum < oneRoundMaxTotalBet, "Over the peak of total bet amount of this round!");
 
+    asset depositAmount = (betDealer + betPlayer + betTie + betDealerPush + betPlayerPush);
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         "eosio.token"_n, {{player, "active"_n}},
-        {player, _self, betAmount, std::string("playerbet")});
+        {player, _self, depositAmount, std::string("playerbet")});
 
     player_bet_info temp;
     temp.player = player;
-    temp.betAmount = betAmount;
-    temp.betType = betType;
+    temp.betDealer = betDealer;
+    temp.betPlayer = betPlayer;
+    temp.betTie = betTie;
+    temp.betDealerPush = betDealerPush;
+    temp.betPlayerPush = betPlayerPush;
+    temp.pBonns = asset(0, symbol(symbol_code("SYS"), 4));
+    temp.dBonns = asset(0, symbol(symbol_code("SYS"), 4));
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
@@ -211,50 +229,50 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     auto itr = (existing->playerInfo).begin();
     for (; itr != (existing->playerInfo).end(); itr++)
     {
-        player_bet_info tempInfo;
-        tempInfo = (*itr);
-        if (result)
-        {
-            if (itr->betType >= 5)
-                tempInfo.playerResult = "win";
-            else
-                tempInfo.playerResult = "lose";
-        }
-        else
-        {
-            if (itr->betType >= 5)
-                tempInfo.playerResult = "lose";
-            else
-                tempInfo.playerResult = "win";
-        }
-
-        asset win = tempInfo.betAmount * 2;
-        //win.amount = tempInfo.betAmount.amount*2;
-        if (tempInfo.playerResult == "win")
-        {
-            INLINE_ACTION_SENDER(eosio::token, transfer)
-            (
-                "eosio.token"_n, {{_self, "active"_n}},
-                {_self, tempInfo.player, win, std::string("playerbet result")});
-
-            temp_balance -= tempInfo.betAmount;
-        }
-        else
-        {
-            temp_balance += tempInfo.betAmount;
-        }
-        tempVec.emplace_back(tempInfo);
+//        player_bet_info tempInfo;
+//        tempInfo = (*itr);
+//        if (result)
+//        {
+//            if (itr->betType >= 5)
+//                tempInfo.playerResult = "win";
+//            else
+//                tempInfo.playerResult = "lose";
+//        }
+//        else
+//        {
+//            if (itr->betType >= 5)
+//                tempInfo.playerResult = "lose";
+//            else
+//                tempInfo.playerResult = "win";
+//        }
+//
+//        asset win = tempInfo.betAmount * 2;
+//        //win.amount = tempInfo.betAmount.amount*2;
+//        if (tempInfo.playerResult == "win")
+//        {
+//            INLINE_ACTION_SENDER(eosio::token, transfer)
+//            (
+//                "eosio.token"_n, {{_self, "active"_n}},
+//                {_self, tempInfo.player, win, std::string("playerbet result")});
+//
+//            temp_balance -= tempInfo.betAmount;
+//        }
+//        else
+//        {
+//            temp_balance += tempInfo.betAmount;
+//        }
+//        tempVec.emplace_back(tempInfo);
     }
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo = tempVec;
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
         if (existing->dealerBalance.amount > temp_balance.amount)
-            s.result = "dealer lose"; //todo?
+            s.roundResult = "dealer lose"; //todo?
         else if (existing->dealerBalance.amount == temp_balance.amount)
-            s.result = "dealer tie";
+            s.roundResult = "dealer tie";
         else
-            s.result = "dealer win";
+            s.roundResult = "dealer win";
         s.dealerBalance = temp_balance;
     });
 }

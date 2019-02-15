@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Feb 13 18:27:14 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Feb 15 16:01:55 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -41,6 +41,16 @@
             ]
         },
         {
+            "name": "erasingdata",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "exitruteship",
             "base": "",
             "fields": [
@@ -73,16 +83,32 @@
                     "type": "name"
                 },
                 {
-                    "name": "betType",
-                    "type": "uint64"
-                },
-                {
-                    "name": "betAmount",
+                    "name": "betDealer",
                     "type": "asset"
                 },
                 {
-                    "name": "playerResult",
-                    "type": "string"
+                    "name": "betPlayer",
+                    "type": "asset"
+                },
+                {
+                    "name": "betTie",
+                    "type": "asset"
+                },
+                {
+                    "name": "betDealerPush",
+                    "type": "asset"
+                },
+                {
+                    "name": "betPlayerPush",
+                    "type": "asset"
+                },
+                {
+                    "name": "pBonns",
+                    "type": "asset"
+                },
+                {
+                    "name": "dBonns",
+                    "type": "asset"
                 }
             ]
         },
@@ -103,7 +129,23 @@
                     "type": "name"
                 },
                 {
-                    "name": "betAmount",
+                    "name": "betDealer",
+                    "type": "asset"
+                },
+                {
+                    "name": "betPlayer",
+                    "type": "asset"
+                },
+                {
+                    "name": "betTie",
+                    "type": "asset"
+                },
+                {
+                    "name": "betDealerPush",
+                    "type": "asset"
+                },
+                {
+                    "name": "betPlayerPush",
                     "type": "asset"
                 }
             ]
@@ -151,7 +193,7 @@
                     "type": "bool"
                 },
                 {
-                    "name": "result",
+                    "name": "roundResult",
                     "type": "string"
                 },
                 {
@@ -171,8 +213,16 @@
                     "type": "asset"
                 },
                 {
+                    "name": "currRoundBetSum",
+                    "type": "asset"
+                },
+                {
                     "name": "playerInfo",
                     "type": "player_bet_info[]"
+                },
+                {
+                    "name": "validCardVec",
+                    "type": "uint16[]"
                 }
             ]
         },
@@ -233,6 +283,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "erasingdata",
+            "type": "erasingdata",
+            "ricardian_contract": ""
+        },
+        {
             "name": "exitruteship",
             "type": "exitruteship",
             "ricardian_contract": ""
@@ -270,7 +325,7 @@
     ],
     "tables": [
         {
-            "name": "tablesinfoar",
+            "name": "tablesinfo",
             "type": "table_stats",
             "index_type": "i64",
             "key_names": [],
