@@ -62,6 +62,8 @@ flag | symbol | full name
 
 ### (3) reveal
 - card apply, 4 cards, or 5 cards, or 6 cards? 
+    - player_hands
+    - banker_hands
 > Refer to the rules table:
 
 ![image](https://github.com/evsward/wubba/blob/master/resouce/cardapplyrules.jpg?raw=true)
