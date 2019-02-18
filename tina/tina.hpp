@@ -24,7 +24,15 @@ public:
       : contract(receiver, code, ds), tinatable(receiver, receiver.value) {}
 
   typedef eosio::multi_index<"tina"_n, tina::tina_info> single_t;
-
+  std::string to_hex(const char *d, uint32_t s)
+  {
+    std::string r;
+    const char *to_hex = "0123456789abcdef";
+    uint8_t *c = (uint8_t *)d;
+    for (uint32_t i = 0; i < s; ++i)
+      (r += to_hex[(c[i] >> 4)]) += to_hex[(c[i] & 0x0f)];
+    return r;
+  }
   ACTION erasingdata(uint64_t key);
   ACTION testmultidex(asset money); // asset in multi_index demo
   ACTION testdispatch();            // asset demo / Sc-> account
