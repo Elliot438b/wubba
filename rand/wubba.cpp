@@ -4,7 +4,7 @@
  */
 
 #include "wubba.hpp"
-
+#include <eosiolib/crypto.hpp>
 #include "eosio.token.hpp"
 
 uint32_t wubba::betPeriod = 30;
@@ -15,10 +15,20 @@ asset wubba::minPerBet = asset(20000, symbol(symbol_code("SYS"), 4));
 asset wubba::oneRoundMaxTotalBet = asset(100000, symbol(symbol_code("SYS"), 4));
 asset wubba::minTableDeposit = wubba::oneRoundMaxTotalBet * wubba::minTableRounds;
 
-void wubba::shuffcards(std::vector<uint16_t> cardVec)
+std::string to_hex_w( const char* d, uint32_t s )
+{
+    std::string r;
+    const char* to_hex="0123456789abcdef";
+    uint8_t* c = (uint8_t*)d;
+    for( uint32_t i = 0; i < s; ++i )
+        (r += to_hex[(c[i]>>4)]) += to_hex[(c[i] &0x0f)];
+    return r;
+}
+
+void shuffcards(std::vector<uint16_t> &cardVec)
 {
     uint16_t tempNum = 0;
-    for (; tempNum < decks * 52; tempNum++)
+    for (; tempNum < wubba::decks * 52; tempNum++)
     {
         cardVec.emplace_back(tempNum);
     }
@@ -38,6 +48,7 @@ ACTION wubba::newtable(name dealer, asset deposit)
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
         s.dealer = dealer;
         s.dealerBalance = deposit;
+        shuffcards(s.validCardVec);
     });
 }
 
@@ -166,9 +177,11 @@ ACTION wubba::endbet(uint64_t tableId)
     uint64_t useTime = now() - existing->betStartTime;
     print_f("use time is %\n", useTime);
     eosio_assert(useTime > betPeriod, "Bet time is not end now, wait... ");
+
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_REVEAL;
     });
+
 }
 
 ACTION wubba::verdealeseed(uint64_t tableId, string seed)
@@ -199,10 +212,15 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     tableround.modify(existing, _self, [&](auto &s) {
         s.sSeedVerity = true;
     });
-    constexpr size_t max_stack_buffer_size = 128;
-    char *buffer = (char *)(malloc(max_stack_buffer_size));
-    datastream<char *> ds(buffer, max_stack_buffer_size);
-    ds << existing->serverSeed;
+
+//    constexpr size_t max_stack_buffer_size = 128;
+//    char *buffer = (char *)(malloc(max_stack_buffer_size));
+//    datastream<char *> ds(buffer, max_stack_buffer_size);
+//    ds << existing->serverSeed;
+    string serverSeed_str = to_hex_w(reinterpret_cast<const char *>(existing->serverSeed.data()), 32);
+    string dealerSeed_str = to_hex_w(reinterpret_cast<const char *>(existing->dealerSeed.data()), 32);
+    string hash_str = serverSeed_str;
+
     if (!existing->dSeedVerity && !existing->trusteeship)
     { // dealer disconnect
         INLINE_ACTION_SENDER(wubba, disconnecthi)
@@ -212,8 +230,60 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     }
     else if (existing->dSeedVerity && !existing->trusteeship)
     { // dealer online and not trusteeship
-        ds << existing->dealerSeed;
+        //ds << existing->dealerSeed;
+        hash_str += dealerSeed_str;
     }
+
+    //todo:rand_result
+    checksum256 hash;
+    hash = sha256( hash_str.c_str(), hash_str.size() );
+    auto hash_data = hash.extract_as_byte_array();
+    string result_str = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
+    eosio::print(" hash_data : ", result_str);
+
+//    std::vector<string> cardSeedsVec;
+    std::vector<uint16_t> cardSeedPos;
+    auto counter = 0;
+    while (counter < 6)
+    {
+        string temp_str = result_str.substr(counter * 9, 9);
+
+        wbrng.srand(SDBMHash((char *)temp_str.c_str()));
+        uint64_t pos = wbrng.rand() % existing->validCardVec.size();
+        // eosio::print(" counter : ", counter, " temp_str=", temp_str);
+       // cardSeedsVec.emplace_back(temp_str);
+        cardSeedPos.emplace_back(pos);
+        counter++;
+    }
+
+    for (const auto &tem : cardSeedPos)
+    {
+        //eosio::print("position = ", tem);
+        uint16_t suitcolor =  (existing->validCardVec[tem] + 1)/13%4;
+        uint16_t cardnumber = (existing->validCardVec[tem] + 1)%13;
+
+        if(cardnumber == 0)
+            cardnumber = 13;
+        switch(suitcolor)
+        {
+            case 0:
+                eosio::print("[pos = ", tem, "  cardpos = ", existing->validCardVec[tem]," S", cardnumber, "]");
+                break;
+            case 1:
+                eosio::print("[pos = ", tem, "  cardpos = ", existing->validCardVec[tem]," H", cardnumber, "]");
+                break;
+            case 2:
+                eosio::print("[pos = ", tem, "  cardpos = ", existing->validCardVec[tem]," D", cardnumber, "]");
+                break;
+            case 3:
+                eosio::print("[pos = ", tem, "  cardpos = ", existing->validCardVec[tem]," C", cardnumber, "]");
+                break;
+        }
+
+    }
+
+    //////////////////////////////
+    /*
     wbrng.srand(SDBMHash(buffer));
     uint64_t limitNum = wbrng.rand() % 10;
     print_f("limitNum is %\n", limitNum);
@@ -273,6 +343,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
             s.roundResult = "dealer win";
         s.dealerBalance = temp_balance;
     });
+*/
 }
 
 ACTION wubba::trusteeship(uint64_t tableId)

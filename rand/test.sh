@@ -23,6 +23,12 @@ temptest)
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',6,useraaaaaaac,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaac
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',2,useraaaaaaad,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaad
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
+    sleep 36s
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa endbet '['$tableid']' -p useraaaaaaah
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa verdealeseed '['$tableid',10]' -p useraaaaaaab
+    sleep 3s
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa verserveseed '['$tableid',704]' -p useraaaaaaah
+    cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
 
     ;;
 erasedata)

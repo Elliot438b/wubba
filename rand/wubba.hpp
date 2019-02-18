@@ -6,7 +6,7 @@
 
 #include <eosiolib/asset.hpp>
 #include <eosiolib/eosio.hpp>
-#include <eosiolib/crypto.h>
+//#include <eosiolib/crypto.h>
 #include <eosiolib/action.hpp>
 #include <eosiolib/transaction.hpp>
 #include <eosiolib/permission.hpp>
@@ -38,7 +38,7 @@ CONTRACT wubba : public contract
     ACTION disconnecthi(name informed, uint64_t tableId);
     ACTION erasingdata(uint64_t key);
 
-    void shuffcards(std::vector<uint16_t> cardVec);
+   // void shuffcards(std::vector<uint16_t> &cardVec);
 
     struct player_bet_info
     {
