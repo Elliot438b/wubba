@@ -15,13 +15,13 @@ asset wubba::minPerBet = asset(20000, symbol(symbol_code("SYS"), 4));
 asset wubba::oneRoundMaxTotalBet = asset(100000, symbol(symbol_code("SYS"), 4));
 asset wubba::minTableDeposit = wubba::oneRoundMaxTotalBet * wubba::minTableRounds;
 
-std::string to_hex_w( const char* d, uint32_t s )
+std::string to_hex_w(const char *d, uint32_t s)
 {
     std::string r;
-    const char* to_hex="0123456789abcdef";
-    uint8_t* c = (uint8_t*)d;
-    for( uint32_t i = 0; i < s; ++i )
-        (r += to_hex[(c[i]>>4)]) += to_hex[(c[i] &0x0f)];
+    const char *to_hex = "0123456789abcdef";
+    uint8_t *c = (uint8_t *)d;
+    for (uint32_t i = 0; i < s; ++i)
+        (r += to_hex[(c[i] >> 4)]) += to_hex[(c[i] & 0x0f)];
     return r;
 }
 
@@ -182,7 +182,6 @@ ACTION wubba::endbet(uint64_t tableId)
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_REVEAL;
     });
-
 }
 
 ACTION wubba::verdealeseed(uint64_t tableId, string seed)
@@ -214,10 +213,10 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
         s.sSeedVerity = true;
     });
 
-//    constexpr size_t max_stack_buffer_size = 128;
-//    char *buffer = (char *)(malloc(max_stack_buffer_size));
-//    datastream<char *> ds(buffer, max_stack_buffer_size);
-//    ds << existing->serverSeed;
+    //    constexpr size_t max_stack_buffer_size = 128;
+    //    char *buffer = (char *)(malloc(max_stack_buffer_size));
+    //    datastream<char *> ds(buffer, max_stack_buffer_size);
+    //    ds << existing->serverSeed;
     string serverSeed_str = to_hex_w(reinterpret_cast<const char *>(existing->serverSeed.data()), 32);
     string dealerSeed_str = to_hex_w(reinterpret_cast<const char *>(existing->dealerSeed.data()), 32);
     string hash_str = serverSeed_str;
@@ -237,155 +236,52 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
 
     //todo:rand_result
     checksum256 hash;
-    hash = sha256( hash_str.c_str(), hash_str.size() );
+    hash = sha256(hash_str.c_str(), hash_str.size());
     auto hash_data = hash.extract_as_byte_array();
     string result_str = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
     eosio::print(" hash_data : ", result_str);
 
-//    std::vector<string> cardSeedsVec;
-    std::vector<uint16_t> cardSeedPos;
+    std::vector<card_info> cardInfo;
+    std::vector<uint16_t> usedCardVec;
     auto counter = 0;
     while (counter < 6)
     {
         string temp_str = result_str.substr(counter * 9, 9);
-
         wbrng.srand(SDBMHash((char *)temp_str.c_str()));
         uint64_t pos = wbrng.rand() % existing->validCardVec.size();
-        // eosio::print(" counter : ", counter, " temp_str=", temp_str);
-       // cardSeedsVec.emplace_back(temp_str);
-        cardSeedPos.emplace_back(pos);
-        counter++;
-    }
-
-    std::vector<card_info> cardInfo;
-    for (const auto &tem : cardSeedPos)
-    {
-        //eosio::print("position = ", tem);
-        uint16_t decks = (existing->validCardVec[tem])/52 + 1;
-        uint16_t suitcolor =  (existing->validCardVec[tem] + 1)/13%4;
-        uint16_t cardnumber = (existing->validCardVec[tem] + 1)%13;
-
-        if(cardnumber == 0)
+        uint16_t cardElement = existing->validCardVec[pos];
+        uint16_t decks = (cardElement) / 52 + 1;
+        uint16_t suitcolor = (cardElement + 1) / 13 % 4;
+        uint16_t cardnumber = (cardElement + 1) % 13;
+        if (cardnumber == 0)
             cardnumber = 13;
-
+        eosio::print("[pos:", pos, ", cardpos:", cardElement, ", suitcolor:", suitcolor, ", number:", cardnumber, ", deck:", decks, "] ");
         card_info tempCard;
         tempCard.decks = decks;
         tempCard.cardNum = cardnumber;
         tempCard.cardColor = suitcolor;
-
-        switch(suitcolor)
-        {
-            case 0:
-                eosio::print("[pos = ", tem, "  cardpos = ", existing->validCardVec[tem]," S", cardnumber, "]");
-                break;
-            case 1:
-                eosio::print("[pos = ", tem, "  cardpos = ", existing->validCardVec[tem]," H", cardnumber, "]");
-                break;
-            case 2:
-                eosio::print("[pos = ", tem, "  cardpos = ", existing->validCardVec[tem]," D", cardnumber, "]");
-                break;
-            case 3:
-                eosio::print("[pos = ", tem, "  cardpos = ", existing->validCardVec[tem]," C", cardnumber, "]");
-                break;
-        }
-
+        usedCardVec.emplace_back(cardElement);
         cardInfo.emplace_back(tempCard);
+        counter++;
     }
 
-    //round_result
     std::vector<card_info> playerCard;
     playerCard.emplace_back(cardInfo[0]);
     playerCard.emplace_back(cardInfo[2]);
-
     std::vector<card_info> bankerCard;
     bankerCard.emplace_back(cardInfo[1]);
     bankerCard.emplace_back(cardInfo[3]);
-
-//    uint8_t dPoint;
-//    uint8_t pPoint
-//    if(dPoint == 8 || dPoint == 9 || pPoint == 8 || pPoint == 9)
-//    {
-//        dPoint =(bankerCard[0].cardnumber+bankerCard[1].cardnumber)%10;
-//        pPoint =(playerCard[0].cardnumber+playerCard[1].cardnumber)%10;
-//    }
-//    else if(dPoint == 6)
-//    {
-//        if(pPoint == 6 || pPoint == 7)
-//        {
-//            bankerCard.emplace_push(cardInfo[4]);
-//        }
-//    }
-
-
-    //////////////////////////////
-    /*
-    wbrng.srand(SDBMHash(buffer));
-    uint64_t limitNum = wbrng.rand() % 10;
-    print_f("limitNum is %\n", limitNum);
-    bool result = false;
-    if (limitNum >= 5)
-        result = true;
-    print_f("result is %\n", result);
-    std::vector<player_bet_info> tempVec;
-
-    asset temp_balance = existing->dealerBalance;
-    auto itr = (existing->playerInfo).begin();
-    for (; itr != (existing->playerInfo).end(); itr++)
-    {
-        //        player_bet_info tempInfo;
-        //        tempInfo = (*itr);
-        //        if (result)
-        //        {
-        //            if (itr->betType >= 5)
-        //                tempInfo.playerResult = "win";
-        //            else
-        //                tempInfo.playerResult = "lose";
-        //        }
-        //        else
-        //        {
-        //            if (itr->betType >= 5)
-        //                tempInfo.playerResult = "lose";
-        //            else
-        //                tempInfo.playerResult = "win";
-        //        }
-        //
-        //        asset win = tempInfo.betAmount * 2;
-        //        //win.amount = tempInfo.betAmount.amount*2;
-        //        if (tempInfo.playerResult == "win")
-        //        {
-        //            INLINE_ACTION_SENDER(eosio::token, transfer)
-        //            (
-        //                "eosio.token"_n, {{_self, "active"_n}},
-        //                {_self, tempInfo.player, win, std::string("playerbet result")});
-        //
-        //            temp_balance -= tempInfo.betAmount;
-        //        }
-        //        else
-        //        {
-        //            temp_balance += tempInfo.betAmount;
-        //        }
-        //        tempVec.emplace_back(tempInfo);
-    }
-*/
-    eosio::print("[pos = ", cardSeedPos[3]);
+    std::sort(usedCardVec.begin(), usedCardVec.end());
     tableround.modify(existing, _self, [&](auto &s) {
-        //s.playerInfo = tempVec;
-       // s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
-       // if (existing->dealerBalance.amount > temp_balance.amount)
-       //     s.roundResult = "dealer lose"; //todo?
-       // else if (existing->dealerBalance.amount == temp_balance.amount)
-       //     s.roundResult = "dealer tie";
-       // else
-       //     s.roundResult = "dealer win";
-       // s.dealerBalance = temp_balance;
         s.playerHands = playerCard;
         s.bankerHands = bankerCard;
-        s.validCardVec.erase(existing->validCardVec.begin()+cardSeedPos[0]);
-        s.validCardVec.erase(existing->validCardVec.begin()+cardSeedPos[1]);
-        s.validCardVec.erase(existing->validCardVec.begin()+cardSeedPos[2]);
-        s.validCardVec.erase(existing->validCardVec.begin()+cardSeedPos[3]);
+        s.validCardVec.erase(existing->validCardVec.begin() + usedCardVec[0]);
+        s.validCardVec.erase(existing->validCardVec.begin() + usedCardVec[1] - 1);
+        s.validCardVec.erase(existing->validCardVec.begin() + usedCardVec[2] - 2);
+        s.validCardVec.erase(existing->validCardVec.begin() + usedCardVec[3] - 3);
+        s.validCardVec.erase(existing->validCardVec.begin() + usedCardVec[4] - 4);
+        s.validCardVec.erase(existing->validCardVec.begin() + usedCardVec[5] - 5);
     });
-
 }
 
 ACTION wubba::trusteeship(uint64_t tableId)
