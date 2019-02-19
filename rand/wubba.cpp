@@ -242,8 +242,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     eosio::print(" hash_data : ", result_str);
 
     std::vector<card_info> cardInfo;
-    std::vector<uint16_t> sixCardsVec;
-    std::vector<uint16_t> usedCardsVec;
+    std::vector<uint16_t> sixPosVec;
     auto counter = 0;
     while (counter < 6)
     {
@@ -261,7 +260,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
         tempCard.decks = decks;
         tempCard.cardNum = cardnumber;
         tempCard.cardColor = suitcolor;
-        sixCardsVec.emplace_back(cardElement);
+        sixPosVec.emplace_back(cardElement);
         cardInfo.emplace_back(tempCard);
         counter++;
     }
@@ -276,57 +275,61 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     bankerCard.emplace_back(cardInfo[3]);
     auto sum_b = (cardInfo[1].cardNum + cardInfo[3].cardNum) % 10;
 
-    usedCardsVec.emplace_back(sixCardsVec[0]);
-    usedCardsVec.emplace_back(sixCardsVec[1]);
-    usedCardsVec.emplace_back(sixCardsVec[2]);
-    usedCardsVec.emplace_back(sixCardsVec[3]);
-    bool fifthCard_p = false;
-    if (sum_p >= 0 && sum_p <= 5)
+    bool fifthCard_flag = false;
+    bool sixthCard_flag = false;
+    if (sum_p < 6)
     {
         playerCard.emplace_back(cardInfo[4]);
-        usedCardsVec.emplace_back(sixCardsVec[4]);
         sum_p = (sum_p + cardInfo[4].cardNum) % 10;
-        fifthCard_p = true;
-        // p optain
+        fifthCard_flag = true;
         if ((sum_p == 6 && sum_b == 6) || (sum_p == 7 && sum_b == 6))
         {
             bankerCard.emplace_back(cardInfo[5]);
-            usedCardsVec.emplace_back(sixCardsVec[5]);
             sum_b = (sum_b + cardInfo[5].cardNum) % 10;
+            sixthCard_flag = true;
         }
     }
-    else if ((sum_b >= 0 && sum_b <= 2) || (sum_b == 3 && !(sum_p == 8 && fifthCard_p)) || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_p)) || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_p)))
+    else if ((sum_b >= 0 && sum_b <= 2) || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_flag)) || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_flag)))
     {
-        if (fifthCard_p)
+        if (fifthCard_flag)
         {
             bankerCard.emplace_back(cardInfo[5]);
-            usedCardsVec.emplace_back(sixCardsVec[5]);
             sum_b = (sum_b + cardInfo[5].cardNum) % 10;
+            sixthCard_flag = true;
         }
         else
         {
             bankerCard.emplace_back(cardInfo[4]);
-            usedCardsVec.emplace_back(sixCardsVec[4]);
             sum_b = (sum_b + cardInfo[4].cardNum) % 10;
+            fifthCard_flag = true;
         }
     }
     else
     {
         eosio::print("Don't need extra optain!");
     }
+    if (!fifthCard_flag && !sixthCard_flag)
+    {
+        sixPosVec.erase(sixPosVec.begin() + 4);
+        sixPosVec.erase(sixPosVec.begin() + 4);
+    }
+    else if (fifthCard_flag || sixthCard_flag)
+    {
+        sixPosVec.erase(sixPosVec.begin() + 5);
+    }
 
-    std::sort(usedCardsVec.begin(), usedCardsVec.end());
+    std::sort(sixPosVec.begin(), sixPosVec.end());
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerHands = playerCard;
         s.bankerHands = bankerCard;
-        s.validCardVec.erase(existing->validCardVec.begin() + usedCardsVec[0]);
-        s.validCardVec.erase(existing->validCardVec.begin() + usedCardsVec[1] - 1);
-        s.validCardVec.erase(existing->validCardVec.begin() + usedCardsVec[2] - 2);
-        s.validCardVec.erase(existing->validCardVec.begin() + usedCardsVec[3] - 3);
-        if (usedCardsVec.size() > 4)
-            s.validCardVec.erase(existing->validCardVec.begin() + usedCardsVec[4] - 4);
-        if (usedCardsVec.size() > 5)
-            s.validCardVec.erase(existing->validCardVec.begin() + usedCardsVec[5] - 5);
+        s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[0]);
+        s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[1] - 1);
+        s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[2] - 2);
+        s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[3] - 3);
+        if (sixPosVec.size() > 4)
+            s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[4] - 4);
+        if (sixPosVec.size() > 5)
+            s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[5] - 5);
     });
 }
 
