@@ -1,38 +1,4 @@
-/**
- *  @file
- *  @copyright defined in eos/LICENSE
- */
-
 #include "wubba.hpp"
-#include <eosiolib/crypto.hpp>
-#include "eosio.token.hpp"
-
-uint32_t wubba::betPeriod = 30;
-uint32_t wubba::minTableRounds = 2;
-uint16_t wubba::decks = 8;
-
-asset wubba::minPerBet = asset(20000, symbol(symbol_code("SYS"), 4));
-asset wubba::oneRoundMaxTotalBet = asset(100000, symbol(symbol_code("SYS"), 4));
-asset wubba::minTableDeposit = wubba::oneRoundMaxTotalBet * wubba::minTableRounds;
-
-std::string to_hex_w(const char *d, uint32_t s)
-{
-    std::string r;
-    const char *to_hex = "0123456789abcdef";
-    uint8_t *c = (uint8_t *)d;
-    for (uint32_t i = 0; i < s; ++i)
-        (r += to_hex[(c[i] >> 4)]) += to_hex[(c[i] & 0x0f)];
-    return r;
-}
-
-void shuffcards(std::vector<uint16_t> &cardVec)
-{
-    uint16_t tempNum = 0;
-    for (; tempNum < wubba::decks * 52; tempNum++)
-    {
-        cardVec.emplace_back(tempNum);
-    }
-}
 
 ACTION wubba::newtable(name dealer, asset deposit)
 {
@@ -48,7 +14,7 @@ ACTION wubba::newtable(name dealer, asset deposit)
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
         s.dealer = dealer;
         s.dealerBalance = deposit;
-        shuffcards(s.validCardVec);
+        shuffle(s.validCardVec);
     });
 }
 
@@ -60,20 +26,24 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     {
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
         require_auth(existing->dealer);
+        // start a new round. init.
         checksum256 hash;
-        std::vector<player_bet_info> tempVec;
+        std::vector<player_bet_info> emptyPlayers;
+        std::vector<card_info> emptyCards;
         tableround.modify(existing, _self, [&](auto &s) {
-            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
             s.betStartTime = 0;
-            s.dealerSeedHash = encodeSeed;
-            s.dSeedVerity = 0;
-            s.dealerSeed = "";
-            s.serverSeedHash = hash;
-            s.sSeedVerity = 0;
-            s.serverSeed = "";
+            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
             s.currRoundBetSum = asset(0, symbol(symbol_code("SYS"), 4));
+            s.dealerSeedHash = encodeSeed;
+            s.serverSeedHash = hash;
+            s.dealerSeed = "";
+            s.serverSeed = "";
+            s.dSeedVerity = 0;
+            s.sSeedVerity = 0;
+            s.playerInfo = emptyPlayers;
             s.roundResult = "";
-            s.playerInfo = tempVec;
+            s.playerHands = emptyCards;
+            s.bankerHands = emptyCards;
         });
     }
 }
@@ -86,20 +56,24 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
     if (existing->trusteeship)
     {
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
+        // start a new round. init.
         checksum256 hash;
-        std::vector<player_bet_info> tempVec;
+        std::vector<player_bet_info> emptyPlayers;
+        std::vector<card_info> emptyCards;
         tableround.modify(existing, _self, [&](auto &s) {
-            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
             s.betStartTime = now();
-            s.dealerSeedHash = hash;
-            s.dSeedVerity = 0;
-            s.dealerSeed = "";
-            s.serverSeedHash = encodeSeed;
-            s.sSeedVerity = 0;
-            s.serverSeed = "";
+            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
             s.currRoundBetSum = asset(0, symbol(symbol_code("SYS"), 4));
+            s.dealerSeedHash = hash;
+            s.serverSeedHash = encodeSeed;
+            s.dealerSeed = "";
+            s.serverSeed = "";
+            s.dSeedVerity = 0;
+            s.sSeedVerity = 0;
+            s.playerInfo = emptyPlayers;
             s.roundResult = "";
-            s.playerInfo = tempVec;
+            s.playerHands = emptyCards;
+            s.bankerHands = emptyCards;
         });
     }
     else
@@ -112,7 +86,7 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
         });
     }
 
-    //todo:defer 30 ,bet->reveal
+    //TODO:defer 30 ,bet->reveal
     // eosio::transaction txn;
     // txn.actions.emplace_back(
     //     permission_level{serveraccount, "active"_n},
@@ -180,7 +154,7 @@ ACTION wubba::endbet(uint64_t tableId)
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     uint64_t useTime = now() - existing->betStartTime;
-    print_f("use time is %\n", useTime);
+    eosio::print("spend time : ", useTime, "s, need ", betPeriod, "s!");
     eosio_assert(useTime > betPeriod, "Bet time is not end now, wait... ");
 
     tableround.modify(existing, _self, [&](auto &s) {
@@ -218,102 +192,97 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
         s.sSeedVerity = true;
         s.serverSeed = seed;
     });
-
-
-    string hash_str = seed;
-    if (!existing->dSeedVerity && !existing->trusteeship)
-    { // dealer disconnect
+    // root_seed.
+    string root_seed = seed;
+    if (existing->trusteeship)
+    {
+        eosio::print("Dealer trusteeship, don't need dealer seed.");
+    }
+    else if (!existing->dSeedVerity)
+    { // dealer disconnect notify
         INLINE_ACTION_SENDER(wubba, disconnecthi)
         (
             _self, {{serveraccount, "active"_n}},
             {existing->dealer, existing->tableId});
     }
-    else if (existing->dSeedVerity && !existing->trusteeship)
+    else if (existing->dSeedVerity)
     { // dealer online and not trusteeship
-        //ds << existing->dealerSeed;
-        hash_str += existing->dealerSeed;
+        root_seed += existing->dealerSeed;
     }
-
-    //todo:rand_result
-    checksum256 hash;
-    hash = sha256(hash_str.c_str(), hash_str.size());
+    // unify 64: root_seed_64.
+    checksum256 hash = sha256(root_seed.c_str(), root_seed.size());
     auto hash_data = hash.extract_as_byte_array();
-    string result_str = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
-    eosio::print(" hash_data : ", result_str);
-
+    string root_seed_64 = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
+    eosio::print(" root_seed_64 : ", root_seed_64, " ");
+    // Split 6 seeds, parse card info.
     std::vector<card_info> cardInfo;
     std::vector<uint16_t> sixPosVec;
     auto counter = 0;
     while (counter < 6)
     {
-        string temp_str = result_str.substr(counter * 9, 9);
-        wbrng.srand(SDBMHash((char *)temp_str.c_str()));
+        string sub_seed = root_seed_64.substr(counter * 9, 9);
+        wbrng.srand(SDBMHash((char *)sub_seed.c_str()));
         uint64_t pos = wbrng.rand() % existing->validCardVec.size();
-
-        uint16_t cardElement = existing->validCardVec[pos];
-        uint16_t decks = (cardElement) / 52 + 1;
-        uint16_t suitcolor = (cardElement + 1) / 13 % 4;
-        uint16_t cardnumber = (cardElement + 1) % 13;
+        uint16_t cardPos = existing->validCardVec[pos]; // value of validCardVec is cardPos(card index).
+        sixPosVec.emplace_back(cardPos);
+        uint16_t deck = (cardPos) / 52 + 1;
+        uint16_t suitcolor = (cardPos + 1) / 13 % 4;
+        uint16_t cardnumber = (cardPos + 1) % 13;
         if (cardnumber == 0)
             cardnumber = 13;
-        eosio::print("[pos:", pos, ", cardpos:", cardElement, ", suitcolor:", suitcolor, ", number:", cardnumber, ", deck:", decks, "] ");
+        eosio::print("[pos:", pos, ", cardpos:", cardPos, ", deck:", deck, ", number:", cardnumber, ", suitcolor:", suitcolor, "]");
         card_info tempCard;
-        tempCard.deck = decks;
+        tempCard.deck = deck;
         tempCard.cardNum = cardnumber;
         tempCard.cardColor = suitcolor;
-        sixPosVec.emplace_back(cardElement);
         cardInfo.emplace_back(tempCard);
         counter++;
     }
-
-    std::vector<card_info> playerCard;
-    playerCard.emplace_back(cardInfo[0]);
-    playerCard.emplace_back(cardInfo[2]);
+    // init first 2 cards.
+    std::vector<card_info> playerHands;
+    playerHands.emplace_back(cardInfo[0]);
+    playerHands.emplace_back(cardInfo[2]);
     auto sum_p = (cardInfo[0].cardNum + cardInfo[2].cardNum) % 10;
 
-    std::vector<card_info> bankerCard;
-    bankerCard.emplace_back(cardInfo[1]);
-    bankerCard.emplace_back(cardInfo[3]);
-
+    std::vector<card_info> bankerHands;
+    bankerHands.emplace_back(cardInfo[1]);
+    bankerHands.emplace_back(cardInfo[3]);
     auto sum_b = (cardInfo[1].cardNum + cardInfo[3].cardNum) % 10;
-
+    // 5th/6th card obtain rules.
     bool fifthCard_flag = false;
     bool sixthCard_flag = false;
     if (sum_p < 6)
     {
-        playerCard.emplace_back(cardInfo[4]);
+        playerHands.emplace_back(cardInfo[4]);
         sum_p = (sum_p + cardInfo[4].cardNum) % 10;
         fifthCard_flag = true;
-        if ((sum_p == 6 && sum_b == 6) || (sum_p == 7 && sum_b == 6))
+        if (sum_b == 6 && (sum_p == 6 || sum_p == 7))
         {
-            bankerCard.emplace_back(cardInfo[5]);
+            bankerHands.emplace_back(cardInfo[5]);
             sum_b = (sum_b + cardInfo[5].cardNum) % 10;
             sixthCard_flag = true;
         }
     }
-    else if ((sum_b < 3)
-             || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag))
-             || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_flag))
-             || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_flag)))
+    else if ((sum_b < 3) || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_flag)) || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_flag)))
     {
         if (fifthCard_flag)
         {
-            bankerCard.emplace_back(cardInfo[5]);
+            bankerHands.emplace_back(cardInfo[5]);
             sum_b = (sum_b + cardInfo[5].cardNum) % 10;
             sixthCard_flag = true;
         }
         else
         {
-            bankerCard.emplace_back(cardInfo[4]);
+            bankerHands.emplace_back(cardInfo[4]);
             sum_b = (sum_b + cardInfo[4].cardNum) % 10;
             fifthCard_flag = true;
         }
     }
     else
     {
-        eosio::print("Don't need extra optain!");
+        eosio::print("4 cards end, don't need extra card obtain!");
     }
-
+    // cards used.
     if (!fifthCard_flag && !sixthCard_flag)
     {
         sixPosVec.erase(sixPosVec.begin() + 4);
@@ -323,11 +292,12 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     {
         sixPosVec.erase(sixPosVec.begin() + 5);
     }
-
     std::sort(sixPosVec.begin(), sixPosVec.end());
     tableround.modify(existing, _self, [&](auto &s) {
-        s.playerHands = playerCard;
-        s.bankerHands = bankerCard;
+        // TODO::dealerBalance & playerinfo & result.
+        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
+        s.playerHands = playerHands;
+        s.bankerHands = bankerHands;
         s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[0]);
         s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[1] - 1);
         s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[2] - 2);
@@ -344,7 +314,7 @@ ACTION wubba::trusteeship(uint64_t tableId)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
-    require_auth(existing->dealer); // dealer trusteeship server.
+    require_auth(existing->dealer); // dealer trustee server.
     tableround.modify(existing, _self, [&](auto &s) {
         s.trusteeship = true;
     });
@@ -355,7 +325,7 @@ ACTION wubba::exitruteship(uint64_t tableId)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
-    require_auth(existing->dealer); // dealer trusteeship server.
+    require_auth(existing->dealer); // dealer exit trusteeship from server.
     tableround.modify(existing, _self, [&](auto &s) {
         s.trusteeship = false;
     });
@@ -367,7 +337,7 @@ ACTION wubba::disconnecthi(name informed, uint64_t tableId)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->dealer == informed, "People informed is not the dealer of table!");
-    print_f("SC disconnecthi has already informed %\n", informed.to_string());
+    eosio::print("SC disconnecthi has already informed :", informed.to_string());
 }
 
 ACTION wubba::erasingdata(uint64_t key)
@@ -378,7 +348,7 @@ ACTION wubba::erasingdata(uint64_t key)
         auto itr = tableround.begin();
         while (itr != tableround.end())
         {
-            eosio::print("Removing data ", _self, ", key: ", key, ", itr: ", itr->tableId, "\n");
+            eosio::print("[Removing data: ", _self, ", key: ", key, ", itr: ", itr->tableId, "]");
             itr = tableround.erase(itr);
         }
     }

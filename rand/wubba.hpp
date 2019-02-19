@@ -1,17 +1,9 @@
-/**
- *  @file
- *  @copyright defined in eos/LICENSE
- */
 #pragma once
 
-#include <eosiolib/asset.hpp>
-#include <eosiolib/eosio.hpp>
-//#include <eosiolib/crypto.h>
-#include <eosiolib/action.hpp>
 #include <eosiolib/transaction.hpp>
 #include <eosiolib/permission.hpp>
-#include <eosiolib/action.hpp>
-#include <string>
+#include <eosiolib/crypto.hpp>
+#include "eosio.token.hpp"
 #include <cstdlib>
 
 using namespace eosio;
@@ -38,9 +30,6 @@ CONTRACT wubba : public contract
     ACTION disconnecthi(name informed, uint64_t tableId);
     ACTION erasingdata(uint64_t key);
 
-   // void shuffcards(std::vector<uint16_t> &cardVec);
-
-
     struct card_info
     {
         uint8_t deck;
@@ -61,38 +50,32 @@ CONTRACT wubba : public contract
         asset pBonns;
         asset dBonns;
 
-        enum class bet_type_fields : uint64_t
-        {
-            BET_BANK = 11,
-            BET_PLAYER = 12,
-            BET_PUSH = 13,
-            BET_BANK_PAIR = 14,
-            BET_PLAYER_PAIR = 15
-        };
-
         EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPush)(betPlayerPush)(pBonns)(dBonns))
     };
 
     TABLE table_stats
     {
-        uint64_t tableId;
-        uint64_t betStartTime;
-        checksum256 dealerSeedHash;
-        string dealerSeed;
-        bool dSeedVerity;
-        checksum256 serverSeedHash;
-        string serverSeed;
-        bool sSeedVerity;
-        string roundResult;
-        uint64_t tableStatus;
-        name dealer;
-        bool trusteeship;
-        asset dealerBalance;
+        // ------------------------------ table field ------------------------------
+        std::vector<uint16_t> validCardVec; // newtable init & new round check.
+        uint64_t tableId;                   // table fix.
+        name dealer;                        // table owner.
+        bool trusteeship;                   // table flag.
+        asset dealerBalance;                // table filed.
+        // ------------------------------ round field ------------------------------
+        uint64_t betStartTime; // for keeping bet stage/round.
+        uint64_t tableStatus;  // round stage.
         asset currRoundBetSum;
 
-        std::vector<player_bet_info> playerInfo;
-        std::vector<uint16_t> validCardVec;
+        checksum256 dealerSeedHash;
+        checksum256 serverSeedHash;
+        string dealerSeed;
+        string serverSeed;
+        bool dSeedVerity;
+        bool sSeedVerity;
 
+        std::vector<player_bet_info> playerInfo;
+
+        string roundResult;
         std::vector<card_info> playerHands;
         std::vector<card_info> bankerHands;
 
@@ -108,11 +91,11 @@ CONTRACT wubba : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeedHash)(dealerSeed)(dSeedVerity)(serverSeedHash)(serverSeed)(sSeedVerity)(roundResult)(tableStatus)(dealer)(trusteeship)(dealerBalance)(currRoundBetSum)(playerInfo)(validCardVec)(playerHands)(bankerHands))
+        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(dealer)(trusteeship)(dealerBalance)(betStartTime)(tableStatus)(currRoundBetSum)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
-    // random
+    // std random
     struct WBRNG
     {
         unsigned long next;
@@ -126,8 +109,7 @@ CONTRACT wubba : public contract
             return (unsigned int)(next / 65536) % 32768;
         }
     };
-
-    // char to int
+    // char to int:string hash function. SDBMHash
     unsigned int SDBMHash(char *str)
     {
         unsigned int hash = 0;
@@ -138,12 +120,29 @@ CONTRACT wubba : public contract
         }
         return (hash & 0x7FFFFFFF);
     }
-
+    // 32 char to hex:64 string
+    string to_hex_w(const char *d, uint32_t s)
+    {
+        std::string r;
+        const char *to_hex = "0123456789abcdef";
+        uint8_t *c = (uint8_t *)d;
+        for (uint32_t i = 0; i < s; ++i)
+            (r += to_hex[(c[i] >> 4)]) += to_hex[(c[i] & 0x0f)];
+        return r;
+    }
+    // shuffle
+    void shuffle(std::vector<uint16_t> & cardVec)
+    {
+        for (auto i = 0; i < initDecks * 52; i++)
+        {
+            cardVec.emplace_back(i);
+        }
+    }
     using newtable_action = action_wrapper<"newtable"_n, &wubba::newtable>;
     using dealerseed_action = action_wrapper<"dealerseed"_n, &wubba::dealerseed>;
     using serverseed_action = action_wrapper<"serverseed"_n, &wubba::serverseed>;
-    using endbet_action = action_wrapper<"endbet"_n, &wubba::endbet>;
     using playerbet_action = action_wrapper<"playerbet"_n, &wubba::playerbet>;
+    using endbet_action = action_wrapper<"endbet"_n, &wubba::endbet>;
     using verdealeseed_action = action_wrapper<"verdealeseed"_n, &wubba::verdealeseed>;
     using verserveseed_action = action_wrapper<"verserveseed"_n, &wubba::verserveseed>;
     using trusteeship_action = action_wrapper<"trusteeship"_n, &wubba::trusteeship>;
@@ -152,16 +151,16 @@ CONTRACT wubba : public contract
     using erasingdata_action = action_wrapper<"erasingdata"_n, &wubba::erasingdata>;
 
     name serveraccount = "useraaaaaaah"_n;
+    name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
+
+    const asset minPerBet = asset(20000, symbol(symbol_code("SYS"), 4));
+    const asset oneRoundMaxTotalBet = asset(100000, symbol(symbol_code("SYS"), 4));
+    const uint32_t betPeriod = 30;
+    const uint32_t minTableRounds = 2;
+    const uint16_t initDecks = 8;
+    const asset minTableDeposit = oneRoundMaxTotalBet * minTableRounds;
+    const char *notableerr = "TableId isn't existing!";
+
     singletable_t tableround;
     WBRNG wbrng;
-
-    static asset minPerBet;
-    static asset oneRoundMaxTotalBet;
-    static asset minTableDeposit;
-
-    static uint32_t betPeriod;
-    static uint32_t minTableRounds;
-
-    static uint16_t decks;
-    const char *notableerr = "TableId isn't existing!";
 };
