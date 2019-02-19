@@ -65,10 +65,12 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         tableround.modify(existing, _self, [&](auto &s) {
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
             s.betStartTime = 0;
-            s.dealerSeed = encodeSeed;
+            s.dealerSeedHash = encodeSeed;
             s.dSeedVerity = 0;
-            s.serverSeed = hash;
+            s.dealerSeed = "";
+            s.serverSeedHash = hash;
             s.sSeedVerity = 0;
+            s.serverSeed = "";
             s.currRoundBetSum = asset(0, symbol(symbol_code("SYS"), 4));
             s.roundResult = "";
             s.playerInfo = tempVec;
@@ -89,10 +91,12 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
         tableround.modify(existing, _self, [&](auto &s) {
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
             s.betStartTime = now();
-            s.dealerSeed = hash;
+            s.dealerSeedHash = hash;
             s.dSeedVerity = 0;
-            s.serverSeed = encodeSeed;
+            s.dealerSeed = "";
+            s.serverSeedHash = encodeSeed;
             s.sSeedVerity = 0;
+            s.serverSeed = "";
             s.currRoundBetSum = asset(0, symbol(symbol_code("SYS"), 4));
             s.roundResult = "";
             s.playerInfo = tempVec;
@@ -102,7 +106,7 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
     {
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_START, "Dealer haven't started a new round yet!");
         tableround.modify(existing, _self, [&](auto &s) {
-            s.serverSeed = encodeSeed;
+            s.serverSeedHash = encodeSeed;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
             s.betStartTime = now();
         });
@@ -193,9 +197,10 @@ ACTION wubba::verdealeseed(uint64_t tableId, string seed)
     {
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
         eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time to verify dealer seed yet.");
-        assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerSeed));
+        assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerSeedHash));
         tableround.modify(existing, _self, [&](auto &s) {
             s.dSeedVerity = true;
+            s.dealerSeed = seed;
         });
     }
 }
@@ -208,19 +213,14 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
     eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time to verify server seed yet.");
-    assert_sha256(seed.c_str(), seed.size(), ((*existing).serverSeed));
+    assert_sha256(seed.c_str(), seed.size(), ((*existing).serverSeedHash));
     tableround.modify(existing, _self, [&](auto &s) {
         s.sSeedVerity = true;
+        s.serverSeed = seed;
     });
 
-    //    constexpr size_t max_stack_buffer_size = 128;
-    //    char *buffer = (char *)(malloc(max_stack_buffer_size));
-    //    datastream<char *> ds(buffer, max_stack_buffer_size);
-    //    ds << existing->serverSeed;
-    string serverSeed_str = to_hex_w(reinterpret_cast<const char *>(existing->serverSeed.data()), 32);
-    string dealerSeed_str = to_hex_w(reinterpret_cast<const char *>(existing->dealerSeed.data()), 32);
-    string hash_str = serverSeed_str;
 
+    string hash_str = seed;
     if (!existing->dSeedVerity && !existing->trusteeship)
     { // dealer disconnect
         INLINE_ACTION_SENDER(wubba, disconnecthi)
@@ -231,7 +231,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     else if (existing->dSeedVerity && !existing->trusteeship)
     { // dealer online and not trusteeship
         //ds << existing->dealerSeed;
-        hash_str += dealerSeed_str;
+        hash_str += existing->dealerSeed;
     }
 
     //todo:rand_result
@@ -249,6 +249,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
         string temp_str = result_str.substr(counter * 9, 9);
         wbrng.srand(SDBMHash((char *)temp_str.c_str()));
         uint64_t pos = wbrng.rand() % existing->validCardVec.size();
+
         uint16_t cardElement = existing->validCardVec[pos];
         uint16_t decks = (cardElement) / 52 + 1;
         uint16_t suitcolor = (cardElement + 1) / 13 % 4;
@@ -257,7 +258,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
             cardnumber = 13;
         eosio::print("[pos:", pos, ", cardpos:", cardElement, ", suitcolor:", suitcolor, ", number:", cardnumber, ", deck:", decks, "] ");
         card_info tempCard;
-        tempCard.decks = decks;
+        tempCard.deck = decks;
         tempCard.cardNum = cardnumber;
         tempCard.cardColor = suitcolor;
         sixPosVec.emplace_back(cardElement);
@@ -273,6 +274,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     std::vector<card_info> bankerCard;
     bankerCard.emplace_back(cardInfo[1]);
     bankerCard.emplace_back(cardInfo[3]);
+
     auto sum_b = (cardInfo[1].cardNum + cardInfo[3].cardNum) % 10;
 
     bool fifthCard_flag = false;
@@ -289,7 +291,10 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
             sixthCard_flag = true;
         }
     }
-    else if ((sum_b >= 0 && sum_b <= 2) || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_flag)) || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_flag)))
+    else if ((sum_b < 3)
+             || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag))
+             || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_flag))
+             || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_flag)))
     {
         if (fifthCard_flag)
         {
@@ -308,6 +313,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     {
         eosio::print("Don't need extra optain!");
     }
+
     if (!fifthCard_flag && !sixthCard_flag)
     {
         sixPosVec.erase(sixPosVec.begin() + 4);

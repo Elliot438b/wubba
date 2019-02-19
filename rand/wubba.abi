@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Feb 19 14:25:58 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Feb 19 18:20:37 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -7,7 +7,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "decks",
+                    "name": "deck",
                     "type": "uint8"
                 },
                 {
@@ -191,16 +191,24 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "dealerSeed",
+                    "name": "dealerSeedHash",
                     "type": "checksum256"
+                },
+                {
+                    "name": "dealerSeed",
+                    "type": "string"
                 },
                 {
                     "name": "dSeedVerity",
                     "type": "bool"
                 },
                 {
-                    "name": "serverSeed",
+                    "name": "serverSeedHash",
                     "type": "checksum256"
+                },
+                {
+                    "name": "serverSeed",
+                    "type": "string"
                 },
                 {
                     "name": "sSeedVerity",

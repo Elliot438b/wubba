@@ -43,11 +43,11 @@ CONTRACT wubba : public contract
 
     struct card_info
     {
-        uint8_t decks;
+        uint8_t deck;
         uint8_t cardNum;
         uint8_t cardColor;
 
-        EOSLIB_SERIALIZE(card_info, (decks)(cardNum)(cardColor))
+        EOSLIB_SERIALIZE(card_info, (deck)(cardNum)(cardColor))
     };
 
     struct player_bet_info
@@ -77,9 +77,11 @@ CONTRACT wubba : public contract
     {
         uint64_t tableId;
         uint64_t betStartTime;
-        checksum256 dealerSeed;
+        checksum256 dealerSeedHash;
+        string dealerSeed;
         bool dSeedVerity;
-        checksum256 serverSeed;
+        checksum256 serverSeedHash;
+        string serverSeed;
         bool sSeedVerity;
         string roundResult;
         uint64_t tableStatus;
@@ -106,7 +108,7 @@ CONTRACT wubba : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(roundResult)(tableStatus)(dealer)(trusteeship)(dealerBalance)(currRoundBetSum)(playerInfo)(validCardVec)(playerHands)(bankerHands))
+        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeedHash)(dealerSeed)(dSeedVerity)(serverSeedHash)(serverSeed)(sSeedVerity)(roundResult)(tableStatus)(dealer)(trusteeship)(dealerBalance)(currRoundBetSum)(playerInfo)(validCardVec)(playerHands)(bankerHands))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
