@@ -1,7 +1,25 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Mon Feb 18 16:53:57 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Feb 19 14:25:58 2019",
     "version": "eosio::abi/1.1",
     "structs": [
+        {
+            "name": "card_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "decks",
+                    "type": "uint8"
+                },
+                {
+                    "name": "cardNum",
+                    "type": "uint8"
+                },
+                {
+                    "name": "cardColor",
+                    "type": "uint8"
+                }
+            ]
+        },
         {
             "name": "dealerseed",
             "base": "",
@@ -121,10 +139,6 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "bet",
-                    "type": "uint64"
-                },
-                {
                     "name": "player",
                     "type": "name"
                 },
@@ -223,6 +237,14 @@
                 {
                     "name": "validCardVec",
                     "type": "uint16[]"
+                },
+                {
+                    "name": "playerHands",
+                    "type": "card_info[]"
+                },
+                {
+                    "name": "bankerHands",
+                    "type": "card_info[]"
                 }
             ]
         },

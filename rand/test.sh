@@ -20,8 +20,8 @@ temptest)
     tableid=`cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',6,useraaaaaaac,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaac
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',2,useraaaaaaad,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaad
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaac,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaac
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaad,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaad
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
     sleep 36s
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa endbet '['$tableid']' -p useraaaaaaah
@@ -54,9 +54,9 @@ normalflow)
 
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',6,useraaaaaaac,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaac
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',2,useraaaaaaad,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaad
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',2,useraaaaaaae,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaae
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaac,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaac
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaad,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaad
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaae,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaae
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
     sleep 36s
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa endbet '['$tableid']' -p useraaaaaaah
@@ -82,9 +82,9 @@ trusteeship)
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa trusteeship '['$tableid']' -p useraaaaaaab
     # cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa dealerseed '['$tableid',9d8cc53ec9a3db76af85145d224201054044d56158d8f6186ea8cc22f3b2f4dd]' -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa serverseed '['$tableid',a2829e4ffc37947dc9172cd3aeb6a1f19bf6bf27ea0abe2c527884620614eff3]' -p useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',6,useraaaaaaac,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaac
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',2,useraaaaaaad,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaad
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',1,useraaaaaaae,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaae
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaac,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaac
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaad,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaad
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaae,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaae
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
     sleep 36s
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa endbet '['$tableid']' -p useraaaaaaah
@@ -104,9 +104,9 @@ exitruteship)
     	echo "this roundId: $num"
     	cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa dealerseed '['$tableid',9d8cc53ec9a3db76af85145d224201054044d56158d8f6186ea8cc22f3b2f4dd]' -p useraaaaaaab
     	cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa serverseed '['$tableid',a2829e4ffc37947dc9172cd3aeb6a1f19bf6bf27ea0abe2c527884620614eff3]' -p useraaaaaaah
-    	cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',6,useraaaaaaac,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaac
-    	cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',2,useraaaaaaad,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaad
-    	cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',1,useraaaaaaae,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaae
+    	cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaac,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaac
+    	cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaad,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaad
+    	cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaae,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaae
     	cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
     	sleep 36s
     	cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa endbet '['$tableid']' -p useraaaaaaah
@@ -124,9 +124,9 @@ disconnect)
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa exitruteship '['$tableid']' -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',6,useraaaaaaac,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaac
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',2,useraaaaaaad,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaad
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',1,useraaaaaaae,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaae
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaac,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaac
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaad,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaad
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaae,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaae
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
     sleep 36s
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa endbet '['$tableid']' -p useraaaaaaah

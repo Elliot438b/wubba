@@ -30,7 +30,7 @@ CONTRACT wubba : public contract
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION endbet(uint64_t tableId);
-    ACTION playerbet(uint64_t tableId, uint64_t bet, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush);
+    ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush);
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
     ACTION trusteeship(uint64_t tableId);
@@ -39,6 +39,16 @@ CONTRACT wubba : public contract
     ACTION erasingdata(uint64_t key);
 
    // void shuffcards(std::vector<uint16_t> &cardVec);
+
+
+    struct card_info
+    {
+        uint8_t decks;
+        uint8_t cardNum;
+        uint8_t cardColor;
+
+        EOSLIB_SERIALIZE(card_info, (decks)(cardNum)(cardColor))
+    };
 
     struct player_bet_info
     {
@@ -81,6 +91,9 @@ CONTRACT wubba : public contract
         std::vector<player_bet_info> playerInfo;
         std::vector<uint16_t> validCardVec;
 
+        std::vector<card_info> playerHands;
+        std::vector<card_info> bankerHands;
+
         uint64_t primary_key() const { return tableId; }
         uint64_t get_dealer() const { return dealer.value; }
 
@@ -93,7 +106,7 @@ CONTRACT wubba : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(roundResult)(tableStatus)(dealer)(trusteeship)(dealerBalance)(currRoundBetSum)(playerInfo)(validCardVec))
+        EOSLIB_SERIALIZE(table_stats, (tableId)(betStartTime)(dealerSeed)(dSeedVerity)(serverSeed)(sSeedVerity)(roundResult)(tableStatus)(dealer)(trusteeship)(dealerBalance)(currRoundBetSum)(playerInfo)(validCardVec)(playerHands)(bankerHands))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
