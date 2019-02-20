@@ -90,7 +90,7 @@ dealerPush, playerPush | 1:11
 ### (4) notices
 - ~~Bet recall function is implemented on the server end, not SC. Server-end keep the bet cache.~~
 - All actions of SC need both operator and server account authority verification. ++**TEST**++
-- Tie determined by the first two cards. 
+- Push determined by the first two cards. 
 - Add conditions, delete **minPerBet, oneRoundMaxTotalBet**:
 ```
     oneRoundMaxTotalBet_BP;   // (1000)max of banker and player total bet. 
