@@ -84,7 +84,7 @@ dealerPush, playerPush | 1:11
 #### state tableround field add:
 - result: round result, who win?
 - player\_bet\_info add:
-    - playerBonus, token amount transfer to player.
+    - playerBonus, token amount transfer to player. minus from dealerBalance.
     - dealerBonus. add into dealderBalance.
 
 ### (4) notices
