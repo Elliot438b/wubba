@@ -277,10 +277,14 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
                 sixthCard_flag = true;
             }
         }
-        if ((sum_b < 3) 
-        || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) 
-        || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag)) 
-        || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag)))
+        if (!sixthCard_flag &&
+                (
+                        sum_b < 3 
+                    || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) 
+                    || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag)) 
+                    || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag))
+                )
+            )
         {
             if (fifthCard_flag)
             {
