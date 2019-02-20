@@ -27,6 +27,7 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
         require_auth(existing->dealer);
         // start a new round. init.
+        eosio::print(" ===validCardVec.size:", existing->validCardVec.size());
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
         std::vector<card_info> emptyCards;
@@ -57,6 +58,7 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
     {
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
         // start a new round. init.
+        eosio::print(" ===validCardVec.size:", existing->validCardVec.size());
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
         std::vector<card_info> emptyCards;
@@ -292,20 +294,29 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     {
         sixPosVec.erase(sixPosVec.begin() + 5);
     }
-    std::sort(sixPosVec.begin(), sixPosVec.end());
+    std::vector<uint16_t> validCardTemp = existing->validCardVec;
+    for (auto i : sixPosVec)
+    {
+        for (auto itr = validCardTemp.begin(); itr != validCardTemp.end(); itr++)
+        {
+            if (*itr == i)
+            {
+                itr = validCardTemp.erase(itr);
+                eosio::print(" 【erase ", i);
+            }
+            if (itr == validCardTemp.end())
+            {
+                break;
+            }
+        }
+        eosio::print(" tem.size ", validCardTemp.size(), "】");
+    }
     tableround.modify(existing, _self, [&](auto &s) {
         // TODO::dealerBalance & playerinfo & result.
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
         s.playerHands = playerHands;
         s.bankerHands = bankerHands;
-        s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[0]);
-        s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[1] - 1);
-        s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[2] - 2);
-        s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[3] - 3);
-        if (sixPosVec.size() > 4)
-            s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[4] - 4);
-        if (sixPosVec.size() > 5)
-            s.validCardVec.erase(existing->validCardVec.begin() + sixPosVec[5] - 5);
+        s.validCardVec = validCardTemp;
     });
 }
 
