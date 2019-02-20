@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Feb 19 18:20:37 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Feb 20 15:00:20 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -183,43 +183,11 @@
             "base": "",
             "fields": [
                 {
+                    "name": "validCardVec",
+                    "type": "uint16[]"
+                },
+                {
                     "name": "tableId",
-                    "type": "uint64"
-                },
-                {
-                    "name": "betStartTime",
-                    "type": "uint64"
-                },
-                {
-                    "name": "dealerSeedHash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "dealerSeed",
-                    "type": "string"
-                },
-                {
-                    "name": "dSeedVerity",
-                    "type": "bool"
-                },
-                {
-                    "name": "serverSeedHash",
-                    "type": "checksum256"
-                },
-                {
-                    "name": "serverSeed",
-                    "type": "string"
-                },
-                {
-                    "name": "sSeedVerity",
-                    "type": "bool"
-                },
-                {
-                    "name": "roundResult",
-                    "type": "string"
-                },
-                {
-                    "name": "tableStatus",
                     "type": "uint64"
                 },
                 {
@@ -235,16 +203,48 @@
                     "type": "asset"
                 },
                 {
+                    "name": "betStartTime",
+                    "type": "uint64"
+                },
+                {
+                    "name": "tableStatus",
+                    "type": "uint64"
+                },
+                {
                     "name": "currRoundBetSum",
                     "type": "asset"
+                },
+                {
+                    "name": "dealerSeedHash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "serverSeedHash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "dealerSeed",
+                    "type": "string"
+                },
+                {
+                    "name": "serverSeed",
+                    "type": "string"
+                },
+                {
+                    "name": "dSeedVerity",
+                    "type": "bool"
+                },
+                {
+                    "name": "sSeedVerity",
+                    "type": "bool"
                 },
                 {
                     "name": "playerInfo",
                     "type": "player_bet_info[]"
                 },
                 {
-                    "name": "validCardVec",
-                    "type": "uint16[]"
+                    "name": "roundResult",
+                    "type": "string"
                 },
                 {
                     "name": "playerHands",

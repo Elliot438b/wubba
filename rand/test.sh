@@ -52,7 +52,7 @@ normalflow)
     cleos --wallet-url http://127.0.0.1:6666 get currency balance eosio.token useraaaaaaac
     cleos --wallet-url http://127.0.0.1:6666 get currency balance eosio.token useraaaaaaad
 
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa dealerseed '['$tableid',ae0f7dccec3e14a7bc1fd55b2f75a30f2682c705dcea9c6dcb9b8d6d23896c6f]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa dealerseed '['$tableid',50e721e49c013f00c62cf59f2163542a9d8df02464efeb615d31051b0fddc326]' -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa serverseed '['$tableid',d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35]' -p useraaaaaaah
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaac,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaac
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaad,"3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS","3.0000 SYS"]' -p useraaaaaaad
@@ -60,7 +60,7 @@ normalflow)
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
     sleep 36s
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa endbet '['$tableid']' -p useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa verdealeseed '['$tableid',"hahahah"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa verdealeseed '['$tableid',"wanglsishuai"]' -p useraaaaaaab
     sleep 3s
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa verserveseed '['$tableid',2]' -p useraaaaaaah
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
