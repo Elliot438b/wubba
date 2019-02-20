@@ -47,10 +47,10 @@ CONTRACT wubba : public contract
         asset betTie;
         asset betDealerPush;
         asset betPlayerPush;
-        asset pBonns;
-        asset dBonns;
+        asset pBonus;
+        asset dBonus;
 
-        EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPush)(betPlayerPush)(pBonns)(dBonns))
+        EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPush)(betPlayerPush)(pBonus)(dBonus))
     };
 
     TABLE table_stats

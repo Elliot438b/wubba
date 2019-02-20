@@ -139,8 +139,8 @@ ACTION wubba::playerbet(uint64_t tableId, name player, asset betDealer, asset be
     temp.betTie = betTie;
     temp.betDealerPush = betDealerPush;
     temp.betPlayerPush = betPlayerPush;
-    temp.pBonns = asset(0, symbol(symbol_code("SYS"), 4));
-    temp.dBonns = asset(0, symbol(symbol_code("SYS"), 4));
+    temp.pBonus = asset(0, symbol(symbol_code("SYS"), 4));
+    temp.dBonus = asset(0, symbol(symbol_code("SYS"), 4));
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
@@ -284,76 +284,65 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     {
         eosio::print("4 cards end, don't need extra card obtain!");
     }
-
     //round result
-    //char roundResult[6];
-    //memset(roundResult, 0, 6);
-    string roundResult = "00000";
-
-    if(sum_p < sum_b)
+    string roundResult = "00000"; //Banker,Player,Tie,BankerPush,PlayerPush
+    if (sum_p < sum_b)            //Banker
         roundResult[0] = '1';
-    else if(sum_p > sum_b)
+    else if (sum_p > sum_b) //Player
         roundResult[1] = '1';
-    else if(sum_p == sum_b)
+    else if (sum_p == sum_b) //Tie
         roundResult[2] = '1';
-
-    if(bankerHands[0].cardNum == bankerHands[1].cardNum)
+    if (bankerHands[0].cardNum == bankerHands[1].cardNum) //BankerPush
         roundResult[3] = '1';
-    if(playerHands[0].cardNum == playerHands[1].cardNum)
+    if (playerHands[0].cardNum == playerHands[1].cardNum) //PlayerPush
         roundResult[4] = '1';
-
     eosio::print(" round_result: ", roundResult, " ");
-
-    //odds
-    std::vector<player_bet_info> tempVec;
-    asset temp_balance = existing->dealerBalance;
-    auto itr = (existing->playerInfo).begin();
-    for (; itr != (existing->playerInfo).end(); itr++)
+    //odds token
+    std::vector<player_bet_info> tempPlayerVec;
+    asset dealerBalance_temp = existing->dealerBalance;
+    for (auto playerBet : existing->playerInfo)
     {
-        player_bet_info tempInfo;
-        tempInfo = (*itr);
-
-        if(roundResult[0] == '1')
-            tempInfo.pBonns = (*itr).betDealer * (((roundResult[0])-'0') + 0.95);
-        else if(roundResult[0] == '0')
-            tempInfo.dBonns = (*itr).betDealer;
-        eosio::print(" pBonns: ", tempInfo.pBonns, " dBonns: ", tempInfo.dBonns, " ");
-
-        if(roundResult[1] == '1')
-            tempInfo.pBonns += tempInfo.betPlayer * (((roundResult[1])-'0') + 1);
-        else if(roundResult[1] == '0')
-            tempInfo.dBonns += (*itr).betPlayer;
-
-        if(roundResult[2] == '1')
-            tempInfo.pBonns += (*itr).betTie * ((roundResult[2]-'0') + 8);
-        else if(roundResult[2] == '0')
-            tempInfo.dBonns += (*itr).betTie;
-        eosio::print(" pBonns: ", tempInfo.pBonns, " dBonns: ", tempInfo.dBonns, " ");
-
-        if(roundResult[3] == '1')
-            tempInfo.pBonns += (*itr).betDealerPush * ((roundResult[3]-'0') + 11);
-        else if(roundResult[3] == '0')
-            tempInfo.dBonns += (*itr).betDealerPush;
-        eosio::print(" pBonns: ", tempInfo.pBonns, " dBonns: ", tempInfo.dBonns, " ");
-
-        if(roundResult[4] == '1')
-            tempInfo.pBonns += (*itr).betPlayerPush * ((roundResult[4]-'0') + 11);
-        else if(roundResult[4] == '0')
-            tempInfo.dBonns += (*itr).betPlayerPush;
-        eosio::print(" pBonns: ", tempInfo.pBonns, " dBonns: ", tempInfo.dBonns, " ");
+        auto pBonus = asset(0, symbol(symbol_code("SYS"), 4));
+        auto dBonus = asset(0, symbol(symbol_code("SYS"), 4));
+        // Banker field
+        if (roundResult[0] == '1')
+            pBonus = playerBet.betDealer * (1 + 0.95);
+        else
+            dBonus = playerBet.betDealer;
+        // Player field
+        if (roundResult[1] == '1')
+            pBonus += playerBet.betPlayer * (1 + 1);
+        else
+            dBonus += playerBet.betPlayer;
+        // Tie field
+        if (roundResult[2] == '1')
+            pBonus += playerBet.betTie * (1 + 8);
+        else
+            dBonus += playerBet.betTie;
+        // DealerPush field
+        if (roundResult[3] == '1')
+            pBonus += playerBet.betDealerPush * (1 + 11);
+        else
+            dBonus += playerBet.betDealerPush;
+        // PlayerPush field
+        if (roundResult[4] == '1')
+            pBonus += playerBet.betPlayerPush * (1 + 11);
+        else
+            dBonus += playerBet.betPlayerPush;
 
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (
             "eosio.token"_n, {{_self, "active"_n}},
-            {_self, tempInfo.player, tempInfo.pBonns, std::string("playerbet result")});
+            {_self, playerBet.player, pBonus, std::string("playerbet win")});
 
-        temp_balance -= tempInfo.pBonns;
-        temp_balance += tempInfo.dBonns;
-
-        tempVec.emplace_back(tempInfo);
+        dealerBalance_temp -= pBonus;
+        dealerBalance_temp += dBonus;
+        playerBet.pBonus = pBonus;
+        playerBet.dBonus = dBonus;
+        tempPlayerVec.emplace_back(playerBet);
     }
 
-    // cards used.
+    // delete cards used.
     if (!fifthCard_flag && !sixthCard_flag)
     {
         sixPosVec.erase(sixPosVec.begin() + 4);
@@ -386,10 +375,8 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
         s.bankerHands = bankerHands;
         s.validCardVec = validCardTemp;
         s.roundResult = roundResult;
-        s.dealerBalance = temp_balance;
-        s.playerInfo = tempVec;
-        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
-
+        s.dealerBalance = dealerBalance_temp;
+        s.playerInfo = tempPlayerVec;
     });
 }
 
