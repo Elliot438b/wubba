@@ -253,36 +253,48 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     // 5th/6th card obtain rules.
     bool fifthCard_flag = false;
     bool sixthCard_flag = false;
-    if (sum_p < 6)
-    {
-        playerHands.emplace_back(cardInfo[4]);
-        sum_p = (sum_p + cardInfo[4].cardNum) % 10;
-        fifthCard_flag = true;
-        if (sum_b == 6 && (sum_p == 6 || sum_p == 7))
-        {
-            bankerHands.emplace_back(cardInfo[5]);
-            sum_b = (sum_b + cardInfo[5].cardNum) % 10;
-            sixthCard_flag = true;
-        }
-    }
-    else if ((sum_b < 3) || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_flag)) || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 10) && fifthCard_flag)))
-    {
-        if (fifthCard_flag)
-        {
-            bankerHands.emplace_back(cardInfo[5]);
-            sum_b = (sum_b + cardInfo[5].cardNum) % 10;
-            sixthCard_flag = true;
-        }
-        else
-        {
-            bankerHands.emplace_back(cardInfo[4]);
-            sum_b = (sum_b + cardInfo[4].cardNum) % 10;
-            fifthCard_flag = true;
-        }
-    }
-    else
+    // all non-obtain rules
+    if (sum_p == 8 || sum_p == 9 || sum_b == 8 || sum_b == 9)
     {
         eosio::print("4 cards end, don't need extra card obtain!");
+    }
+    else if ((sum_p == 6 || sum_p == 7) && (sum_b == 6 || sum_b == 7))
+    {
+        eosio::print("4 cards end, don't need extra card obtain!");
+    }
+    // all obtain rules.
+    else
+    {
+        if (sum_p < 6)
+        {
+            playerHands.emplace_back(cardInfo[4]);
+            sum_p = (sum_p + cardInfo[4].cardNum) % 10;
+            fifthCard_flag = true;
+            if (sum_b == 6 && (sum_p == 6 || sum_p == 7))
+            {
+                bankerHands.emplace_back(cardInfo[5]);
+                sum_b = (sum_b + cardInfo[5].cardNum) % 10;
+                sixthCard_flag = true;
+            }
+        }
+        if ((sum_b < 3) 
+        || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) 
+        || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag)) 
+        || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag)))
+        {
+            if (fifthCard_flag)
+            {
+                bankerHands.emplace_back(cardInfo[5]);
+                sum_b = (sum_b + cardInfo[5].cardNum) % 10;
+                sixthCard_flag = true;
+            }
+            else
+            {
+                bankerHands.emplace_back(cardInfo[4]);
+                sum_b = (sum_b + cardInfo[4].cardNum) % 10;
+                fifthCard_flag = true;
+            }
+        }
     }
     //round result
     string roundResult = "00000"; //Banker,Player,Tie,BankerPush,PlayerPush
