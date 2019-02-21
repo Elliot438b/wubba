@@ -102,16 +102,13 @@ ACTION tina::testcardobta()
                     auto sum_p = p2;
                     auto sum_b = b2;
                     // 5th/6th card obtain rules.
-                    bool fifthCard_flag = false;
-                    bool sixthCard_flag = false;
+                    bool fifthCard_p = false; // if player obtain the 3th card.
+                    bool fifthCard_b = false; // if banker obtain the 3th card which is the 5th card of six.
+                    bool sixthCard_b = false; // if banker obtain the 3th card which is the 6th card of six.
                     // all non-obtain rules
-                    if (sum_p == 8 || sum_p == 9 || sum_b == 8 || sum_b == 9)
+                    if ((sum_p == 8 || sum_p == 9 || sum_b == 8 || sum_b == 9) || ((sum_p == 6 || sum_p == 7) && (sum_b == 6 || sum_b == 7)))
                     {
-                        eosio::print("@");
-                    }
-                    else if ((sum_p == 6 || sum_p == 7) && (sum_b == 6 || sum_b == 7))
-                    {
-                        eosio::print("@");
+                        eosio::print("@"); // player has 2 cards and banker has 2 cards.
                     }
                     // all obtain rules.
                     else
@@ -119,29 +116,42 @@ ACTION tina::testcardobta()
                         if (sum_p < 6)
                         {
                             sum_p = (sum_p + c5) % 10;
-                            fifthCard_flag = true;
+                            fifthCard_p = true;
                             if (sum_b == 6 && (sum_p == 6 || sum_p == 7))
                             {
                                 sum_b = (sum_b + c6) % 10;
-                                sixthCard_flag = true;
+                                sixthCard_b = true;
                             }
                         }
-                        if (!sixthCard_flag &&
-                            (sum_b < 3 || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag)) || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag))))
+                        if (!sixthCard_b &&
+                            (sum_b < 3 || (sum_b == 3 && !(sum_p == 8 && fifthCard_p)) || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_p)) || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_p))))
                         {
-                            if (fifthCard_flag)
+                            if (fifthCard_p)
                             {
                                 sum_b = (sum_b + c6) % 10;
-                                sixthCard_flag = true;
+                                sixthCard_b = true;
                             }
                             else
                             {
                                 sum_b = (sum_b + c5) % 10;
-                                fifthCard_flag = true;
+                                fifthCard_b = true;
                             }
                         }
                     }
-                    eosio::print("[", p2, ",", b2, ",", c5, ",", c6, "]", "==[", fifthCard_flag, ",", sixthCard_flag, "] ");
+                    // symbol macroscopic
+                    if (fifthCard_p && sixthCard_b)
+                    {
+                        eosio::print("-"); // player has 3 cards and banker has 3 cards.
+                    }
+                    else if (fifthCard_p && !sixthCard_b)
+                    {
+                        eosio::print("#"); // player has 3 cards and banker has 2 cards.
+                    }
+                    else if (fifthCard_b)
+                    {
+                        eosio::print("$"); // player has 2 cards and banker has 3 cards.
+                    }
+                    eosio::print("[", p2, ",", b2, ",", c5, ",", c6, "]", "==[", fifthCard_p, ",", fifthCard_b || sixthCard_b, "] ");
                 }
             }
         }
