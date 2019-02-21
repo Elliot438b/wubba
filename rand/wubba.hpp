@@ -165,7 +165,7 @@ CONTRACT wubba : public contract
     const asset oneRoundDealerMaxPay = oneRoundMaxTotalBet_Push*11*2 + max(oneRoundMaxTotalBet_BP*1, oneRoundMaxTotalBet_Tie*8);
 
     const uint32_t betPeriod = 30;
-    const uint32_t minTableRounds = 2;
+    const uint32_t minTableRounds = 10;
     const uint16_t initDecks = 8;
     const asset minTableDeposit = oneRoundDealerMaxPay * minTableRounds;
     const char *notableerr = "TableId isn't existing!";

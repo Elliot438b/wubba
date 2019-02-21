@@ -107,15 +107,23 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
 
 ACTION wubba::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush)
 {
+    asset empty = asset(0, symbol(symbol_code("SYS"), 4));
     require_auth(player);
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     eosio_assert((now() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
-    eosio_assert((betDealer + betPlayer) > minPerBet_BP, "betDealer + betPlayer < minPerBet_BP");
-    eosio_assert(betTie > minPerBet_Tie, "betTie < minPerBet_Tie");
-    eosio_assert((betDealerPush + betPlayerPush) > minPerBet_Push, "(betDealerPush + betPlayerPush) < minPerBet_Push");
+    if (betDealer > empty)
+        eosio_assert(betDealer >= minPerBet_BP, "Banker bet is too small!");
+    if (betPlayer > empty)
+        eosio_assert(betPlayer >= minPerBet_BP, "Player bet is too small!");
+    if (betTie > empty)
+        eosio_assert(betTie >= minPerBet_Tie, "Tie bet is too small!");
+    if (betDealerPush > empty)
+        eosio_assert(betDealerPush >= minPerBet_Push, "BankerPush bet is too small!");
+    if (betPlayerPush > empty)
+        eosio_assert(betPlayerPush >= minPerBet_Push, "PlayerPush bet is too small!");
 
     asset player_amount_sum_bp = existing->currRoundBetSum_BP;
     asset player_amount_sum_tie = existing->currRoundBetSum_Tie;
@@ -144,11 +152,13 @@ ACTION wubba::playerbet(uint64_t tableId, name player, asset betDealer, asset be
     eosio_assert(player_amount_sum_push < oneRoundMaxTotalBet_Push, "Over the peak of total bet_push amount of this round!");
 
     asset depositAmount = (betDealer + betPlayer + betTie + betDealerPush + betPlayerPush);
-    INLINE_ACTION_SENDER(eosio::token, transfer)
-    (
-        "eosio.token"_n, {{player, "active"_n}},
-        {player, _self, depositAmount, std::string("playerbet")});
-
+    if (depositAmount > empty)
+    {
+        INLINE_ACTION_SENDER(eosio::token, transfer)
+        (
+            "eosio.token"_n, {{player, "active"_n}},
+            {player, _self, depositAmount, std::string("playerbet")});
+    }
     player_bet_info temp;
     temp.player = player;
     temp.betDealer = betDealer;
@@ -297,13 +307,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
             }
         }
         if (!sixthCard_flag &&
-                (
-                        sum_b < 3 
-                    || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) 
-                    || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag)) 
-                    || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag))
-                )
-            )
+            (sum_b < 3 || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag)) || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag))))
         {
             if (fifthCard_flag)
             {
