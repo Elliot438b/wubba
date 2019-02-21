@@ -64,7 +64,9 @@ CONTRACT wubba : public contract
         // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
         uint64_t tableStatus;  // round stage.
-        asset currRoundBetSum;
+        asset currRoundBetSum_BP;
+        asset currRoundBetSum_Tie;
+        asset currRoundBetSum_Push;
 
         checksum256 dealerSeedHash;
         checksum256 serverSeedHash;
@@ -91,7 +93,7 @@ CONTRACT wubba : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(dealer)(trusteeship)(dealerBalance)(betStartTime)(tableStatus)(currRoundBetSum)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
+        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(dealer)(trusteeship)(dealerBalance)(betStartTime)(tableStatus)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
@@ -153,12 +155,19 @@ CONTRACT wubba : public contract
     name serveraccount = "useraaaaaaah"_n;
     name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
 
-    const asset minPerBet = asset(20000, symbol(symbol_code("SYS"), 4));
-    const asset oneRoundMaxTotalBet = asset(100000, symbol(symbol_code("SYS"), 4));
+    const asset oneRoundMaxTotalBet_BP = asset(10000000, symbol(symbol_code("SYS"), 4));
+    const asset minPerBet_BP = asset(1000000, symbol(symbol_code("SYS"), 4));
+    const asset oneRoundMaxTotalBet_Tie = asset(1000000, symbol(symbol_code("SYS"), 4));
+    const asset minPerBet_Tie = asset(100000, symbol(symbol_code("SYS"), 4));
+    const asset oneRoundMaxTotalBet_Push = asset(500000, symbol(symbol_code("SYS"), 4));
+    const asset minPerBet_Push = asset(10000, symbol(symbol_code("SYS"), 4));
+
+    const asset oneRoundDealerMaxPay = oneRoundMaxTotalBet_Push*11*2 + max(oneRoundMaxTotalBet_BP*1, oneRoundMaxTotalBet_Tie*8);
+
     const uint32_t betPeriod = 30;
     const uint32_t minTableRounds = 2;
     const uint16_t initDecks = 8;
-    const asset minTableDeposit = oneRoundMaxTotalBet * minTableRounds;
+    const asset minTableDeposit = oneRoundDealerMaxPay * minTableRounds;
     const char *notableerr = "TableId isn't existing!";
 
     singletable_t tableround;

@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Feb 20 15:00:20 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Feb 21 11:31:49 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -121,11 +121,11 @@
                     "type": "asset"
                 },
                 {
-                    "name": "pBonns",
+                    "name": "pBonus",
                     "type": "asset"
                 },
                 {
-                    "name": "dBonns",
+                    "name": "dBonus",
                     "type": "asset"
                 }
             ]
@@ -211,7 +211,15 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "currRoundBetSum",
+                    "name": "currRoundBetSum_BP",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_Tie",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_Push",
                     "type": "asset"
                 },
                 {

@@ -34,7 +34,9 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = 0;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
-            s.currRoundBetSum = asset(0, symbol(symbol_code("SYS"), 4));
+            s.currRoundBetSum_BP = asset(0, symbol(symbol_code("SYS"), 4));
+            s.currRoundBetSum_Tie = asset(0, symbol(symbol_code("SYS"), 4));
+            s.currRoundBetSum_Push = asset(0, symbol(symbol_code("SYS"), 4));
             s.dealerSeedHash = encodeSeed;
             s.serverSeedHash = hash;
             s.dealerSeed = "";
@@ -65,7 +67,9 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = now();
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
-            s.currRoundBetSum = asset(0, symbol(symbol_code("SYS"), 4));
+            s.currRoundBetSum_BP = asset(0, symbol(symbol_code("SYS"), 4));
+            s.currRoundBetSum_Tie = asset(0, symbol(symbol_code("SYS"), 4));
+            s.currRoundBetSum_Push = asset(0, symbol(symbol_code("SYS"), 4));
             s.dealerSeedHash = hash;
             s.serverSeedHash = encodeSeed;
             s.dealerSeed = "";
@@ -104,13 +108,18 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
 ACTION wubba::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush)
 {
     require_auth(player);
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     eosio_assert((now() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
-    // eosio_assert(betAmount > minPerBet, "betAmount < minPerBet");
+    eosio_assert((betDealer + betPlayer) > minPerBet_BP, "betDealer + betPlayer < minPerBet_BP");
+    eosio_assert(betTie > minPerBet_Tie, "betTie < minPerBet_Tie");
+    eosio_assert((betDealerPush + betPlayerPush) > minPerBet_Push, "(betDealerPush + betPlayerPush) < minPerBet_Push");
 
-    asset player_amount_sum = existing->currRoundBetSum;
+    asset player_amount_sum_bp = existing->currRoundBetSum_BP;
+    asset player_amount_sum_tie = existing->currRoundBetSum_Tie;
+    asset player_amount_sum_push = existing->currRoundBetSum_Push;
 
     bool flag = false;
     for (const auto &p : existing->playerInfo)
@@ -123,8 +132,16 @@ ACTION wubba::playerbet(uint64_t tableId, name player, asset betDealer, asset be
     }
 
     eosio_assert(!flag, "player have bet");
-    //player_amount_sum += betAmount;
-    //eosio_assert(player_amount_sum < oneRoundMaxTotalBet, "Over the peak of total bet amount of this round!");
+    player_amount_sum_bp += betDealer;
+    player_amount_sum_bp += betPlayer;
+    eosio_assert(player_amount_sum_bp < oneRoundMaxTotalBet_BP, "Over the peak of total bet_bp amount of this round!");
+
+    player_amount_sum_tie += betTie;
+    eosio_assert(player_amount_sum_tie < oneRoundMaxTotalBet_Tie, "Over the peak of total bet_tie amount of this round!");
+
+    player_amount_sum_push += betDealerPush;
+    player_amount_sum_push += betPlayerPush;
+    eosio_assert(player_amount_sum_push < oneRoundMaxTotalBet_Push, "Over the peak of total bet_push amount of this round!");
 
     asset depositAmount = (betDealer + betPlayer + betTie + betDealerPush + betPlayerPush);
     INLINE_ACTION_SENDER(eosio::token, transfer)
@@ -144,7 +161,9 @@ ACTION wubba::playerbet(uint64_t tableId, name player, asset betDealer, asset be
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
-        s.currRoundBetSum = player_amount_sum;
+        s.currRoundBetSum_BP = player_amount_sum_bp;
+        s.currRoundBetSum_Tie = player_amount_sum_tie;
+        s.currRoundBetSum_Push = player_amount_sum_push;
     });
 }
 
