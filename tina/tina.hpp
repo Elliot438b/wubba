@@ -39,12 +39,14 @@ public:
   ACTION testtransfer(asset money); // Sc-> account
   ACTION testreverse(asset money);  // accounta-> SC
   ACTION testaccount(asset money);  // accounta-> accountb
+  ACTION testcardobta();            // test card obtain logic.
   using erasingdata_action = action_wrapper<"erasingdata"_n, &tina::erasingdata>;
   using testmultidex_action = action_wrapper<"testmultidex"_n, &tina::testmultidex>;
   using testtransfer_action = action_wrapper<"testtransfer"_n, &tina::testtransfer>;
-  using testreverse_action = action_wrapper<"testreverse"_n, &tina::testtransfer>;
-  using testaccount_action = action_wrapper<"testaccount"_n, &tina::testtransfer>;
-  using testdispatch_action = action_wrapper<"testdispatch"_n, &tina::testtransfer>;
+  using testreverse_action = action_wrapper<"testreverse"_n, &tina::testreverse>;
+  using testaccount_action = action_wrapper<"testaccount"_n, &tina::testaccount>;
+  using testdispatch_action = action_wrapper<"testdispatch"_n, &tina::testdispatch>;
+  using testcardobta_action = action_wrapper<"testcardobta"_n, &tina::testcardobta>;
 
   name accounta = "useraaaaaaai"_n;
   name accountb = "useraaaaaaah"_n;

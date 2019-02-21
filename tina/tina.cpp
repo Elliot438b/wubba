@@ -88,5 +88,63 @@ ACTION tina::testaccount(asset money)
         "eosio.token"_n, {{accounta, "active"_n}},
         {accounta, accountb, money, std::string("money ")});
 }
-
-EOSIO_DISPATCH(tina, (erasingdata)(testmultidex)(testdispatch)(testtransfer)(testreverse)(testaccount))
+ACTION tina::testcardobta()
+{
+    for (auto p2 = 0; p2 < 10; p2++)
+    {
+        for (auto b2 = 0; b2 < 10; b2++)
+        {
+            for (auto c5 = 0; c5 < 10; c5++)
+            {
+                for (auto c6 = 0; c6 < 10; c6++)
+                {
+                    // first 2 cards init.
+                    auto sum_p = p2;
+                    auto sum_b = b2;
+                    // 5th/6th card obtain rules.
+                    bool fifthCard_flag = false;
+                    bool sixthCard_flag = false;
+                    // all non-obtain rules
+                    if (sum_p == 8 || sum_p == 9 || sum_b == 8 || sum_b == 9)
+                    {
+                        eosio::print("@");
+                    }
+                    else if ((sum_p == 6 || sum_p == 7) && (sum_b == 6 || sum_b == 7))
+                    {
+                        eosio::print("@");
+                    }
+                    // all obtain rules.
+                    else
+                    {
+                        if (sum_p < 6)
+                        {
+                            sum_p = (sum_p + c5) % 10;
+                            fifthCard_flag = true;
+                            if (sum_b == 6 && (sum_p == 6 || sum_p == 7))
+                            {
+                                sum_b = (sum_b + c6) % 10;
+                                sixthCard_flag = true;
+                            }
+                        }
+                        if (!sixthCard_flag &&
+                            (sum_b < 3 || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag)) || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag))))
+                        {
+                            if (fifthCard_flag)
+                            {
+                                sum_b = (sum_b + c6) % 10;
+                                sixthCard_flag = true;
+                            }
+                            else
+                            {
+                                sum_b = (sum_b + c5) % 10;
+                                fifthCard_flag = true;
+                            }
+                        }
+                    }
+                    eosio::print("[", p2, ",", b2, ",", c5, ",", c6, "]", "==[", fifthCard_flag, ",", sixthCard_flag, "] ");
+                }
+            }
+        }
+    }
+}
+EOSIO_DISPATCH(tina, (erasingdata)(testmultidex)(testdispatch)(testtransfer)(testreverse)(testaccount)(testcardobta))
