@@ -121,7 +121,7 @@ minTableDeposit = oneRoundDealerMaxPay*minTableRounds
 - Add a global variable: **CardsMinLimit**, initial with 100.
 - Add a bool field in table-stats: **isPrivate**. If it's true, UI could hidden this table in list.
 - Add an ACTION depositable: allow dealer to supply deposit for its existing table. 
-    - **NOTE**: AUTO START: if tables tatus == PAUSED, change it to ROUND_END.
+    - **NOTE**: AUTO START: if table status == PAUSED, change it to ROUND_END.
     - **NOTE**: Can edit **isPrivate** field of its existing table though this ACTION.
     - params: (name dealer, asset deposit, bool isPrivate)
 - Change ACTION newtable params:
