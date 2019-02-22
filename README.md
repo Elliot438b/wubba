@@ -114,29 +114,34 @@ minTableDeposit = oneRoundDealerMaxPay*minTableRounds
     1. closetable (can't recover)
 
 ## v0.5 target
-- _self operation of deleting all closed table.
-- add an ACTION depositable, allow dealer suppy deposit for its exsiting table. 
-    - **NOTE**: AUTO START: if tablestatus==PAUSED, change to ROUND_END
-- add global var CardsMinLimit, init with 100.
-- add a bool table field in table-stats: isPrivate. If it's true, UI could hidden the table.
-- change newtable ACTION params:
+
+**NOTICE: Checking all transfer actions, if the amount == 0, don't transfer.**
+
+- Smart contract account's operation: delete all of table closed.
+- Add a global variable: **CardsMinLimit**, initial with 100.
+- Add a bool field in table-stats: **isPrivate**. If it's true, UI could hidden this table in list.
+- Add an ACTION depositable: allow dealer to supply deposit for its existing table. 
+    - **NOTE**: AUTO START: if tables tatus == PAUSED, change it to ROUND_END.
+    - **NOTE**: Can edit **isPrivate** field of its existing table though this ACTION.
+    - params: (name dealer, asset deposit, bool isPrivate)
+- Change ACTION newtable params:
 
 parameter | required | default
 ---|---|---
 name dealer | *required | 
 asset deposit | *required | 
-isPrivate | *option | 0 (public)
-oneRoundMaxTotalBet_BP | *option | 1000
-minPerBet_BP | *option | 100
-oneRoundMaxTotalBet_Tie | *option | 100
-minPerBet_Tie | *option | 1
-oneRoundMaxTotalBet_Push | *option | 50
-minPerBet_Push | *option | 1
+bool isPrivate | *option | 0 (public)
+asset oneRoundMaxTotalBet_BP | *option | 1000
+asset minPerBet_BP | *option | 100
+asset oneRoundMaxTotalBet_Tie | *option | 100
+asset minPerBet_Tie | *option | 1
+asset oneRoundMaxTotalBet_Push | *option | 50
+asset minPerBet_Push | *option | 1
 
-- add an ACTION dealerWitdaw, allow dealer withdraw from dealerBalance. 
+- Add an ACTION dealerWitdaw: allow dealer to withdraw from dealerBalance. 
     - **NOTE**: Must keep dealerBalance >= oneRoundDealerMaxPay*2 at least.
     - **NOTE**: If dealer want to withdraw all, close the table.
-- change closetable ACTION: transfer all the dealerBalance to dealer account before closing table. 
+- Change ACTION closetable: transfer all the dealerBalance to dealer account before closing this table. 
     - **NOTE**: table closed can't be recovery any more.
 
 ## v0.5.1 target
