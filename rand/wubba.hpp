@@ -167,11 +167,11 @@ CONTRACT wubba : public contract
     const asset oneRoundMaxTotalBet_BP = asset(10000000, symbol(symbol_code("SYS"), 4));
     const asset minPerBet_BP = asset(1000000, symbol(symbol_code("SYS"), 4));
     const asset oneRoundMaxTotalBet_Tie = asset(1000000, symbol(symbol_code("SYS"), 4));
-    const asset minPerBet_Tie = asset(100000, symbol(symbol_code("SYS"), 4));
+    const asset minPerBet_Tie = asset(10000, symbol(symbol_code("SYS"), 4));
     const asset oneRoundMaxTotalBet_Push = asset(500000, symbol(symbol_code("SYS"), 4));
     const asset minPerBet_Push = asset(10000, symbol(symbol_code("SYS"), 4));
 
-    const asset oneRoundDealerMaxPay = oneRoundMaxTotalBet_Push*11*2 + max(oneRoundMaxTotalBet_BP*1, oneRoundMaxTotalBet_Tie*8);
+    const asset oneRoundDealerMaxPay = oneRoundMaxTotalBet_Push * 11 * 2 + max(oneRoundMaxTotalBet_BP * 1, oneRoundMaxTotalBet_Tie * 8);
 
     const uint32_t betPeriod = 30;
     const uint32_t minTableRounds = 10;

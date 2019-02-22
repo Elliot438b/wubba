@@ -14,7 +14,7 @@ ACTION wubba::newtable(name dealer, asset deposit)
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
         s.dealer = dealer;
         s.dealerBalance = deposit;
-        //s.dealerBalance = asset(2000000, symbol(symbol_code("SYS"), 4));//test existing->dealerBalance > oneRoundDealerMaxPay*2
+        s.dealerBalance = asset(2000000, symbol(symbol_code("SYS"), 4)); //test existing->dealerBalance > oneRoundDealerMaxPay*2
         shuffle(s.validCardVec);
     });
 }
@@ -24,43 +24,44 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
 
-    if(existing->dealerBalance < oneRoundDealerMaxPay*2)
+    if (!existing->trusteeship)
     {
-        pausetable(existing->tableId);
-
-        INLINE_ACTION_SENDER(wubba, pausetablehi)
-        (
-             _self, {{existing->dealer, "active"_n}},
-             {existing->tableId});
-    }
-    else {
-        if (!existing->trusteeship) {
-            eosio_assert(existing->tableStatus == (uint64_t) table_stats::status_fields::ROUND_END,
-                         "tableStatus != end");
-            require_auth(existing->dealer);
-            // start a new round. init.
-            eosio::print(" ===validCardVec.size:", existing->validCardVec.size());
-            checksum256 hash;
-            std::vector <player_bet_info> emptyPlayers;
-            std::vector <card_info> emptyCards;
+        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END,
+                     "tableStatus != end");
+        require_auth(existing->dealer);
+        if (existing->dealerBalance < oneRoundDealerMaxPay * 2)
+        {
             tableround.modify(existing, _self, [&](auto &s) {
-                s.betStartTime = 0;
-                s.tableStatus = (uint64_t) table_stats::status_fields::ROUND_START;
-                s.currRoundBetSum_BP = asset(0, symbol(symbol_code("SYS"), 4));
-                s.currRoundBetSum_Tie = asset(0, symbol(symbol_code("SYS"), 4));
-                s.currRoundBetSum_Push = asset(0, symbol(symbol_code("SYS"), 4));
-                s.dealerSeedHash = encodeSeed;
-                s.serverSeedHash = hash;
-                s.dealerSeed = "";
-                s.serverSeed = "";
-                s.dSeedVerity = 0;
-                s.sSeedVerity = 0;
-                s.playerInfo = emptyPlayers;
-                s.roundResult = "";
-                s.playerHands = emptyCards;
-                s.bankerHands = emptyCards;
+                s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
             });
+            INLINE_ACTION_SENDER(wubba, pausetablehi)
+            (
+                _self, {{existing->dealer, "active"_n}},
+                {existing->tableId});
+            return;
         }
+        // start a new round. init.
+        eosio::print(" ===validCardVec.size:", existing->validCardVec.size());
+        checksum256 hash;
+        std::vector<player_bet_info> emptyPlayers;
+        std::vector<card_info> emptyCards;
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.betStartTime = 0;
+            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
+            s.currRoundBetSum_BP = asset(0, symbol(symbol_code("SYS"), 4));
+            s.currRoundBetSum_Tie = asset(0, symbol(symbol_code("SYS"), 4));
+            s.currRoundBetSum_Push = asset(0, symbol(symbol_code("SYS"), 4));
+            s.dealerSeedHash = encodeSeed;
+            s.serverSeedHash = hash;
+            s.dealerSeed = "";
+            s.serverSeed = "";
+            s.dSeedVerity = 0;
+            s.sSeedVerity = 0;
+            s.playerInfo = emptyPlayers;
+            s.roundResult = "";
+            s.playerHands = emptyCards;
+            s.bankerHands = emptyCards;
+        });
     }
 }
 
@@ -69,52 +70,50 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-
     bool shuffle_flag = false;
-    if(existing->validCardVec.size() <= 100)
+    if (existing->validCardVec.size() <= 100)
     {
         shuffle_flag = true;
+        eosio::print("---Cards aren't enough, re shuffle.---");
     }
-
     if (existing->trusteeship)
     {
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
-        if(existing->dealerBalance < oneRoundDealerMaxPay*2)
+        if (existing->dealerBalance < oneRoundDealerMaxPay * 2)
         {
-            pausetable(existing->tableId);
-
+            tableround.modify(existing, _self, [&](auto &s) {
+                s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
+            });
             INLINE_ACTION_SENDER(wubba, pausetablehi)
             (
-                 _self, {{existing->dealer, "active"_n}},
-                 {existing->tableId});
+                _self, {{existing->dealer, "active"_n}},
+                {existing->tableId});
+            return;
         }
-        else {
-
-            // start a new round. init.
-            eosio::print(" ===validCardVec.size:", existing->validCardVec.size());
-            checksum256 hash;
-            std::vector <player_bet_info> emptyPlayers;
-            std::vector <card_info> emptyCards;
-            tableround.modify(existing, _self, [&](auto &s) {
-                s.betStartTime = now();
-                s.tableStatus = (uint64_t) table_stats::status_fields::ROUND_BET;
-                s.currRoundBetSum_BP = asset(0, symbol(symbol_code("SYS"), 4));
-                s.currRoundBetSum_Tie = asset(0, symbol(symbol_code("SYS"), 4));
-                s.currRoundBetSum_Push = asset(0, symbol(symbol_code("SYS"), 4));
-                s.dealerSeedHash = hash;
-                s.serverSeedHash = encodeSeed;
-                s.dealerSeed = "";
-                s.serverSeed = "";
-                s.dSeedVerity = 0;
-                s.sSeedVerity = 0;
-                s.playerInfo = emptyPlayers;
-                s.roundResult = "";
-                s.playerHands = emptyCards;
-                s.bankerHands = emptyCards;
-                if (shuffle_flag)
-                    shuffle(s.validCardVec);
-            });
-        }
+        // start a new round. init.
+        eosio::print(" ===validCardVec.size:", existing->validCardVec.size());
+        checksum256 hash;
+        std::vector<player_bet_info> emptyPlayers;
+        std::vector<card_info> emptyCards;
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.betStartTime = now();
+            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
+            s.currRoundBetSum_BP = asset(0, symbol(symbol_code("SYS"), 4));
+            s.currRoundBetSum_Tie = asset(0, symbol(symbol_code("SYS"), 4));
+            s.currRoundBetSum_Push = asset(0, symbol(symbol_code("SYS"), 4));
+            s.dealerSeedHash = hash;
+            s.serverSeedHash = encodeSeed;
+            s.dealerSeed = "";
+            s.serverSeed = "";
+            s.dSeedVerity = 0;
+            s.sSeedVerity = 0;
+            s.playerInfo = emptyPlayers;
+            s.roundResult = "";
+            s.playerHands = emptyCards;
+            s.bankerHands = emptyCards;
+            if (shuffle_flag)
+                shuffle(s.validCardVec);
+        });
     }
     else
     {
@@ -123,7 +122,7 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
             s.serverSeedHash = encodeSeed;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
             s.betStartTime = now();
-            if(shuffle_flag)
+            if (shuffle_flag)
                 shuffle(s.validCardVec);
         });
     }
@@ -406,11 +405,15 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
         else
             dBonus += playerBet.betPlayerPush;
 
-        INLINE_ACTION_SENDER(eosio::token, transfer)
-        (
-            "eosio.token"_n, {{_self, "active"_n}},
-            {_self, playerBet.player, pBonus, std::string("playerbet win")});
-
+        eosio::print(" [player:", playerBet.player, ", total bonus:", pBonus, "] ");
+        asset empty = asset(0, symbol(symbol_code("SYS"), 4));
+        if (pBonus > empty)
+        {
+            INLINE_ACTION_SENDER(eosio::token, transfer)
+            (
+                "eosio.token"_n, {{_self, "active"_n}},
+                {_self, playerBet.player, pBonus, std::string("playerbet win")});
+        }
         dealerBalance_temp -= pBonus;
         dealerBalance_temp += dBonus;
         playerBet.pBonus = pBonus;
@@ -424,7 +427,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
         sixPosVec.erase(sixPosVec.begin() + 4);
         sixPosVec.erase(sixPosVec.begin() + 4);
     }
-    else if (fifthCard_flag || sixthCard_flag)
+    else if (!sixthCard_flag)
     {
         sixPosVec.erase(sixPosVec.begin() + 5);
     }
@@ -511,8 +514,8 @@ ACTION wubba::pausetable(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer); // dealer trustee server.
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round not end, can`t pausetable");
+    require_auth(existing->dealer);
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't pause table");
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
     });
@@ -547,18 +550,5 @@ ACTION wubba::closetable(uint64_t tableId)
         s.tableStatus = (uint64_t)table_stats::status_fields::CLOSED;
     });
 }
-
-//void wubba::verbalance(asset balance, uint64_t tableId)
-//{
-//    if(balance < oneRoundDealerMaxPay*2)
-//    {
-//        pausetable(tableId);
-//
-//        INLINE_ACTION_SENDER(wubba, pausetablehi)
-//                (
-//                        _self, {{existing->dealer, "active"_n}},
-//                        {existing->tableId});
-//    }
-//}
 
 EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetable)(pausetablehi)(continuetable)(closetable))
