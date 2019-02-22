@@ -29,6 +29,10 @@ CONTRACT wubba : public contract
     ACTION exitruteship(uint64_t tableId);
     ACTION disconnecthi(name informed, uint64_t tableId);
     ACTION erasingdata(uint64_t key);
+    ACTION pausetable(uint64_t tableId);
+    ACTION pausetablehi(uint64_t tableId);
+    ACTION continuetable(uint64_t tableId);
+    ACTION closetable(uint64_t tableId);
 
     struct card_info
     {
@@ -135,6 +139,7 @@ CONTRACT wubba : public contract
     // shuffle
     void shuffle(std::vector<uint16_t> & cardVec)
     {
+        cardVec.clear();
         for (auto i = 0; i < initDecks * 52; i++)
         {
             cardVec.emplace_back(i);
@@ -151,6 +156,10 @@ CONTRACT wubba : public contract
     using exitruteship_action = action_wrapper<"exitruteship"_n, &wubba::exitruteship>;
     using disconnecthi_action = action_wrapper<"disconnecthi"_n, &wubba::disconnecthi>;
     using erasingdata_action = action_wrapper<"erasingdata"_n, &wubba::erasingdata>;
+    using pausetable_action = action_wrapper<"pausetable"_n, &wubba::pausetable>;
+    using pausetablehi_action = action_wrapper<"pausetablehi"_n, &wubba::pausetablehi>;
+    using continuetable_action = action_wrapper<"continuetable"_n, &wubba::continuetable>;
+    using closetable_action = action_wrapper<"closetable"_n, &wubba::closetable>;
 
     name serveraccount = "useraaaaaaah"_n;
     name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
@@ -166,9 +175,11 @@ CONTRACT wubba : public contract
 
     const uint32_t betPeriod = 30;
     const uint32_t minTableRounds = 10;
-    const uint16_t initDecks = 8;
+    const uint16_t initDecks = 2;
     const asset minTableDeposit = oneRoundDealerMaxPay * minTableRounds;
     const char *notableerr = "TableId isn't existing!";
+    const char *closetableerr = "TableId have been closed";
+    const char *pausedtableerr = "TableId have been paused";
 
     singletable_t tableround;
     WBRNG wbrng;

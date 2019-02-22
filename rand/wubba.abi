@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Feb 21 11:31:49 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Feb 22 14:51:41 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -17,6 +17,26 @@
                 {
                     "name": "cardColor",
                     "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "closetable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "continuetable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
                 }
             ]
         },
@@ -89,6 +109,26 @@
                 {
                     "name": "deposit",
                     "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "pausetable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "pausetablehi",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
                 }
             ]
         },
@@ -306,6 +346,16 @@
     "types": [],
     "actions": [
         {
+            "name": "closetable",
+            "type": "closetable",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "continuetable",
+            "type": "continuetable",
+            "ricardian_contract": ""
+        },
+        {
             "name": "dealerseed",
             "type": "dealerseed",
             "ricardian_contract": ""
@@ -333,6 +383,16 @@
         {
             "name": "newtable",
             "type": "newtable",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "pausetable",
+            "type": "pausetable",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "pausetablehi",
+            "type": "pausetablehi",
             "ricardian_contract": ""
         },
         {
