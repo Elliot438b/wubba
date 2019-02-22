@@ -115,21 +115,29 @@ minTableDeposit = oneRoundDealerMaxPay*minTableRounds
 
 ## v0.5 target
 - _self operation of deleting all closed table.
-- add an ACTION depositable, allow dealer suppy deposit for its exsiting table. (CHECKING: if tablestatus==PAUSED, change to ROUND_END)
+- add an ACTION depositable, allow dealer suppy deposit for its exsiting table. 
+    - **NOTE**: AUTO START: if tablestatus==PAUSED, change to ROUND_END
 - add global var CardsMinLimit, init with 100.
 - add a bool table field in table-stats: isPrivate. If it's true, UI could hidden the table.
 - change newtable ACTION params:
-    - name dealer               (*required)
-    - asset deposit             (*required)
-    - isPrivate                 (*option, default:0)
-    - oneRoundMaxTotalBet_BP    (*option, default:1000)
-    - minPerBet_BP              (*option, default:100)
-    - oneRoundMaxTotalBet_Tie   (*option, default:100)
-    - minPerBet_Tie             (*option, default:1)
-    - oneRoundMaxTotalBet_Push  (*option, default:50)
-    - minPerBet_Push            (*option, default:1)
-- add an ACTION dealerWitdaw, allow dealer withdraw from dealerBalance. (Note: Must keep dealerBalance >= oneRoundDealerMaxPay*2 at least. If dealer want to withdraw all, close the table)
-- change closetable ACTION: transfer all the dealerBalance to dealer account before closing table. (table closed can't be recovery any more.)
+
+parameter | required | default
+---|---|---
+name dealer | *required | 
+asset deposit | *required | 
+isPrivate | *option | 0 (public)
+oneRoundMaxTotalBet_BP | *option | 1000
+minPerBet_BP | *option | 100
+oneRoundMaxTotalBet_Tie | *option | 100
+minPerBet_Tie | *option | 1
+oneRoundMaxTotalBet_Push | *option | 50
+minPerBet_Push | *option | 1
+
+- add an ACTION dealerWitdaw, allow dealer withdraw from dealerBalance. 
+    - **NOTE**: Must keep dealerBalance >= oneRoundDealerMaxPay*2 at least.
+    - **NOTE**: If dealer want to withdraw all, close the table.
+- change closetable ACTION: transfer all the dealerBalance to dealer account before closing table. 
+    - **NOTE**: table closed can't be recovery any more.
 
 ## v0.5.1 target
 ### random result uniform distribution
