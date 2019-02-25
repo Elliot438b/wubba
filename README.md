@@ -123,7 +123,7 @@ minTableDeposit = oneRoundDealerMaxPay*minTableRounds
 - Add an ACTION depositable: allow dealer to supply deposit for its existing table. 
     - **NOTE**: AUTO START: if table status == PAUSED, change it to ROUND_END.
     - **NOTE**: Can edit **isPrivate** field of its existing table via this ACTION.
-    - params: (name dealer, asset deposit, bool isPrivate)
+    - params: (uint64_t tableId, name dealer, asset deposit, bool isPrivate)
 - Change ACTION newtable params:
 
 parameter | required | default
