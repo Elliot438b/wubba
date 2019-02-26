@@ -33,8 +33,9 @@ CONTRACT wubba : public contract
     ACTION pausetablehi(uint64_t tableId);
     ACTION continuetable(uint64_t tableId);
     ACTION closetable(uint64_t tableId);
-    ACTION depositable(name dealer, uint64_t tableId, asset deposit, bool isPrivate);
+    ACTION depositable(name dealer, uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
+    ACTION changeprivat(bool isPrivate, uint64_t tableId);
 
     struct card_info
     {
@@ -209,19 +210,10 @@ CONTRACT wubba : public contract
     using closetable_action = action_wrapper<"closetable"_n, &wubba::closetable>;
     using depositable_action = action_wrapper<"depositable"_n, &wubba::depositable>;
     using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &wubba::dealerwitdaw>;
+    using changeprivat_action = action_wrapper<"changeprivat"_n, &wubba::changeprivat>;
 
     name serveraccount = "useraaaaaaah"_n;
     name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
-
-//    const asset oneRoundMaxTotalBet_BP = asset(10000000, symbol(symbol_code("SYS"), 4));
-//    const asset minPerBet_BP = asset(1000000, symbol(symbol_code("SYS"), 4));
-//    const asset oneRoundMaxTotalBet_Tie = asset(1000000, symbol(symbol_code("SYS"), 4));
-//    const asset minPerBet_Tie = asset(10000, symbol(symbol_code("SYS"), 4));
-//    const asset oneRoundMaxTotalBet_Push = asset(500000, symbol(symbol_code("SYS"), 4));
-//    const asset minPerBet_Push = asset(10000, symbol(symbol_code("SYS"), 4));
-
-//    const asset oneRoundDealerMaxPay = oneRoundMaxTotalBet_Push * 11 * 2 + max(oneRoundMaxTotalBet_BP * 1, oneRoundMaxTotalBet_Tie * 8);
-//    const asset minTableDeposit = oneRoundDealerMaxPay * minTableRounds;
 
     const uint16_t CardsMinLimit = 100;
     const uint32_t betPeriod = 30;

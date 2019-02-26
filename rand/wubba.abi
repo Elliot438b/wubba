@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Feb 26 15:06:11 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Feb 26 15:27:11 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -17,6 +17,20 @@
                 {
                     "name": "cardColor",
                     "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "changeprivat",
+            "base": "",
+            "fields": [
+                {
+                    "name": "isPrivate",
+                    "type": "bool"
+                },
+                {
+                    "name": "tableId",
+                    "type": "uint64"
                 }
             ]
         },
@@ -83,10 +97,6 @@
                 {
                     "name": "deposit",
                     "type": "asset"
-                },
-                {
-                    "name": "isPrivate",
-                    "type": "bool"
                 }
             ]
         },
@@ -445,6 +455,11 @@
     ],
     "types": [],
     "actions": [
+        {
+            "name": "changeprivat",
+            "type": "changeprivat",
+            "ricardian_contract": ""
+        },
         {
             "name": "closetable",
             "type": "closetable",

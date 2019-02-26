@@ -604,7 +604,7 @@ ACTION wubba::closetable(uint64_t tableId)
         {_self, existing->dealer, existing->dealerBalance, std::string("close, withdraw all")});
 }
 
-ACTION wubba::depositable(name dealer, uint64_t tableId, asset deposit, bool isPrivate)
+ACTION wubba::depositable(name dealer, uint64_t tableId, asset deposit)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -617,7 +617,6 @@ ACTION wubba::depositable(name dealer, uint64_t tableId, asset deposit, bool isP
 
     tableround.modify(existing, _self, [&](auto &s) {
        s.dealerBalance += deposit;
-       s.isPrivate = isPrivate;
     });
 
     INLINE_ACTION_SENDER(wubba, continuetable)
@@ -644,4 +643,14 @@ ACTION wubba::dealerwitdaw(uint64_t tableId, asset withdraw)
     });
 }
 
-EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetable)(pausetablehi)(continuetable)(closetable)(depositable)(dealerwitdaw))
+ACTION wubba::changeprivat(bool isPrivate, uint64_t tableId)
+{
+    auto existing = tableround.find(tableId);
+    eosio_assert(existing != tableround.end(), notableerr);
+    require_auth(existing->dealer);
+    tableround.modify(existing, _self, [&](auto &s) {
+        s.isPrivate = isPrivate;
+    });
+
+}
+EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetable)(pausetablehi)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))

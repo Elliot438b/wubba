@@ -27,7 +27,7 @@ temptest)
         cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
     done
 
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa depositable '[useraaaaaaab, '$tableid', "23000.0000 SYS", 0]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa depositable '[useraaaaaaab, '$tableid', "23000.0000 SYS"]' -p useraaaaaaab
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
 
     sleep 3s
@@ -47,6 +47,9 @@ temptest)
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
 
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa closetable '['$tableid']' -p useraaaaaaab
+    cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
+
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa changeprivat '[1, '$tableid']' -p useraaaaaaab
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
 
     ;;
