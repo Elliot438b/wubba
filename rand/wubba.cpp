@@ -314,6 +314,8 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     {
         eosio::print("Dealer trusteeship, don't need dealer seed.");
     }
+    // non-trustee server, so table_round is waiting for ACTION::wubba::dealerseed until dealer reconnect.
+    // TODO Can be considered: auto trustee server until dealer reconnect and ACTION::wubba::exitruteship.
     else if (!existing->dSeedVerity)
     { // dealer disconnect notify
         INLINE_ACTION_SENDER(wubba, disconnecthi)
