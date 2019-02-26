@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Feb 22 14:51:41 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Feb 26 13:43:18 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -55,6 +55,42 @@
             ]
         },
         {
+            "name": "dealerwitdaw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "withdraw",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "depositable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "dealer",
+                    "type": "name"
+                },
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "deposit",
+                    "type": "asset"
+                },
+                {
+                    "name": "isPrivate",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
             "name": "disconnecthi",
             "base": "",
             "fields": [
@@ -83,8 +119,8 @@
             "base": "",
             "fields": [
                 {
-                    "name": "key",
-                    "type": "uint64"
+                    "name": "condition",
+                    "type": "string"
                 }
             ]
         },
@@ -108,6 +144,34 @@
                 },
                 {
                     "name": "deposit",
+                    "type": "asset"
+                },
+                {
+                    "name": "isPrivate",
+                    "type": "bool"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_BP",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_BP",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_Tie",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_Tie",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_Push",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_Push",
                     "type": "asset"
                 }
             ]
@@ -243,6 +307,38 @@
                     "type": "asset"
                 },
                 {
+                    "name": "oneRoundMaxTotalBet_BP",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_BP",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_Tie",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_Tie",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_Push",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_Push",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundDealerMaxPay",
+                    "type": "asset"
+                },
+                {
+                    "name": "minTableDeposit",
+                    "type": "asset"
+                },
+                {
                     "name": "betStartTime",
                     "type": "uint64"
                 },
@@ -284,6 +380,10 @@
                 },
                 {
                     "name": "sSeedVerity",
+                    "type": "bool"
+                },
+                {
+                    "name": "isPrivate",
                     "type": "bool"
                 },
                 {
@@ -358,6 +458,16 @@
         {
             "name": "dealerseed",
             "type": "dealerseed",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "dealerwitdaw",
+            "type": "dealerwitdaw",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "depositable",
+            "type": "depositable",
             "ricardian_contract": ""
         },
         {
