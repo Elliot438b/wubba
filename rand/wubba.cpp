@@ -24,9 +24,6 @@ ACTION wubba::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoun
         minPerBet_Tie_temp = minPerBet_tie;
         oneRoundMaxTotalBet_Push_temp = oneRoundMaxTotalBet_push;
         minPerBet_Push_temp = minPerBet_push;
-        oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_Push_temp * 11 * 2 + max(oneRoundMaxTotalBet_BP_temp * 1, oneRoundMaxTotalBet_Tie_temp * 8);
-        deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
-        eosio::print(" [deposit limit : ", deposit_tmp, "],[oneRoundDealerMaxPay: ", oneRoundDealerMaxPay_temp, "]");
     }
     else
     {
@@ -36,11 +33,10 @@ ACTION wubba::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoun
         minPerBet_Tie_temp = asset(10000, symbol(symbol_code("SYS"), 4));
         oneRoundMaxTotalBet_Push_temp = asset(500000, symbol(symbol_code("SYS"), 4));
         minPerBet_Push_temp = asset(10000, symbol(symbol_code("SYS"), 4));
-
-        oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_Push_temp * 11 * 2 + max(oneRoundMaxTotalBet_BP_temp * 1, oneRoundMaxTotalBet_Tie_temp * 8);
-        deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
-        eosio::print(" [deault===deposit limit : ", deposit_tmp, "],[oneRoundDealerMaxPay: ", oneRoundDealerMaxPay_temp, "]");
     }
+
+    oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_Push_temp * 11 * 2 + max(oneRoundMaxTotalBet_BP_temp * 1, oneRoundMaxTotalBet_Tie_temp * 8);
+    deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
 
     eosio_assert(deposit >= deposit_tmp, "Table deposit is not enough!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
@@ -620,7 +616,7 @@ ACTION wubba::closetable(uint64_t tableId)
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::CLOSED;
-        s.dealerBalance -= existing->dealerBalance;
+        s.dealerBalance = asset(0, symbol(symbol_code("SYS"), 4));
     });
 }
 
