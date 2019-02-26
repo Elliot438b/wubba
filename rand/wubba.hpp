@@ -68,7 +68,7 @@ CONTRACT wubba : public contract
         name dealer;                        // table owner.
         bool trusteeship;                   // table flag.
         bool isPrivate;
-        asset dealerBalance;                // table filed.
+        asset dealerBalance; // table filed.
         asset oneRoundMaxTotalBet_BP;
         asset minPerBet_BP;
         asset oneRoundMaxTotalBet_Tie;
@@ -182,20 +182,18 @@ CONTRACT wubba : public contract
 
     const uint16_t CardsMinLimit = 100;
     const uint32_t betPeriod = 30;
-    const uint16_t initDecks = 2;
+    const uint16_t initDecks = 8;
     const uint32_t minTableRounds = 10;
 
-    const asset oneRoundMaxTotalBet_BP_default = asset(10000000, symbol(symbol_code("SYS"), 4));;
-    const asset minPerBet_BP_default = asset(1000000, symbol(symbol_code("SYS"), 4));;
-    const asset oneRoundMaxTotalBet_Tie_default = asset(1000000, symbol(symbol_code("SYS"), 4));;
-    const asset minPerBet_Tie_default = asset(10000, symbol(symbol_code("SYS"), 4));;
-    const asset oneRoundMaxTotalBet_Push_default = asset(500000, symbol(symbol_code("SYS"), 4));;
-    const asset minPerBet_Push_default = asset(10000, symbol(symbol_code("SYS"), 4));;
+    const asset oneRoundMaxTotalBet_BP_default = asset(1000 * 10000, symbol(symbol_code("SYS"), 4)); //1000
+    const asset minPerBet_BP_default = asset(100 * 10000, symbol(symbol_code("SYS"), 4));            //100
+    const asset oneRoundMaxTotalBet_Tie_default = asset(100 * 10000, symbol(symbol_code("SYS"), 4)); //100
+    const asset minPerBet_Tie_default = asset(1 * 10000, symbol(symbol_code("SYS"), 4));             //1
+    const asset oneRoundMaxTotalBet_Push_default = asset(50 * 10000, symbol(symbol_code("SYS"), 4)); //50
+    const asset minPerBet_Push_default = asset(1 * 10000, symbol(symbol_code("SYS"), 4));            //1
     const asset init_asset_empty = asset(0, symbol(symbol_code("SYS"), 4));
 
     const char *notableerr = "TableId isn't existing!";
-    const char *closetableerr = "TableId have been closed";
-    const char *pausedtableerr = "TableId have been paused";
 
     singletable_t tableround;
     WBRNG wbrng;
