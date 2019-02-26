@@ -2,26 +2,25 @@
 
 uint32_t wubba::minTableRounds = 10;
 ACTION wubba::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
-        asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
-        asset oneRoundMaxTotalBet_push, asset minPerBet_push)
+                       asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
+                       asset oneRoundMaxTotalBet_push, asset minPerBet_push)
 {
     require_auth(dealer);
     table_stats tableinfo_temp;
     asset oneRoundDealerMaxPay_temp;
     asset deposit_tmp;
     asset empty = asset(0, symbol(symbol_code("SYS"), 4));
-    if(oneRoundMaxTotalBet_bp > empty && minPerBet_bp > empty
-        && oneRoundMaxTotalBet_tie > empty && minPerBet_tie > empty
-        && oneRoundMaxTotalBet_push > empty && minPerBet_push > empty)
+    if (oneRoundMaxTotalBet_bp > empty && minPerBet_bp > empty && oneRoundMaxTotalBet_tie > empty && minPerBet_tie > empty && oneRoundMaxTotalBet_push > empty && minPerBet_push > empty)
     {
         oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_push * 11 * 2 + max(oneRoundMaxTotalBet_bp * 1, oneRoundMaxTotalBet_tie * 8);
         deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
-        eosio::print(" deposit_tmp: ", deposit_tmp, "oneRoundDealerMaxPay_temp: ", oneRoundDealerMaxPay_temp);
+        eosio::print(" [deposit limit : ", deposit_tmp, "],[oneRoundDealerMaxPay: ", oneRoundDealerMaxPay_temp, "]");
     }
-    else{
+    else
+    {
         oneRoundDealerMaxPay_temp = tableinfo_temp.oneRoundDealerMaxPay;
         deposit_tmp = tableinfo_temp.minTableDeposit;
-        eosio::print(" ===default deposit: ", deposit_tmp, "oneRoundDealerMaxPay: ", oneRoundDealerMaxPay_temp);
+        eosio::print(" [default===deposit limit : ", deposit_tmp, "],[oneRoundDealerMaxPay: ", oneRoundDealerMaxPay_temp, "]");
     }
 
     eosio_assert(deposit >= deposit_tmp, "Table deposit is not enough!");
@@ -47,7 +46,6 @@ ACTION wubba::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoun
         s.oneRoundDealerMaxPay = oneRoundDealerMaxPay_temp;
         s.minTableDeposit = deposit_tmp;
     });
-
 }
 
 ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
@@ -538,19 +536,22 @@ ACTION wubba::erasingdata(uint64_t key)
             itr = tableround.erase(itr);
         }
     }
-    else if(key == -2) {
+    else if (key == -2)
+    {
         auto itr = tableround.begin();
         while (itr != tableround.end())
         {
-            if(itr->tableStatus == (uint64_t)table_stats::status_fields::CLOSED) {
+            if (itr->tableStatus == (uint64_t)table_stats::status_fields::CLOSED)
+            {
                 eosio::print("[Removing data: ", _self, ", condition: ", key, ", itr: ", itr->tableId, "]");
                 itr = tableround.erase(itr);
             }
             else
-                itr ++;
+                itr++;
         }
     }
-    else{
+    else
+    {
         auto itr = tableround.find(key);
         eosio_assert(itr != tableround.end(), "the erase key is not existe");
         eosio::print("Removing data ", _self, ", condition: ", key, ", itr: ", itr->tableId);
@@ -616,14 +617,13 @@ ACTION wubba::depositable(name dealer, uint64_t tableId, asset deposit)
         {dealer, _self, deposit, std::string("tabledeposit")});
 
     tableround.modify(existing, _self, [&](auto &s) {
-       s.dealerBalance += deposit;
+        s.dealerBalance += deposit;
     });
 
     INLINE_ACTION_SENDER(wubba, continuetable)
     (
         _self, {{existing->dealer, "active"_n}},
         {existing->tableId});
-
 }
 
 ACTION wubba::dealerwitdaw(uint64_t tableId, asset withdraw)
@@ -651,6 +651,5 @@ ACTION wubba::changeprivat(bool isPrivate, uint64_t tableId)
     tableround.modify(existing, _self, [&](auto &s) {
         s.isPrivate = isPrivate;
     });
-
 }
 EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetable)(pausetablehi)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))

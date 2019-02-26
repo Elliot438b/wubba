@@ -101,7 +101,6 @@ CONTRACT wubba : public contract
         uint64_t primary_key() const { return tableId; }
         uint64_t get_dealer() const { return dealer.value; }
 
-        //TODO:add init
         table_stats()
         {
             checksum256 hash;
@@ -134,7 +133,6 @@ CONTRACT wubba : public contract
             roundResult = "";
             playerHands = emptyCards;
             bankerHands = emptyCards;
-
         }
         enum class status_fields : uint64_t
         {
