@@ -6,7 +6,7 @@ ACTION wubba::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoun
                        asset oneRoundMaxTotalBet_push, asset minPerBet_push)
 {
     require_auth(dealer);
-    asset empty = asset(0, symbol(symbol_code("SYS"), 4));
+
     asset oneRoundMaxTotalBet_BP_temp;
     asset minPerBet_BP_temp;
     asset oneRoundMaxTotalBet_Tie_temp;
@@ -16,7 +16,7 @@ ACTION wubba::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoun
     asset oneRoundDealerMaxPay_temp;
     asset deposit_tmp;
 
-    if (oneRoundMaxTotalBet_bp > empty && minPerBet_bp > empty && oneRoundMaxTotalBet_tie > empty && minPerBet_tie > empty && oneRoundMaxTotalBet_push > empty && minPerBet_push > empty)
+    if (oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp > init_asset_empty && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie > init_asset_empty && oneRoundMaxTotalBet_push > init_asset_empty && minPerBet_push > init_asset_empty)
     {
         oneRoundMaxTotalBet_BP_temp = oneRoundMaxTotalBet_bp;
         minPerBet_BP_temp = minPerBet_bp;
@@ -27,12 +27,12 @@ ACTION wubba::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoun
     }
     else
     {
-        oneRoundMaxTotalBet_BP_temp = asset(10000000, symbol(symbol_code("SYS"), 4));
-        minPerBet_BP_temp = asset(1000000, symbol(symbol_code("SYS"), 4));
-        oneRoundMaxTotalBet_Tie_temp = asset(1000000, symbol(symbol_code("SYS"), 4));
-        minPerBet_Tie_temp = asset(10000, symbol(symbol_code("SYS"), 4));
-        oneRoundMaxTotalBet_Push_temp = asset(500000, symbol(symbol_code("SYS"), 4));
-        minPerBet_Push_temp = asset(10000, symbol(symbol_code("SYS"), 4));
+        oneRoundMaxTotalBet_BP_temp = oneRoundMaxTotalBet_BP_default;
+        minPerBet_BP_temp = minPerBet_BP_default;
+        oneRoundMaxTotalBet_Tie_temp = oneRoundMaxTotalBet_Tie_default;
+        minPerBet_Tie_temp = minPerBet_Tie_default;
+        oneRoundMaxTotalBet_Push_temp = oneRoundMaxTotalBet_Push_default;
+        minPerBet_Push_temp = minPerBet_Push_default;
     }
 
     oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_Push_temp * 11 * 2 + max(oneRoundMaxTotalBet_BP_temp * 1, oneRoundMaxTotalBet_Tie_temp * 8);
@@ -92,9 +92,9 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = 0;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
-            s.currRoundBetSum_BP = asset(0, symbol(symbol_code("SYS"), 4));
-            s.currRoundBetSum_Tie = asset(0, symbol(symbol_code("SYS"), 4));
-            s.currRoundBetSum_Push = asset(0, symbol(symbol_code("SYS"), 4));
+            s.currRoundBetSum_BP = init_asset_empty;
+            s.currRoundBetSum_Tie = init_asset_empty;
+            s.currRoundBetSum_Push = init_asset_empty;
             s.dealerSeedHash = encodeSeed;
             s.serverSeedHash = hash;
             s.dealerSeed = "";
@@ -142,9 +142,9 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = now();
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
-            s.currRoundBetSum_BP = asset(0, symbol(symbol_code("SYS"), 4));
-            s.currRoundBetSum_Tie = asset(0, symbol(symbol_code("SYS"), 4));
-            s.currRoundBetSum_Push = asset(0, symbol(symbol_code("SYS"), 4));
+            s.currRoundBetSum_BP = init_asset_empty;
+            s.currRoundBetSum_Tie = init_asset_empty;
+            s.currRoundBetSum_Push = init_asset_empty;
             s.dealerSeedHash = hash;
             s.serverSeedHash = encodeSeed;
             s.dealerSeed = "";
@@ -186,22 +186,21 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
 
 ACTION wubba::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush)
 {
-    asset empty = asset(0, symbol(symbol_code("SYS"), 4));
     require_auth(player);
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     eosio_assert((now() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
-    if (betDealer > empty)
+    if (betDealer > init_asset_empty)
         eosio_assert(betDealer >= existing->minPerBet_BP, "Banker bet is too small!");
-    if (betPlayer > empty)
+    if (betPlayer > init_asset_empty)
         eosio_assert(betPlayer >= existing->minPerBet_BP, "Player bet is too small!");
-    if (betTie > empty)
+    if (betTie > init_asset_empty)
         eosio_assert(betTie >= existing->minPerBet_Tie, "Tie bet is too small!");
-    if (betDealerPush > empty)
+    if (betDealerPush > init_asset_empty)
         eosio_assert(betDealerPush >= existing->minPerBet_Push, "BankerPush bet is too small!");
-    if (betPlayerPush > empty)
+    if (betPlayerPush > init_asset_empty)
         eosio_assert(betPlayerPush >= existing->minPerBet_Push, "PlayerPush bet is too small!");
 
     asset player_amount_sum_bp = existing->currRoundBetSum_BP;
@@ -231,7 +230,7 @@ ACTION wubba::playerbet(uint64_t tableId, name player, asset betDealer, asset be
     eosio_assert(player_amount_sum_push < existing->oneRoundMaxTotalBet_Push, "Over the peak of total bet_push amount of this round!");
 
     asset depositAmount = (betDealer + betPlayer + betTie + betDealerPush + betPlayerPush);
-    if (depositAmount > empty)
+    if (depositAmount > init_asset_empty)
     {
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (
@@ -245,8 +244,8 @@ ACTION wubba::playerbet(uint64_t tableId, name player, asset betDealer, asset be
     temp.betTie = betTie;
     temp.betDealerPush = betDealerPush;
     temp.betPlayerPush = betPlayerPush;
-    temp.pBonus = asset(0, symbol(symbol_code("SYS"), 4));
-    temp.dBonus = asset(0, symbol(symbol_code("SYS"), 4));
+    temp.pBonus = init_asset_empty;
+    temp.dBonus = init_asset_empty;
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
@@ -423,8 +422,8 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     asset dealerBalance_temp = existing->dealerBalance;
     for (auto playerBet : existing->playerInfo)
     {
-        auto pBonus = asset(0, symbol(symbol_code("SYS"), 4));
-        auto dBonus = asset(0, symbol(symbol_code("SYS"), 4));
+        auto pBonus = init_asset_empty;
+        auto dBonus = init_asset_empty;
         // Banker field
         if (roundResult[0] == '1')
             pBonus = playerBet.betDealer * (1 + 0.95);
@@ -452,8 +451,8 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
             dBonus += playerBet.betPlayerPush;
 
         eosio::print(" [player:", playerBet.player, ", total bonus:", pBonus, "] ");
-        asset empty = asset(0, symbol(symbol_code("SYS"), 4));
-        if (pBonus > empty)
+
+        if (pBonus > init_asset_empty)
         {
             INLINE_ACTION_SENDER(eosio::token, transfer)
             (
@@ -616,7 +615,7 @@ ACTION wubba::closetable(uint64_t tableId)
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::CLOSED;
-        s.dealerBalance = asset(0, symbol(symbol_code("SYS"), 4));
+        s.dealerBalance = init_asset_empty;
     });
 }
 

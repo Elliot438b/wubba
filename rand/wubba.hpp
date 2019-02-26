@@ -185,6 +185,14 @@ CONTRACT wubba : public contract
     const uint16_t initDecks = 2;
     const uint32_t minTableRounds = 10;
 
+    const asset oneRoundMaxTotalBet_BP_default = asset(10000000, symbol(symbol_code("SYS"), 4));;
+    const asset minPerBet_BP_default = asset(1000000, symbol(symbol_code("SYS"), 4));;
+    const asset oneRoundMaxTotalBet_Tie_default = asset(1000000, symbol(symbol_code("SYS"), 4));;
+    const asset minPerBet_Tie_default = asset(10000, symbol(symbol_code("SYS"), 4));;
+    const asset oneRoundMaxTotalBet_Push_default = asset(500000, symbol(symbol_code("SYS"), 4));;
+    const asset minPerBet_Push_default = asset(10000, symbol(symbol_code("SYS"), 4));;
+    const asset init_asset_empty = asset(0, symbol(symbol_code("SYS"), 4));
+
     const char *notableerr = "TableId isn't existing!";
     const char *closetableerr = "TableId have been closed";
     const char *pausedtableerr = "TableId have been paused";
