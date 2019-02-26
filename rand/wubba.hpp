@@ -67,6 +67,7 @@ CONTRACT wubba : public contract
         uint64_t tableId;                   // table fix.
         name dealer;                        // table owner.
         bool trusteeship;                   // table flag.
+        bool isPrivate;
         asset dealerBalance;                // table filed.
         asset oneRoundMaxTotalBet_BP;
         asset minPerBet_BP;
@@ -90,7 +91,6 @@ CONTRACT wubba : public contract
         string serverSeed;
         bool dSeedVerity;
         bool sSeedVerity;
-        bool isPrivate;
 
         std::vector<player_bet_info> playerInfo;
 
@@ -101,39 +101,6 @@ CONTRACT wubba : public contract
         uint64_t primary_key() const { return tableId; }
         uint64_t get_dealer() const { return dealer.value; }
 
-        table_stats()
-        {
-            checksum256 hash;
-            std::vector<player_bet_info> emptyPlayers;
-            std::vector<card_info> emptyCards;
-
-            betStartTime = 0;
-            trusteeship = 0;
-            tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
-            currRoundBetSum_BP = asset(0, symbol(symbol_code("SYS"), 4));
-            currRoundBetSum_Tie = asset(0, symbol(symbol_code("SYS"), 4));
-            currRoundBetSum_Push = asset(0, symbol(symbol_code("SYS"), 4));
-            dealerBalance = asset(0, symbol(symbol_code("SYS"), 4));
-            oneRoundMaxTotalBet_BP = asset(10000000, symbol(symbol_code("SYS"), 4));
-            minPerBet_BP = asset(1000000, symbol(symbol_code("SYS"), 4));
-            oneRoundMaxTotalBet_Tie = asset(1000000, symbol(symbol_code("SYS"), 4));
-            minPerBet_Tie = asset(10000, symbol(symbol_code("SYS"), 4));
-            oneRoundMaxTotalBet_Push = asset(500000, symbol(symbol_code("SYS"), 4));
-            minPerBet_Push = asset(10000, symbol(symbol_code("SYS"), 4));
-            oneRoundDealerMaxPay = oneRoundMaxTotalBet_Push * 11 * 2 + max(oneRoundMaxTotalBet_BP * 1, oneRoundMaxTotalBet_Tie * 8);
-            minTableDeposit = oneRoundDealerMaxPay * wubba::minTableRounds;
-            dealerSeedHash = hash;
-            serverSeedHash = hash;
-            dealerSeed = "";
-            serverSeed = "";
-            dSeedVerity = 0;
-            sSeedVerity = 0;
-            isPrivate = 0;
-            playerInfo = emptyPlayers;
-            roundResult = "";
-            playerHands = emptyCards;
-            bankerHands = emptyCards;
-        }
         enum class status_fields : uint64_t
         {
             ROUND_START = 1,
@@ -143,7 +110,7 @@ CONTRACT wubba : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(dealer)(trusteeship)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Push)(minPerBet_Push)(oneRoundDealerMaxPay)(minTableDeposit)(betStartTime)(tableStatus)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(isPrivate)(playerInfo)(roundResult)(playerHands)(bankerHands))
+        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Push)(minPerBet_Push)(oneRoundDealerMaxPay)(minTableDeposit)(betStartTime)(tableStatus)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
@@ -216,8 +183,7 @@ CONTRACT wubba : public contract
     const uint16_t CardsMinLimit = 100;
     const uint32_t betPeriod = 30;
     const uint16_t initDecks = 2;
-
-    static uint32_t minTableRounds;
+    const uint32_t minTableRounds = 10;
 
     const char *notableerr = "TableId isn't existing!";
     const char *closetableerr = "TableId have been closed";

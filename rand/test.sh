@@ -17,7 +17,7 @@ temptest)
     echo "temptest"
     eosio-cpp -abigen wubba.cpp -o wubba.wasm
     cleos --wallet-url http://127.0.0.1:6666 set contract useraaaaaaaa ./ wubba.wasm wubba.abi
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa newtable '[useraaaaaaab,"23000.0000 SYS", 1, "1000.0000 SYS","100.0000 SYS","100.0000 SYS","0.0000 SYS","50.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa newtable '[useraaaaaaab,"23000.0000 SYS", 1, "1000.0000 SYS","0.0000 SYS","100.0000 SYS","1.0000 SYS","50.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
     tableid=`cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
     for((num=1;num<=1;num++));
@@ -49,7 +49,7 @@ temptest)
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa closetable '['$tableid']' -p useraaaaaaab
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
 
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa changeprivat '[1, '$tableid']' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa changeprivat '[0, '$tableid']' -p useraaaaaaab
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
 
     ;;

@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Feb 26 15:27:11 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Feb 26 16:56:13 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -313,6 +313,10 @@
                     "type": "bool"
                 },
                 {
+                    "name": "isPrivate",
+                    "type": "bool"
+                },
+                {
                     "name": "dealerBalance",
                     "type": "asset"
                 },
@@ -390,10 +394,6 @@
                 },
                 {
                     "name": "sSeedVerity",
-                    "type": "bool"
-                },
-                {
-                    "name": "isPrivate",
                     "type": "bool"
                 },
                 {
