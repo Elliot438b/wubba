@@ -67,8 +67,8 @@ CONTRACT wubba : public contract
         uint64_t tableId;                   // table fix.
         name dealer;                        // table owner.
         bool trusteeship;                   // table flag.
-        bool isPrivate;
-        asset dealerBalance; // table filed.
+        bool isPrivate;                     // table flag.
+        asset dealerBalance;                // table filed.
         asset oneRoundMaxTotalBet_BP;
         asset minPerBet_BP;
         asset oneRoundMaxTotalBet_Tie;
