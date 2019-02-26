@@ -17,7 +17,7 @@ temptest)
     echo "temptest"
     eosio-cpp -abigen wubba.cpp -o wubba.wasm
     cleos --wallet-url http://127.0.0.1:6666 set contract useraaaaaaaa ./ wubba.wasm wubba.abi
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa newtable '[useraaaaaaab,"23000.0000 SYS", 1, "0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa newtable '[useraaaaaaab,"23000.0000 SYS", 1, "1000.0000 SYS","100.0000 SYS","100.0000 SYS","0.0000 SYS","50.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
     tableid=`cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
     for((num=1;num<=1;num++));
@@ -56,7 +56,7 @@ shuffle)
     echo "test shuffle"
     eosio-cpp -abigen wubba.cpp -o wubba.wasm
     cleos --wallet-url http://127.0.0.1:6666 set contract useraaaaaaaa ./ wubba.wasm wubba.abi
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa newtable '[useraaaaaaab,"23000.0000 SYS", 1, "0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa newtable '[useraaaaaaab,"23000.0000 SYS", 1, "1.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS"]' -p useraaaaaaab
     tableid=`cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
     for((num=1;num<=2;num++));
@@ -82,6 +82,7 @@ pausetable)
     cleos --wallet-url http://127.0.0.1:6666 set contract useraaaaaaaa ./ wubba.wasm wubba.abi
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa newtable '[useraaaaaaab,"23000.0000 SYS", 1, "0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS"]' -p useraaaaaaab
     tableid=`cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
+    cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
 
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa pausetable '['$tableid']' -p useraaaaaaab
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
@@ -93,7 +94,7 @@ pausetable)
 
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaac,"500.0000 SYS","0.0000 SYS","3.0000 SYS","4.0000 SYS","3.0000 SYS"]' -p useraaaaaaac useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaad,"0.0000 SYS","100.0000 SYS","0.0000 SYS","10.0000 SYS","10.0000 SYS"]' -p useraaaaaaad useraaaaaaah
+    #cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa playerbet '['$tableid',useraaaaaaad,"0.0000 SYS","100.0000 SYS","0.0000 SYS","10.0000 SYS","10.0000 SYS"]' -p useraaaaaaad useraaaaaaah
     cleos get table useraaaaaaaa useraaaaaaaa tablesinfo -L $tableid -U $tableid
     sleep 36s
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa endbet '['$tableid']' -p useraaaaaaah
@@ -110,8 +111,8 @@ pausetable)
 
     ;;
 erasedata)
-    #the second parameter is (all||close||num)
-    echo "erase old data(the second parameter is (all||close||num))"
+    #the second parameter is (-1 = erase all|| -2 = erase close||num)
+    echo "erase old data(the second parameter is (-1 = erase all|| -2 = erase close||num))"
     cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaa erasingdata '['$2']' -p useraaaaaaaa
     ;;
 normalflow)

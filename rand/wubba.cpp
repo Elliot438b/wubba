@@ -10,9 +10,9 @@ ACTION wubba::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoun
     asset oneRoundDealerMaxPay_temp;
     asset deposit_tmp;
     asset empty = asset(0, symbol(symbol_code("SYS"), 4));
-    if(oneRoundMaxTotalBet_bp > empty || minPerBet_bp > empty
-        || oneRoundMaxTotalBet_tie > empty || minPerBet_tie > empty
-        || oneRoundMaxTotalBet_push > empty || minPerBet_push > empty)
+    if(oneRoundMaxTotalBet_bp > empty && minPerBet_bp > empty
+        && oneRoundMaxTotalBet_tie > empty && minPerBet_tie > empty
+        && oneRoundMaxTotalBet_push > empty && minPerBet_push > empty)
     {
         oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_push * 11 * 2 + max(oneRoundMaxTotalBet_bp * 1, oneRoundMaxTotalBet_tie * 8);
         deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
@@ -21,7 +21,7 @@ ACTION wubba::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoun
     else{
         oneRoundDealerMaxPay_temp = tableinfo_temp.oneRoundDealerMaxPay;
         deposit_tmp = tableinfo_temp.minTableDeposit;
-        eosio::print(" ===deposit_tmp: ", deposit_tmp, "oneRoundDealerMaxPay_temp: ", oneRoundDealerMaxPay_temp);
+        eosio::print(" ===default deposit: ", deposit_tmp, "oneRoundDealerMaxPay: ", oneRoundDealerMaxPay_temp);
     }
 
     eosio_assert(deposit >= deposit_tmp, "Table deposit is not enough!");
@@ -82,14 +82,6 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
             s.currRoundBetSum_BP = asset(0, symbol(symbol_code("SYS"), 4));
             s.currRoundBetSum_Tie = asset(0, symbol(symbol_code("SYS"), 4));
             s.currRoundBetSum_Push = asset(0, symbol(symbol_code("SYS"), 4));
-            s.oneRoundMaxTotalBet_BP = asset(10000000, symbol(symbol_code("SYS"), 4));
-            s.minPerBet_BP = asset(1000000, symbol(symbol_code("SYS"), 4));
-            s.oneRoundMaxTotalBet_Tie = asset(1000000, symbol(symbol_code("SYS"), 4));
-            s.minPerBet_Tie = asset(10000, symbol(symbol_code("SYS"), 4));
-            s.oneRoundMaxTotalBet_Push = asset(500000, symbol(symbol_code("SYS"), 4));
-            s.minPerBet_Push = asset(10000, symbol(symbol_code("SYS"), 4));
-            s.oneRoundDealerMaxPay = s.oneRoundMaxTotalBet_Push * 11 * 2 + max(s.oneRoundMaxTotalBet_BP * 1, s.oneRoundMaxTotalBet_Tie * 8);
-            s.minTableDeposit = s.oneRoundDealerMaxPay * minTableRounds;
             s.dealerSeedHash = encodeSeed;
             s.serverSeedHash = hash;
             s.dealerSeed = "";
@@ -141,14 +133,6 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
             s.currRoundBetSum_BP = asset(0, symbol(symbol_code("SYS"), 4));
             s.currRoundBetSum_Tie = asset(0, symbol(symbol_code("SYS"), 4));
             s.currRoundBetSum_Push = asset(0, symbol(symbol_code("SYS"), 4));
-            s.oneRoundMaxTotalBet_BP = asset(10000000, symbol(symbol_code("SYS"), 4));
-            s.minPerBet_BP = asset(1000000, symbol(symbol_code("SYS"), 4));
-            s.oneRoundMaxTotalBet_Tie = asset(1000000, symbol(symbol_code("SYS"), 4));
-            s.minPerBet_Tie = asset(10000, symbol(symbol_code("SYS"), 4));
-            s.oneRoundMaxTotalBet_Push = asset(500000, symbol(symbol_code("SYS"), 4));
-            s.minPerBet_Push = asset(10000, symbol(symbol_code("SYS"), 4));
-            s.oneRoundDealerMaxPay = s.oneRoundMaxTotalBet_Push * 11 * 2 + max(s.oneRoundMaxTotalBet_BP * 1, s.oneRoundMaxTotalBet_Tie * 8);
-            s.minTableDeposit = s.oneRoundDealerMaxPay * minTableRounds;
             s.dealerSeedHash = hash;
             s.serverSeedHash = encodeSeed;
             s.dealerSeed = "";
@@ -542,30 +526,24 @@ ACTION wubba::disconnecthi(name informed, uint64_t tableId)
     eosio::print("SC disconnecthi has already informed :", informed.to_string());
 }
 
-ACTION wubba::erasingdata(string condition)
+ACTION wubba::erasingdata(uint64_t key)
 {
     require_auth(_self);
-    if (condition.compare("all") == 0)
+    if (key == -1)
     {
         auto itr = tableround.begin();
         while (itr != tableround.end())
         {
-            eosio::print("[Removing data: ", _self, ", condition: ", condition, ", itr: ", itr->tableId, "]");
+            eosio::print("[Removing data: ", _self, ", condition: ", key, ", itr: ", itr->tableId, "]");
             itr = tableround.erase(itr);
         }
     }
-    else if(condition.compare("close") == 0) {
+    else if(key == -2) {
         auto itr = tableround.begin();
         while (itr != tableround.end())
         {
             if(itr->tableStatus == (uint64_t)table_stats::status_fields::CLOSED) {
-                eosio::print("[Removing data: ", _self, ", condition: ", condition, ", itr: ", itr->tableId, "]");
-
-                INLINE_ACTION_SENDER(eosio::token, transfer)
-                (
-                     "eosio.token"_n, {{_self, "active"_n}},
-                     {_self, itr->dealer, itr->dealerBalance, std::string("close, withdraw all")});
-
+                eosio::print("[Removing data: ", _self, ", condition: ", key, ", itr: ", itr->tableId, "]");
                 itr = tableround.erase(itr);
             }
             else
@@ -573,11 +551,9 @@ ACTION wubba::erasingdata(string condition)
         }
     }
     else{
-        uint64_t num = atoi(condition.c_str());
-        eosio::print("con=",num, "  ");
-        auto itr = tableround.find(num);
+        auto itr = tableround.find(key);
         eosio_assert(itr != tableround.end(), "the erase key is not existe");
-        eosio::print("Removing data ", _self, ", condition: ", condition, ", itr: ", itr->tableId);
+        eosio::print("Removing data ", _self, ", condition: ", key, ", itr: ", itr->tableId);
         tableround.erase(itr);
     }
 }
@@ -621,6 +597,11 @@ ACTION wubba::closetable(uint64_t tableId)
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::CLOSED;
     });
+
+    INLINE_ACTION_SENDER(eosio::token, transfer)
+    (
+        "eosio.token"_n, {{_self, "active"_n}},
+        {_self, existing->dealer, existing->dealerBalance, std::string("close, withdraw all")});
 }
 
 ACTION wubba::depositable(name dealer, uint64_t tableId, asset deposit, bool isPrivate)
@@ -651,7 +632,7 @@ ACTION wubba::dealerwitdaw(uint64_t tableId, asset withdraw)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
-    eosio_assert((existing->dealerBalance - withdraw) > existing->oneRoundDealerMaxPay*2, "Table dealerBalance is not enough to support next round!");
+    eosio_assert((existing->dealerBalance - withdraw) > existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (

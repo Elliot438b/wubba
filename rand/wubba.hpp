@@ -28,7 +28,7 @@ CONTRACT wubba : public contract
     ACTION trusteeship(uint64_t tableId);
     ACTION exitruteship(uint64_t tableId);
     ACTION disconnecthi(name informed, uint64_t tableId);
-    ACTION erasingdata(string condition);
+    ACTION erasingdata(uint64_t key);
     ACTION pausetable(uint64_t tableId);
     ACTION pausetablehi(uint64_t tableId);
     ACTION continuetable(uint64_t tableId);
