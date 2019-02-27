@@ -29,8 +29,8 @@ CONTRACT wubba : public contract
     ACTION exitruteship(uint64_t tableId);
     ACTION disconnecthi(name informed, uint64_t tableId);
     ACTION erasingdata(uint64_t key);
-    ACTION pausetable(uint64_t tableId);
-    ACTION pausetablehi(uint64_t tableId);
+    ACTION pausetabledea(uint64_t tableId);
+    ACTION pausetablesee(uint64_t tableId);
     ACTION continuetable(uint64_t tableId);
     ACTION closetable(uint64_t tableId);
     ACTION depositable(name dealer, uint64_t tableId, asset deposit);
@@ -169,8 +169,8 @@ CONTRACT wubba : public contract
     using exitruteship_action = action_wrapper<"exitruteship"_n, &wubba::exitruteship>;
     using disconnecthi_action = action_wrapper<"disconnecthi"_n, &wubba::disconnecthi>;
     using erasingdata_action = action_wrapper<"erasingdata"_n, &wubba::erasingdata>;
-    using pausetable_action = action_wrapper<"pausetable"_n, &wubba::pausetable>;
-    using pausetablehi_action = action_wrapper<"pausetablehi"_n, &wubba::pausetablehi>;
+    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &wubba::pausetabledea>;
+    using pausetableser_action = action_wrapper<"pausetablesee"_n, &wubba::pausetablesee>;
     using continuetable_action = action_wrapper<"continuetable"_n, &wubba::continuetable>;
     using closetable_action = action_wrapper<"closetable"_n, &wubba::closetable>;
     using depositable_action = action_wrapper<"depositable"_n, &wubba::depositable>;

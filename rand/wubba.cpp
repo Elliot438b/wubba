@@ -75,10 +75,7 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         require_auth(existing->dealer);
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
-            tableround.modify(existing, _self, [&](auto &s) {
-                s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
-            });
-            INLINE_ACTION_SENDER(wubba, pausetablehi)
+            INLINE_ACTION_SENDER(wubba, pausetabledea)
             (
                 _self, {{existing->dealer, "active"_n}},
                 {existing->tableId});
@@ -125,12 +122,9 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
-            tableround.modify(existing, _self, [&](auto &s) {
-                s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
-            });
-            INLINE_ACTION_SENDER(wubba, pausetablehi)
+            INLINE_ACTION_SENDER(wubba, pausetablesee)
             (
-                _self, {{existing->dealer, "active"_n}},
+                _self, {{serveraccount, "active"_n}},
                 {existing->tableId});
             return;
         }
@@ -570,23 +564,26 @@ ACTION wubba::erasingdata(uint64_t key)
     }
 }
 
-ACTION wubba::pausetable(uint64_t tableId)
+ACTION wubba::pausetabledea(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer);
+    require_auth(existing->dealer); // dealer of the table permission.
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't pause table");
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
     });
 }
 
-ACTION wubba::pausetablehi(uint64_t tableId)
+ACTION wubba::pausetablesee(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer);
-    eosio::print("SC pausetablehi has already informed :", existing->dealer, "tableId: ", tableId);
+    require_auth(serveraccount); // server permission.
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't pause table");
+    tableround.modify(existing, _self, [&](auto &s) {
+        s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
+    });
 }
 
 ACTION wubba::continuetable(uint64_t tableId)
@@ -631,10 +628,13 @@ ACTION wubba::depositable(name dealer, uint64_t tableId, asset deposit)
         s.dealerBalance += deposit;
     });
     // automate recover the table round.
-    INLINE_ACTION_SENDER(wubba, continuetable)
-    (
-        _self, {{existing->dealer, "active"_n}},
-        {existing->tableId});
+    if(existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED)
+    {
+        INLINE_ACTION_SENDER(wubba, continuetable)
+        (
+            _self, {{existing->dealer, "active"_n}},
+            {existing->tableId});
+    }
 }
 
 ACTION wubba::dealerwitdaw(uint64_t tableId, asset withdraw)
@@ -661,4 +661,4 @@ ACTION wubba::changeprivat(bool isPrivate, uint64_t tableId)
         s.isPrivate = isPrivate;
     });
 }
-EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetable)(pausetablehi)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))
+EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))
