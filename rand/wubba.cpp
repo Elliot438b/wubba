@@ -525,6 +525,7 @@ ACTION wubba::disconnecthi(name informed, uint64_t tableId)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
     eosio_assert(existing->dealer == informed, "People informed is not the dealer of table!");
     eosio::print("SC disconnecthi has already informed :", informed.to_string());
 }
@@ -603,11 +604,11 @@ ACTION wubba::closetable(uint64_t tableId)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round not end, can`t closetable");
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't close!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         "eosio.token"_n, {{_self, "active"_n}},
-        {_self, existing->dealer, existing->dealerBalance, std::string("close, withdraw all")});
+        {_self, existing->dealer, existing->dealerBalance, std::string("closetable, withdraw all")});
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::CLOSED;
         s.dealerBalance = init_asset_empty;
