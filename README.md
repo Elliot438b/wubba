@@ -145,6 +145,11 @@ asset minPerBet_Push | *option | 1
     - **NOTE**: table closed can't be recovery any more.
 
 ## v0.5.1 target
+### add dice and roulette game.
+- modify 3 ACTION: newtable, playerbet, verserveseed(reveal)
+- modify the state table structure. (dice and roulette are more simple)
+
+## v0.5.2 target
 ### random result uniform distribution
 - Need a big data analysis model by python script. 
 - Adjust variate of the solution to obtain a best result.
