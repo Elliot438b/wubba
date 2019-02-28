@@ -1,6 +1,6 @@
-#include "wubba.hpp"
+#include "gameroulette.hpp"
 
-ACTION wubba::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
+ACTION gameroulette::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
                        asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
                        asset oneRoundMaxTotalBet_push, asset minPerBet_push)
 {
@@ -63,7 +63,7 @@ ACTION wubba::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoun
     });
 }
 
-ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
+ACTION gameroulette::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -75,7 +75,7 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         require_auth(existing->dealer);
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
-            INLINE_ACTION_SENDER(wubba, pausetabledea)
+            INLINE_ACTION_SENDER(gameroulette, pausetabledea)
             (
                 _self, {{existing->dealer, "active"_n}},
                 {existing->tableId});
@@ -106,7 +106,7 @@ ACTION wubba::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     }
 }
 
-ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
+ACTION gameroulette::serverseed(uint64_t tableId, checksum256 encodeSeed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -122,7 +122,7 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
-            INLINE_ACTION_SENDER(wubba, pausetablesee)
+            INLINE_ACTION_SENDER(gameroulette, pausetablesee)
             (
                 _self, {{serveraccount, "active"_n}},
                 {existing->tableId});
@@ -178,7 +178,7 @@ ACTION wubba::serverseed(uint64_t tableId, checksum256 encodeSeed)
     // txn.send(deferred_id, _self, false);
 }
 
-ACTION wubba::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush)
+ACTION gameroulette::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush)
 {
     require_auth(player);
     require_auth(serveraccount);
@@ -250,7 +250,7 @@ ACTION wubba::playerbet(uint64_t tableId, name player, asset betDealer, asset be
 }
 
 // server defer action: end bet
-ACTION wubba::endbet(uint64_t tableId)
+ACTION gameroulette::endbet(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -265,7 +265,7 @@ ACTION wubba::endbet(uint64_t tableId)
     });
 }
 
-ACTION wubba::verdealeseed(uint64_t tableId, string seed)
+ACTION gameroulette::verdealeseed(uint64_t tableId, string seed)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -283,7 +283,7 @@ ACTION wubba::verdealeseed(uint64_t tableId, string seed)
 }
 
 // Server push defer 3' action, once got ROUND_REVEAL.
-ACTION wubba::verserveseed(uint64_t tableId, string seed)
+ACTION gameroulette::verserveseed(uint64_t tableId, string seed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -301,11 +301,11 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     {
         eosio::print("Dealer trusteeship, don't need dealer seed.");
     }
-    // non-trustee server, so table_round is waiting for ACTION::wubba::dealerseed until dealer reconnect.
-    // TODO Can be considered: auto trustee server until dealer reconnect and ACTION::wubba::exitruteship.
+    // non-trustee server, so table_round is waiting for ACTION::gameroulette::dealerseed until dealer reconnect.
+    // TODO Can be considered: auto trustee server until dealer reconnect and ACTION::gameroulette::exitruteship.
     else if (!existing->dSeedVerity)
     { // dealer disconnect notify
-        INLINE_ACTION_SENDER(wubba, disconnecthi)
+        INLINE_ACTION_SENDER(gameroulette, disconnecthi)
         (
             _self, {{serveraccount, "active"_n}},
             {existing->dealer, existing->tableId});
@@ -498,7 +498,7 @@ ACTION wubba::verserveseed(uint64_t tableId, string seed)
     });
 }
 
-ACTION wubba::trusteeship(uint64_t tableId)
+ACTION gameroulette::trusteeship(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -509,7 +509,7 @@ ACTION wubba::trusteeship(uint64_t tableId)
     });
 }
 
-ACTION wubba::exitruteship(uint64_t tableId)
+ACTION gameroulette::exitruteship(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -520,7 +520,7 @@ ACTION wubba::exitruteship(uint64_t tableId)
     });
 }
 
-ACTION wubba::disconnecthi(name informed, uint64_t tableId)
+ACTION gameroulette::disconnecthi(name informed, uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -530,7 +530,7 @@ ACTION wubba::disconnecthi(name informed, uint64_t tableId)
     eosio::print("SC disconnecthi has already informed :", informed.to_string());
 }
 
-ACTION wubba::erasingdata(uint64_t key)
+ACTION gameroulette::erasingdata(uint64_t key)
 {
     require_auth(_self);
     if (key == -1)
@@ -565,7 +565,7 @@ ACTION wubba::erasingdata(uint64_t key)
     }
 }
 
-ACTION wubba::pausetabledea(uint64_t tableId)
+ACTION gameroulette::pausetabledea(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -576,7 +576,7 @@ ACTION wubba::pausetabledea(uint64_t tableId)
     });
 }
 
-ACTION wubba::pausetablesee(uint64_t tableId)
+ACTION gameroulette::pausetablesee(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -587,7 +587,7 @@ ACTION wubba::pausetablesee(uint64_t tableId)
     });
 }
 
-ACTION wubba::continuetable(uint64_t tableId)
+ACTION gameroulette::continuetable(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -599,7 +599,7 @@ ACTION wubba::continuetable(uint64_t tableId)
     });
 }
 
-ACTION wubba::closetable(uint64_t tableId)
+ACTION gameroulette::closetable(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -615,7 +615,7 @@ ACTION wubba::closetable(uint64_t tableId)
     });
 }
 
-ACTION wubba::depositable(name dealer, uint64_t tableId, asset deposit)
+ACTION gameroulette::depositable(name dealer, uint64_t tableId, asset deposit)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -631,14 +631,14 @@ ACTION wubba::depositable(name dealer, uint64_t tableId, asset deposit)
     // automate recover the table round.
     if(existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED)
     {
-        INLINE_ACTION_SENDER(wubba, continuetable)
+        INLINE_ACTION_SENDER(gameroulette, continuetable)
         (
             _self, {{existing->dealer, "active"_n}},
             {existing->tableId});
     }
 }
 
-ACTION wubba::dealerwitdaw(uint64_t tableId, asset withdraw)
+ACTION gameroulette::dealerwitdaw(uint64_t tableId, asset withdraw)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -653,7 +653,7 @@ ACTION wubba::dealerwitdaw(uint64_t tableId, asset withdraw)
     });
 }
 
-ACTION wubba::changeprivat(bool isPrivate, uint64_t tableId)
+ACTION gameroulette::changeprivat(bool isPrivate, uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -662,4 +662,4 @@ ACTION wubba::changeprivat(bool isPrivate, uint64_t tableId)
         s.isPrivate = isPrivate;
     });
 }
-EOSIO_DISPATCH(wubba, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))
+EOSIO_DISPATCH(gameroulette, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))

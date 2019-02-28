@@ -3,19 +3,19 @@
 #include <eosiolib/transaction.hpp>
 #include <eosiolib/permission.hpp>
 #include <eosiolib/crypto.hpp>
-#include "eosio.token.hpp"
+#include "../../chain/eosio.token.hpp"
 #include <cstdlib>
 
 using namespace eosio;
 using namespace std;
 using std::string;
 
-CONTRACT wubba : public contract
+CONTRACT gamebaccarat : public contract
 {
   public:
     using contract::contract;
 
-    wubba(name receiver, name code, datastream<const char *> ds)
+    gamebaccarat(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value) {}
 
     ACTION newtable(name dealer, asset deposit, bool isPrivate, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
@@ -113,7 +113,7 @@ CONTRACT wubba : public contract
         EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Push)(minPerBet_Push)(oneRoundDealerMaxPay)(minTableDeposit)(betStartTime)(tableStatus)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
     };
 
-    typedef eosio::multi_index<"tablesinfo"_n, wubba::table_stats, indexed_by<"dealer"_n, const_mem_fun<wubba::table_stats, uint64_t, &wubba::table_stats::get_dealer>>> singletable_t;
+    typedef eosio::multi_index<"tablesinfo"_n, gamebaccarat::table_stats, indexed_by<"dealer"_n, const_mem_fun<gamebaccarat::table_stats, uint64_t, &gamebaccarat::table_stats::get_dealer>>> singletable_t;
     // std random
     struct WBRNG
     {
@@ -158,24 +158,24 @@ CONTRACT wubba : public contract
             cardVec.emplace_back(i);
         }
     }
-    using newtable_action = action_wrapper<"newtable"_n, &wubba::newtable>;
-    using dealerseed_action = action_wrapper<"dealerseed"_n, &wubba::dealerseed>;
-    using serverseed_action = action_wrapper<"serverseed"_n, &wubba::serverseed>;
-    using playerbet_action = action_wrapper<"playerbet"_n, &wubba::playerbet>;
-    using endbet_action = action_wrapper<"endbet"_n, &wubba::endbet>;
-    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &wubba::verdealeseed>;
-    using verserveseed_action = action_wrapper<"verserveseed"_n, &wubba::verserveseed>;
-    using trusteeship_action = action_wrapper<"trusteeship"_n, &wubba::trusteeship>;
-    using exitruteship_action = action_wrapper<"exitruteship"_n, &wubba::exitruteship>;
-    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &wubba::disconnecthi>;
-    using erasingdata_action = action_wrapper<"erasingdata"_n, &wubba::erasingdata>;
-    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &wubba::pausetabledea>;
-    using pausetableser_action = action_wrapper<"pausetablesee"_n, &wubba::pausetablesee>;
-    using continuetable_action = action_wrapper<"continuetable"_n, &wubba::continuetable>;
-    using closetable_action = action_wrapper<"closetable"_n, &wubba::closetable>;
-    using depositable_action = action_wrapper<"depositable"_n, &wubba::depositable>;
-    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &wubba::dealerwitdaw>;
-    using changeprivat_action = action_wrapper<"changeprivat"_n, &wubba::changeprivat>;
+    using newtable_action = action_wrapper<"newtable"_n, &gamebaccarat::newtable>;
+    using dealerseed_action = action_wrapper<"dealerseed"_n, &gamebaccarat::dealerseed>;
+    using serverseed_action = action_wrapper<"serverseed"_n, &gamebaccarat::serverseed>;
+    using playerbet_action = action_wrapper<"playerbet"_n, &gamebaccarat::playerbet>;
+    using endbet_action = action_wrapper<"endbet"_n, &gamebaccarat::endbet>;
+    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &gamebaccarat::verdealeseed>;
+    using verserveseed_action = action_wrapper<"verserveseed"_n, &gamebaccarat::verserveseed>;
+    using trusteeship_action = action_wrapper<"trusteeship"_n, &gamebaccarat::trusteeship>;
+    using exitruteship_action = action_wrapper<"exitruteship"_n, &gamebaccarat::exitruteship>;
+    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &gamebaccarat::disconnecthi>;
+    using erasingdata_action = action_wrapper<"erasingdata"_n, &gamebaccarat::erasingdata>;
+    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &gamebaccarat::pausetabledea>;
+    using pausetableser_action = action_wrapper<"pausetablesee"_n, &gamebaccarat::pausetablesee>;
+    using continuetable_action = action_wrapper<"continuetable"_n, &gamebaccarat::continuetable>;
+    using closetable_action = action_wrapper<"closetable"_n, &gamebaccarat::closetable>;
+    using depositable_action = action_wrapper<"depositable"_n, &gamebaccarat::depositable>;
+    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &gamebaccarat::dealerwitdaw>;
+    using changeprivat_action = action_wrapper<"changeprivat"_n, &gamebaccarat::changeprivat>;
 
     name serveraccount = "useraaaaaaah"_n;
     name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
