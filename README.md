@@ -210,7 +210,7 @@ roundResult=["small","even","anytri","tri2","pair2","total6","s2"]
 size(roundResult) = 7/9
 
 - 3 odds redeem  
-    - pBonus
+    - **pBonus** (odds chose, lots of judgments and loops.)
     - dBouns
 
 Traverse player_bet_info    
