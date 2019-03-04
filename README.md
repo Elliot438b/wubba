@@ -157,7 +157,7 @@ Modify the params: (uint64_t tableId, name player, string bet)
 
 This is a JSON.  **JSON resolver in SC**
 
-**Betting options**
+**Betting options**  
 
 name | code | odds | notes
 ---|---|---|---
@@ -243,7 +243,7 @@ remove unused codes inherit from baccarat.
 ## v0.6.1 target
 - Add betPerMin/oneRoundMaxTotalBet control. (including **currRoundBetSum** in table state.)
 
-**betPerMin/oneRoundMaxTotalBet control**
+**betPerMin/oneRoundMaxTotalBet control**  
 
 name | odds | include| betPerMin_(name) | oneRoundMaxTotalBet_(name)
 ---|---|---|---|---
