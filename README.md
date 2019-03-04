@@ -271,6 +271,8 @@ betPerMin/oneRoundMaxTotalBet naming  rule, for example:
     - asset oneRoundDealerMaxPay;
     - asset minTableDeposit;
 
+### **newtable** no longer set the betPerMin/oneRoundMaxTotalBet
+
 ## v0.7 target
 ### add roulette game.
 - modify 3 ACTION: newtable, playerbet, verserveseed(reveal)
