@@ -158,6 +158,7 @@ Modify the params: (uint64_t tableId, name player, string bet)
 This is a JSON.  **JSON resolver in SC**
 
 **Betting options**
+
 name | code | odds | notes
 ---|---|---|---
 big | big | 1:1 | score =[11,17] without triple
@@ -243,6 +244,7 @@ remove unused codes inherit from baccarat.
 - Add betPerMin/oneRoundMaxTotalBet control. (including **currRoundBetSum** in table state.)
 
 **betPerMin/oneRoundMaxTotalBet control**
+
 name | odds | include| betPerMin_(name) | oneRoundMaxTotalBet_(name)
 ---|---|---|---|---
 bsoe | 1:1 | big,small,odd,even | 10.0000 SYS | 3000.0000 SYS
