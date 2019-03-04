@@ -144,22 +144,141 @@ asset minPerBet_Push | *option | 1
 - Change ACTION closetable: transfer all the dealerBalance to dealer account before closing this table. 
     - **NOTE**: table closed can't be recovery any more.
 
-## v0.5.1 target
-### add dice and roulette game.
+## v0.6 target
+Add Sicbo.
 - modify 3 ACTION: newtable, playerbet, verserveseed(reveal)
-- modify the state table structure. (dice and roulette are more simple)
+- modify the state table structure. 
 
-## v0.5.2 target
+### newtable
+Modify the params: (name dealer, asset deposit, bool isPrivate)
+### playerbet
+Modify the params: (uint64_t tableId, name player, string bet)
+> string bet
+
+This is a JSON.  **JSON resolver in SC**
+
+**Betting options**
+name | code | odds | notes
+---|---|---|---
+big | big | 1:1 | score =[11,17] without triple
+small | small |  1:1 | score =[4,10] without triple
+odd | odd |  1:1 | score =odd without triple
+even | even |  1:1 | score =even without triple
+any triple | anytri |  1:24 | 
+specific triple | tri1/tri2/tri3/tri4/tri5/tri6 |  1:150 | 
+specific double | pair1/pair2/pair3/pair4/pair5/pair6 |  1:8 | 
+total(4,17) | total4/total17 | 1:50 | 
+total(5,16) | total5/total16 | 1:18 | 
+total(6,15) | total6/total15 | 1:14 | 
+total(7,14) | total7/total14 | 1:12 | 
+total(8,13) | total8/total13 | 1:8 | 
+total(9,12) | total9/total12 | 1:6 | 
+total(10,11) | total10/total11 | 1:6 | 
+two combinations | c12/c13/c14/c15/c16/c23/c24/c25/c26/c34/c35/c36/c45/c46/c56 | 1:5 | 
+single | s1/s2/s3/s4/s5/s6 | 1:1 | 
+
+JSON data structure example：
+```
+{
+    "small": "0.5000 SYS",
+    "total6": "2.5000 SYS",
+    "tri2": "10.0000 SYS"
+}
+```
+### verserveseed(reveal)
+- 1 diceResult  
+
+root_seed split to 3 sub_seeds. 
+> diceNumber = random(sub_seed) % 6 + 1
+
+> score = sum of 3 diceNumbers.
+
+diceResult data structure example：
+```
+diceResult="345"
+```
+
+- 2 roundResult  
+
+parse to **Betting options**  
+roundResult data structure example：
+```
+roundResult=["small","total6","tri2"]
+```
+
+- 3 odds redeem  
+    - pBonus
+    - dBouns
+
+Traverse player_bet_info    
+According to the odds in the **Betting options** table as above, calculate pBonus/dBonus.  Transfer to player with pBonus and add to **dealerBalance** with dBouns.
+
+### state table structure
+- table fields: uint64_t tableId, name dealer, bool trusteeship, bool isPrivate, asset dealerBalance
+- round fields: 
+
+    uint64_t betStartTime  
+    uint64_t tableStatus  
+    checksum256 dealerSeedHash  
+    checksum256 serverSeedHash  
+    string dealerSeed  
+    string serverSeed  
+    bool dSeedVerity  
+    bool sSeedVerity  
+    std::vector<player_bet_info> playerInfo  
+    string diceResult  
+    string roundResult
+
+- player_bet_info
+
+    name player  
+    string bet  (JSON)
+    asset pBonus  
+    asset dBonus  
+
+### remove unused codes
+remove unused codes inherit from baccarat.
+
+## v0.6.1 target
+- Add betPerMin/oneRoundMaxTotalBet control. (including **currRoundBetSum** in table state.)
+
+**betPerMin/oneRoundMaxTotalBet control**
+name | odds | include| betPerMin_(name) | oneRoundMaxTotalBet_(name)
+---|---|---|---|---
+bsoe | 1:1 | big,small,odd,even | 10.0000 SYS | 3000.0000 SYS
+anytri | 1:24 |  anytri | 0.5000 SYS | 400.0000 SYS
+trinum | 1:150 |  tri1/tri2/tri3/tri4/tri5/tri6 | 0.1000 SYS | 100.0000 SYS
+pairnum | 1:8 |  pair1/pair2/pair3/pair4/pair5/pair6 | 1.0000 SYS | 1000.0000 SYS
+t417 | 1:50 |  total4/total17 | 0.1000 SYS | 200.0000 SYS
+t516 | 1:18 |  total5/total16 | 0.5000 SYS | 500.0000 SYS
+t615 | 1:14 |  total6/total15 | 1.0000 SYS | 700.0000 SYS
+t714 | 1:12 |  total7/total14 | 1.0000 SYS | 800.0000 SYS
+t813 | 1:8 |  total8/total13 | 1.0000 SYS | 1100.0000 SYS
+t912 | 1:6 |  total9/total12 | 1.0000 SYS | 1200.0000 SYS
+t1011 | 1:6 |  total10/total11 | 1.0000 SYS | 1300.0000 SYS
+twocom | 1:5 |  c12/c13/c14/c15/c16/c23/c24/c25/c26/c34/c35/c36/c45/c46/c56 | 1.0000 SYS | 1500.0000 SYS
+single | 1:1 |  s1/s2/s3/s4/s5/s6 | 10.0000 SYS | 3000.0000 SYS
+
+betPerMin/oneRoundMaxTotalBet naming  rule, for example:
+
+> betPerMin_bsoe, betPerMin_anytri ... use betPerMin add the name of "control table" as above.
+
+## v0.7 target
+### add roulette game.
+- modify 3 ACTION: newtable, playerbet, verserveseed(reveal)
+- modify the state table structure.
+
+## v0.8 target
 ### random result uniform distribution
 - Need a big data analysis model by python script. 
 - Adjust variate of the solution to obtain a best result.
 - Seed source.
 
-## v0.6 target
+## v0.9 target
 ### commission flow
 - dealer
 - platform
 - agent
 
-## v0.6.1 target
+## v0.9.1 target
 agent workflow.

@@ -10,12 +10,12 @@ using namespace eosio;
 using namespace std;
 using std::string;
 
-CONTRACT gamebestdice : public contract
+CONTRACT gamebstsicbo : public contract
 {
   public:
     using contract::contract;
 
-    gamebestdice(name receiver, name code, datastream<const char *> ds)
+    gamebstsicbo(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value) {}
 
     ACTION newtable(name dealer, asset deposit, bool isPrivate, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
@@ -113,7 +113,7 @@ CONTRACT gamebestdice : public contract
         EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Push)(minPerBet_Push)(oneRoundDealerMaxPay)(minTableDeposit)(betStartTime)(tableStatus)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
     };
 
-    typedef eosio::multi_index<"tablesinfo"_n, gamebestdice::table_stats, indexed_by<"dealer"_n, const_mem_fun<gamebestdice::table_stats, uint64_t, &gamebestdice::table_stats::get_dealer>>> singletable_t;
+    typedef eosio::multi_index<"tablesinfo"_n, gamebstsicbo::table_stats, indexed_by<"dealer"_n, const_mem_fun<gamebstsicbo::table_stats, uint64_t, &gamebstsicbo::table_stats::get_dealer>>> singletable_t;
     // std random
     struct WBRNG
     {
@@ -158,24 +158,24 @@ CONTRACT gamebestdice : public contract
             cardVec.emplace_back(i);
         }
     }
-    using newtable_action = action_wrapper<"newtable"_n, &gamebestdice::newtable>;
-    using dealerseed_action = action_wrapper<"dealerseed"_n, &gamebestdice::dealerseed>;
-    using serverseed_action = action_wrapper<"serverseed"_n, &gamebestdice::serverseed>;
-    using playerbet_action = action_wrapper<"playerbet"_n, &gamebestdice::playerbet>;
-    using endbet_action = action_wrapper<"endbet"_n, &gamebestdice::endbet>;
-    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &gamebestdice::verdealeseed>;
-    using verserveseed_action = action_wrapper<"verserveseed"_n, &gamebestdice::verserveseed>;
-    using trusteeship_action = action_wrapper<"trusteeship"_n, &gamebestdice::trusteeship>;
-    using exitruteship_action = action_wrapper<"exitruteship"_n, &gamebestdice::exitruteship>;
-    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &gamebestdice::disconnecthi>;
-    using erasingdata_action = action_wrapper<"erasingdata"_n, &gamebestdice::erasingdata>;
-    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &gamebestdice::pausetabledea>;
-    using pausetableser_action = action_wrapper<"pausetablesee"_n, &gamebestdice::pausetablesee>;
-    using continuetable_action = action_wrapper<"continuetable"_n, &gamebestdice::continuetable>;
-    using closetable_action = action_wrapper<"closetable"_n, &gamebestdice::closetable>;
-    using depositable_action = action_wrapper<"depositable"_n, &gamebestdice::depositable>;
-    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &gamebestdice::dealerwitdaw>;
-    using changeprivat_action = action_wrapper<"changeprivat"_n, &gamebestdice::changeprivat>;
+    using newtable_action = action_wrapper<"newtable"_n, &gamebstsicbo::newtable>;
+    using dealerseed_action = action_wrapper<"dealerseed"_n, &gamebstsicbo::dealerseed>;
+    using serverseed_action = action_wrapper<"serverseed"_n, &gamebstsicbo::serverseed>;
+    using playerbet_action = action_wrapper<"playerbet"_n, &gamebstsicbo::playerbet>;
+    using endbet_action = action_wrapper<"endbet"_n, &gamebstsicbo::endbet>;
+    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &gamebstsicbo::verdealeseed>;
+    using verserveseed_action = action_wrapper<"verserveseed"_n, &gamebstsicbo::verserveseed>;
+    using trusteeship_action = action_wrapper<"trusteeship"_n, &gamebstsicbo::trusteeship>;
+    using exitruteship_action = action_wrapper<"exitruteship"_n, &gamebstsicbo::exitruteship>;
+    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &gamebstsicbo::disconnecthi>;
+    using erasingdata_action = action_wrapper<"erasingdata"_n, &gamebstsicbo::erasingdata>;
+    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &gamebstsicbo::pausetabledea>;
+    using pausetableser_action = action_wrapper<"pausetablesee"_n, &gamebstsicbo::pausetablesee>;
+    using continuetable_action = action_wrapper<"continuetable"_n, &gamebstsicbo::continuetable>;
+    using closetable_action = action_wrapper<"closetable"_n, &gamebstsicbo::closetable>;
+    using depositable_action = action_wrapper<"depositable"_n, &gamebstsicbo::depositable>;
+    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &gamebstsicbo::dealerwitdaw>;
+    using changeprivat_action = action_wrapper<"changeprivat"_n, &gamebstsicbo::changeprivat>;
 
     name serveraccount = "useraaaaaaah"_n;
     name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
