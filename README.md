@@ -204,8 +204,10 @@ diceResult="345"
 parse to **Betting options**  
 roundResult data structure example：
 ```
-roundResult=["small","total6","tri2"]
+diceResult="222"
+roundResult=["small","even","anytri","tri2","pair2","total6","s2"]
 ```
+size(roundResult) = 7/9
 
 - 3 odds redeem  
     - pBonus
