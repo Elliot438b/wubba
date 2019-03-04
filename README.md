@@ -265,6 +265,12 @@ betPerMin/oneRoundMaxTotalBet naming  rule, for example:
 
 > betPerMin_bsoe, betPerMin_anytri ... use betPerMin add the name of "control table" as above.
 
+- currRoundBetSum_bsoe, currRoundBetSum_anytri ...
+
+- Modify the control of:
+    - asset oneRoundDealerMaxPay;
+    - asset minTableDeposit;
+
 ## v0.7 target
 ### add roulette game.
 - modify 3 ACTION: newtable, playerbet, verserveseed(reveal)
