@@ -233,7 +233,7 @@ According to the odds in the **Betting options** table as above, calculate pBonu
 - player_bet_info
 
     name player  
-    string bet  (JSON)
+    string bet  (JSON)  
     asset pBonus  
     asset dBonus  
 
