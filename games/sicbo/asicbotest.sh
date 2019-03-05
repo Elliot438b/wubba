@@ -17,24 +17,24 @@ temptest)
     echo "temptest"
     eosio-cpp -abigen gamebstsicbo.cpp -o gamebstsicbo.wasm
     cleos --wallet-url http://127.0.0.1:6666 set contract gamebstsicbo ./ gamebstsicbo.wasm gamebstsicbo.abi
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo newtable '[useraaaaaaab,"23000.0000 SYS", 1, "1001.0000 SYS","100.0000 SYS","100.0000 SYS","1.0000 SYS","50.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo newtable '[useraaaaaaab,"2000.0000 SYS", 1]' -p useraaaaaaab
     tableid=`cleos get table gamebstsicbo gamebstsicbo tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
-    for((num=1;num<=1;num++));
-    do
-        cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
-        cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab
-        cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
-    done
+    #for((num=1;num<=1;num++));
+    #do
+    #    cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
+    #    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab
+    #    cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
+    #done
 
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo depositable '[useraaaaaaab, '$tableid', "23000.0000 SYS"]' -p useraaaaaaab
-    cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
+    #cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo depositable '[useraaaaaaab, '$tableid', "23000.0000 SYS"]' -p useraaaaaaab
+    #cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
 
     sleep 3s
     cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo playerbet '['$tableid',useraaaaaaac,"0.0000 SYS","200.0000 SYS","3.0000 SYS","4.0000 SYS","3.0000 SYS"]' -p useraaaaaaac useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo playerbet '['$tableid',useraaaaaaad,"0.0000 SYS","100.0000 SYS","0.0000 SYS","10.0000 SYS","10.0000 SYS"]' -p useraaaaaaad useraaaaaaah
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo playerbet '['$tableid',useraaaaaaac,"{\"small\": \"0.5000 SYS\",\"total6\": \"2.5000 SYS\",\"tri2\": \"10.0000 SYS\",\"111\": \"10.0000 SYS\"}"]' -p useraaaaaaac useraaaaaaah
+    #cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo playerbet '['$tableid',useraaaaaaad,""]' -p useraaaaaaad useraaaaaaah
     cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
     sleep 36s
     cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo endbet '['$tableid']' -p useraaaaaaah
@@ -43,7 +43,7 @@ temptest)
     cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo verserveseed '['$tableid',704]' -p useraaaaaaah
     cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
 
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo dealerwitdaw '['$tableid', "2000.0000 SYS"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo dealerwitdaw '['$tableid', "20.0000 SYS"]' -p useraaaaaaab
     cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
 
     cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo closetable '['$tableid']' -p useraaaaaaab
@@ -122,7 +122,7 @@ normalflow)
     echo "normalflow test"
     eosio-cpp -abigen gamebstsicbo.cpp -o gamebstsicbo.wasm
     cleos --wallet-url http://127.0.0.1:6666 set contract gamebstsicbo ./ gamebstsicbo.wasm gamebstsicbo.abi
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo newtable '[useraaaaaaab,"23000.0000 SYS", 1, "0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo newtable '[useraaaaaaab,"230.0000 SYS", 1, "0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS"]' -p useraaaaaaab
     tableid=`cleos get table gamebstsicbo gamebstsicbo tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
   #  cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo newtable '[useraaaaaaac,"23000.0000 SYS"]' -p useraaaaaaac

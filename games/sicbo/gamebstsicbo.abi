@@ -1,25 +1,7 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Feb 28 10:35:37 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Mar  5 19:15:21 2019",
     "version": "eosio::abi/1.1",
     "structs": [
-        {
-            "name": "card_info",
-            "base": "",
-            "fields": [
-                {
-                    "name": "deck",
-                    "type": "uint8"
-                },
-                {
-                    "name": "cardNum",
-                    "type": "uint8"
-                },
-                {
-                    "name": "cardColor",
-                    "type": "uint8"
-                }
-            ]
-        },
         {
             "name": "changeprivat",
             "base": "",
@@ -159,30 +141,6 @@
                 {
                     "name": "isPrivate",
                     "type": "bool"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_BP",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_BP",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_Tie",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_Tie",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_Push",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_Push",
-                    "type": "asset"
                 }
             ]
         },
@@ -215,24 +173,8 @@
                     "type": "name"
                 },
                 {
-                    "name": "betDealer",
-                    "type": "asset"
-                },
-                {
-                    "name": "betPlayer",
-                    "type": "asset"
-                },
-                {
-                    "name": "betTie",
-                    "type": "asset"
-                },
-                {
-                    "name": "betDealerPush",
-                    "type": "asset"
-                },
-                {
-                    "name": "betPlayerPush",
-                    "type": "asset"
+                    "name": "bet",
+                    "type": "string"
                 },
                 {
                     "name": "pBonus",
@@ -257,24 +199,8 @@
                     "type": "name"
                 },
                 {
-                    "name": "betDealer",
-                    "type": "asset"
-                },
-                {
-                    "name": "betPlayer",
-                    "type": "asset"
-                },
-                {
-                    "name": "betTie",
-                    "type": "asset"
-                },
-                {
-                    "name": "betDealerPush",
-                    "type": "asset"
-                },
-                {
-                    "name": "betPlayerPush",
-                    "type": "asset"
+                    "name": "bet",
+                    "type": "string"
                 }
             ]
         },
@@ -297,10 +223,6 @@
             "base": "",
             "fields": [
                 {
-                    "name": "validCardVec",
-                    "type": "uint16[]"
-                },
-                {
                     "name": "tableId",
                     "type": "uint64"
                 },
@@ -321,56 +243,12 @@
                     "type": "asset"
                 },
                 {
-                    "name": "oneRoundMaxTotalBet_BP",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_BP",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_Tie",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_Tie",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_Push",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_Push",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundDealerMaxPay",
-                    "type": "asset"
-                },
-                {
-                    "name": "minTableDeposit",
-                    "type": "asset"
-                },
-                {
                     "name": "betStartTime",
                     "type": "uint64"
                 },
                 {
                     "name": "tableStatus",
                     "type": "uint64"
-                },
-                {
-                    "name": "currRoundBetSum_BP",
-                    "type": "asset"
-                },
-                {
-                    "name": "currRoundBetSum_Tie",
-                    "type": "asset"
-                },
-                {
-                    "name": "currRoundBetSum_Push",
-                    "type": "asset"
                 },
                 {
                     "name": "dealerSeedHash",
@@ -405,12 +283,8 @@
                     "type": "string"
                 },
                 {
-                    "name": "playerHands",
-                    "type": "card_info[]"
-                },
-                {
-                    "name": "bankerHands",
-                    "type": "card_info[]"
+                    "name": "diceResult",
+                    "type": "string"
                 }
             ]
         },

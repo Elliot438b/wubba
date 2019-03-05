@@ -18,11 +18,11 @@ CONTRACT gamebstsicbo : public contract
     gamebstsicbo(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value) {}
 
-    ACTION newtable(name dealer, asset deposit, bool isPrivate, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
+    ACTION newtable(name dealer, asset deposit, bool isPrivate);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION endbet(uint64_t tableId);
-    ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush);
+    ACTION playerbet(uint64_t tableId, name player, string bet);
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
     ACTION trusteeship(uint64_t tableId);
@@ -37,53 +37,29 @@ CONTRACT gamebstsicbo : public contract
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
     ACTION changeprivat(bool isPrivate, uint64_t tableId);
 
-    struct card_info
-    {
-        uint8_t deck;
-        uint8_t cardNum;
-        uint8_t cardColor;
-
-        EOSLIB_SERIALIZE(card_info, (deck)(cardNum)(cardColor))
-    };
+    bool checkName(string bet);
 
     struct player_bet_info
     {
         name player;
-        asset betDealer;
-        asset betPlayer;
-        asset betTie;
-        asset betDealerPush;
-        asset betPlayerPush;
+        string bet;
         asset pBonus;
         asset dBonus;
 
-        EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPush)(betPlayerPush)(pBonus)(dBonus))
+        EOSLIB_SERIALIZE(player_bet_info, (player)(bet)(pBonus)(dBonus))
     };
 
     TABLE table_stats
     {
         // ------------------------------ table field ------------------------------
-        std::vector<uint16_t> validCardVec; // newtable init & new round check.
         uint64_t tableId;                   // table fix.
         name dealer;                        // table owner.
         bool trusteeship;                   // table flag.
         bool isPrivate;                     // table flag.
         asset dealerBalance;                // table filed.
-        asset oneRoundMaxTotalBet_BP;
-        asset minPerBet_BP;
-        asset oneRoundMaxTotalBet_Tie;
-        asset minPerBet_Tie;
-        asset oneRoundMaxTotalBet_Push;
-        asset minPerBet_Push;
-
-        asset oneRoundDealerMaxPay;
-        asset minTableDeposit;
-        // ------------------------------ round field ------------------------------
+            // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
         uint64_t tableStatus;  // round stage.
-        asset currRoundBetSum_BP;
-        asset currRoundBetSum_Tie;
-        asset currRoundBetSum_Push;
 
         checksum256 dealerSeedHash;
         checksum256 serverSeedHash;
@@ -95,8 +71,7 @@ CONTRACT gamebstsicbo : public contract
         std::vector<player_bet_info> playerInfo;
 
         string roundResult;
-        std::vector<card_info> playerHands;
-        std::vector<card_info> bankerHands;
+        string diceResult;
 
         uint64_t primary_key() const { return tableId; }
         uint64_t get_dealer() const { return dealer.value; }
@@ -110,7 +85,7 @@ CONTRACT gamebstsicbo : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Push)(minPerBet_Push)(oneRoundDealerMaxPay)(minTableDeposit)(betStartTime)(tableStatus)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
+        EOSLIB_SERIALIZE(table_stats, (tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(betStartTime)(tableStatus)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(diceResult))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, gamebstsicbo::table_stats, indexed_by<"dealer"_n, const_mem_fun<gamebstsicbo::table_stats, uint64_t, &gamebstsicbo::table_stats::get_dealer>>> singletable_t;
@@ -149,15 +124,7 @@ CONTRACT gamebstsicbo : public contract
             (r += to_hex[(c[i] >> 4)]) += to_hex[(c[i] & 0x0f)];
         return r;
     }
-    // shuffle
-    void shuffle(std::vector<uint16_t> & cardVec)
-    {
-        cardVec.clear();
-        for (auto i = 0; i < initDecks * 52; i++)
-        {
-            cardVec.emplace_back(i);
-        }
-    }
+
     using newtable_action = action_wrapper<"newtable"_n, &gamebstsicbo::newtable>;
     using dealerseed_action = action_wrapper<"dealerseed"_n, &gamebstsicbo::dealerseed>;
     using serverseed_action = action_wrapper<"serverseed"_n, &gamebstsicbo::serverseed>;
@@ -180,21 +147,69 @@ CONTRACT gamebstsicbo : public contract
     name serveraccount = "useraaaaaaah"_n;
     name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
 
-    const uint16_t CardsMinLimit = 100;
     const uint32_t betPeriod = 30;
-    const uint16_t initDecks = 8;
-    const uint32_t minTableRounds = 10;
-
-    const asset oneRoundMaxTotalBet_BP_default = asset(1000 * 10000, symbol(symbol_code("SYS"), 4)); //1000
-    const asset minPerBet_BP_default = asset(100 * 10000, symbol(symbol_code("SYS"), 4));            //100
-    const asset oneRoundMaxTotalBet_Tie_default = asset(100 * 10000, symbol(symbol_code("SYS"), 4)); //100
-    const asset minPerBet_Tie_default = asset(1 * 10000, symbol(symbol_code("SYS"), 4));             //1
-    const asset oneRoundMaxTotalBet_Push_default = asset(50 * 10000, symbol(symbol_code("SYS"), 4)); //50
-    const asset minPerBet_Push_default = asset(1 * 10000, symbol(symbol_code("SYS"), 4));            //1
     const asset init_asset_empty = asset(0, symbol(symbol_code("SYS"), 4));
+
+    static std::vector<string> createInitName()
+    {
+        std::vector<string> tempName;
+
+        tempName.emplace_back("big");
+        tempName.emplace_back("small");
+        tempName.emplace_back("odd");
+        tempName.emplace_back("even");
+        tempName.emplace_back("anytri");
+        auto count = 1;
+        while(count <= 6)
+        {
+            string tri_name = "tri";
+            string pair_name = "pair";
+            string signal_name = "s";
+            char itc[3];
+            sprintf(itc,"%d",count);
+            tri_name += itc;
+            pair_name += itc;
+            signal_name += itc;
+            //eosio::print("tri_name:", tri_name, " pair_name:", pair_name, " signal_name:", signal_name, " !");
+            tempName.emplace_back(tri_name);
+            tempName.emplace_back(pair_name);
+            tempName.emplace_back(signal_name);
+            count ++;
+        }
+
+        count = 4;
+        while(count <= 17)
+        {
+            string total_name = "total";
+            char itc[3];
+            sprintf(itc,"%d",count);
+            total_name += itc;
+            tempName.emplace_back(total_name);
+            count ++;
+        }
+
+        count = 1;
+        for(; count <= 5; count ++)
+        {
+            auto j = count + 1;
+            while(j <= 6)
+            {
+                string com_name = "c";
+                char itc[3];
+                sprintf(itc,"%d%d",count,j);
+                com_name += itc;
+                tempName.emplace_back(com_name);
+                j++;
+            }
+        }
+
+        return tempName;
+    };
+    static const std::vector<string> initName;
 
     const char *notableerr = "TableId isn't existing!";
 
     singletable_t tableround;
     WBRNG wbrng;
 };
+const std::vector<string> gamebstsicbo::initName = gamebstsicbo::createInitName();

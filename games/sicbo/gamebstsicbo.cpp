@@ -1,45 +1,10 @@
 #include "gamebstsicbo.hpp"
 
-ACTION gamebstsicbo::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
-                       asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
-                       asset oneRoundMaxTotalBet_push, asset minPerBet_push)
+
+ACTION gamebstsicbo::newtable(name dealer, asset deposit, bool isPrivate)
 {
     require_auth(dealer);
 
-    asset oneRoundMaxTotalBet_BP_temp;
-    asset minPerBet_BP_temp;
-    asset oneRoundMaxTotalBet_Tie_temp;
-    asset minPerBet_Tie_temp;
-    asset oneRoundMaxTotalBet_Push_temp;
-    asset minPerBet_Push_temp;
-    asset oneRoundDealerMaxPay_temp;
-    asset deposit_tmp;
-
-    if (oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp > init_asset_empty && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie > init_asset_empty && oneRoundMaxTotalBet_push > init_asset_empty && minPerBet_push > init_asset_empty)
-    {
-        oneRoundMaxTotalBet_BP_temp = oneRoundMaxTotalBet_bp;
-        minPerBet_BP_temp = minPerBet_bp;
-        oneRoundMaxTotalBet_Tie_temp = oneRoundMaxTotalBet_tie;
-        minPerBet_Tie_temp = minPerBet_tie;
-        oneRoundMaxTotalBet_Push_temp = oneRoundMaxTotalBet_push;
-        minPerBet_Push_temp = minPerBet_push;
-        eosio::print(" [userset===deposit limit]");
-    }
-    else
-    {
-        oneRoundMaxTotalBet_BP_temp = oneRoundMaxTotalBet_BP_default;
-        minPerBet_BP_temp = minPerBet_BP_default;
-        oneRoundMaxTotalBet_Tie_temp = oneRoundMaxTotalBet_Tie_default;
-        minPerBet_Tie_temp = minPerBet_Tie_default;
-        oneRoundMaxTotalBet_Push_temp = oneRoundMaxTotalBet_Push_default;
-        minPerBet_Push_temp = minPerBet_Push_default;
-        eosio::print(" [deault===deposit limit]");
-    }
-
-    oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_Push_temp * 11 * 2 + max(oneRoundMaxTotalBet_BP_temp * 1, oneRoundMaxTotalBet_Tie_temp * 8);
-    deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
-
-    eosio_assert(deposit >= deposit_tmp, "Table deposit is not enough!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         "eosio.token"_n, {{dealer, "active"_n}},
@@ -51,15 +16,6 @@ ACTION gamebstsicbo::newtable(name dealer, asset deposit, bool isPrivate, asset 
         s.dealer = dealer;
         s.dealerBalance = deposit;
         s.isPrivate = isPrivate;
-        shuffle(s.validCardVec);
-        s.oneRoundMaxTotalBet_BP = oneRoundMaxTotalBet_BP_temp;
-        s.minPerBet_BP = minPerBet_BP_temp;
-        s.oneRoundMaxTotalBet_Tie = oneRoundMaxTotalBet_Tie_temp;
-        s.minPerBet_Tie = minPerBet_Tie_temp;
-        s.oneRoundMaxTotalBet_Push = oneRoundMaxTotalBet_Push_temp;
-        s.minPerBet_Push = minPerBet_Push_temp;
-        s.oneRoundDealerMaxPay = oneRoundDealerMaxPay_temp;
-        s.minTableDeposit = deposit_tmp;
     });
 }
 
@@ -73,25 +29,12 @@ ACTION gamebstsicbo::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END,
                      "tableStatus != end");
         require_auth(existing->dealer);
-        if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
-        {
-            INLINE_ACTION_SENDER(gamebstsicbo, pausetabledea)
-            (
-                _self, {{existing->dealer, "active"_n}},
-                {existing->tableId});
-            return;
-        }
         // start a new round. table_round init.
-        eosio::print(" ===validCardVec.size:", existing->validCardVec.size());
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
-        std::vector<card_info> emptyCards;
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = 0;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
-            s.currRoundBetSum_BP = init_asset_empty;
-            s.currRoundBetSum_Tie = init_asset_empty;
-            s.currRoundBetSum_Push = init_asset_empty;
             s.dealerSeedHash = encodeSeed;
             s.serverSeedHash = hash;
             s.dealerSeed = "";
@@ -100,8 +43,7 @@ ACTION gamebstsicbo::dealerseed(uint64_t tableId, checksum256 encodeSeed)
             s.sSeedVerity = 0;
             s.playerInfo = emptyPlayers;
             s.roundResult = "";
-            s.playerHands = emptyCards;
-            s.bankerHands = emptyCards;
+            s.diceResult = "";
         });
     }
 }
@@ -111,34 +53,17 @@ ACTION gamebstsicbo::serverseed(uint64_t tableId, checksum256 encodeSeed)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    bool shuffle_flag = false;
-    if (existing->validCardVec.size() <= CardsMinLimit)
-    {
-        shuffle_flag = true;
-        eosio::print("---Cards aren't enough, re shuffle.---");
-    }
+
     if (existing->trusteeship)
     {
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
-        if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
-        {
-            INLINE_ACTION_SENDER(gamebstsicbo, pausetablesee)
-            (
-                _self, {{serveraccount, "active"_n}},
-                {existing->tableId});
-            return;
-        }
+
         // start a new round. table_round init.
-        eosio::print(" ===validCardVec.size:", existing->validCardVec.size());
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
-        std::vector<card_info> emptyCards;
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = now();
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
-            s.currRoundBetSum_BP = init_asset_empty;
-            s.currRoundBetSum_Tie = init_asset_empty;
-            s.currRoundBetSum_Push = init_asset_empty;
             s.dealerSeedHash = hash;
             s.serverSeedHash = encodeSeed;
             s.dealerSeed = "";
@@ -147,10 +72,8 @@ ACTION gamebstsicbo::serverseed(uint64_t tableId, checksum256 encodeSeed)
             s.sSeedVerity = 0;
             s.playerInfo = emptyPlayers;
             s.roundResult = "";
-            s.playerHands = emptyCards;
-            s.bankerHands = emptyCards;
-            if (shuffle_flag)
-                shuffle(s.validCardVec);
+            s.diceResult = "";
+
         });
     }
     else
@@ -160,8 +83,7 @@ ACTION gamebstsicbo::serverseed(uint64_t tableId, checksum256 encodeSeed)
             s.serverSeedHash = encodeSeed;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
             s.betStartTime = now();
-            if (shuffle_flag)
-                shuffle(s.validCardVec);
+
         });
     }
 
@@ -178,7 +100,7 @@ ACTION gamebstsicbo::serverseed(uint64_t tableId, checksum256 encodeSeed)
     // txn.send(deferred_id, _self, false);
 }
 
-ACTION gamebstsicbo::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush)
+ACTION gamebstsicbo::playerbet(uint64_t tableId, name player, string bet)
 {
     require_auth(player);
     require_auth(serveraccount);
@@ -186,20 +108,6 @@ ACTION gamebstsicbo::playerbet(uint64_t tableId, name player, asset betDealer, a
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     eosio_assert((now() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
-    if (betDealer > init_asset_empty)
-        eosio_assert(betDealer >= existing->minPerBet_BP, "Banker bet is too small!");
-    if (betPlayer > init_asset_empty)
-        eosio_assert(betPlayer >= existing->minPerBet_BP, "Player bet is too small!");
-    if (betTie > init_asset_empty)
-        eosio_assert(betTie >= existing->minPerBet_Tie, "Tie bet is too small!");
-    if (betDealerPush > init_asset_empty)
-        eosio_assert(betDealerPush >= existing->minPerBet_Push, "BankerPush bet is too small!");
-    if (betPlayerPush > init_asset_empty)
-        eosio_assert(betPlayerPush >= existing->minPerBet_Push, "PlayerPush bet is too small!");
-
-    asset player_amount_sum_bp = existing->currRoundBetSum_BP;
-    asset player_amount_sum_tie = existing->currRoundBetSum_Tie;
-    asset player_amount_sum_push = existing->currRoundBetSum_Push;
 
     bool flag = false;
     for (const auto &p : existing->playerInfo)
@@ -212,40 +120,24 @@ ACTION gamebstsicbo::playerbet(uint64_t tableId, name player, asset betDealer, a
     }
 
     eosio_assert(!flag, "player have bet");
-    player_amount_sum_bp += betDealer;
-    player_amount_sum_bp += betPlayer;
-    eosio_assert(player_amount_sum_bp < existing->oneRoundMaxTotalBet_BP, "Over the peak of total bet_bp amount of this round!");
+    bool ret = checkName(bet);
+    eosio_assert(ret, "name not exist");
+//    if (depositAmount > init_asset_empty)
+//    {
+//        INLINE_ACTION_SENDER(eosio::token, transfer)
+//        (
+//            "eosio.token"_n, {{player, "active"_n}},
+//            {player, _self, depositAmount, std::string("playerbet")});
+//    }
 
-    player_amount_sum_tie += betTie;
-    eosio_assert(player_amount_sum_tie < existing->oneRoundMaxTotalBet_Tie, "Over the peak of total bet_tie amount of this round!");
-
-    player_amount_sum_push += betDealerPush;
-    player_amount_sum_push += betPlayerPush;
-    eosio_assert(player_amount_sum_push < existing->oneRoundMaxTotalBet_Push, "Over the peak of total bet_push amount of this round!");
-
-    asset depositAmount = (betDealer + betPlayer + betTie + betDealerPush + betPlayerPush);
-    if (depositAmount > init_asset_empty)
-    {
-        INLINE_ACTION_SENDER(eosio::token, transfer)
-        (
-            "eosio.token"_n, {{player, "active"_n}},
-            {player, _self, depositAmount, std::string("playerbet")});
-    }
     player_bet_info temp;
     temp.player = player;
-    temp.betDealer = betDealer;
-    temp.betPlayer = betPlayer;
-    temp.betTie = betTie;
-    temp.betDealerPush = betDealerPush;
-    temp.betPlayerPush = betPlayerPush;
+    temp.bet = bet;
     temp.pBonus = init_asset_empty;
     temp.dBonus = init_asset_empty;
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
-        s.currRoundBetSum_BP = player_amount_sum_bp;
-        s.currRoundBetSum_Tie = player_amount_sum_tie;
-        s.currRoundBetSum_Push = player_amount_sum_push;
     });
 }
 
@@ -319,7 +211,7 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
     auto hash_data = hash.extract_as_byte_array();
     string root_seed_64 = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
     eosio::print(" root_seed_64 : ", root_seed_64, " ");
-    // Split 6 seeds, parse card info.
+   /* // Split 6 seeds, parse card info.
     std::vector<card_info> cardInfo;
     std::vector<uint16_t> sixPosVec;
     auto counter = 0;
@@ -487,13 +379,13 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
         }
         eosio::print(" tem.size ", validCardTemp.size(), "】");
     }
+    */
+    std::vector<player_bet_info> tempPlayerVec;
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
-        s.playerHands = playerHands;
-        s.bankerHands = bankerHands;
-        s.validCardVec = validCardTemp;
-        s.roundResult = roundResult;
-        s.dealerBalance = dealerBalance_temp;
+        s.diceResult = "";
+        s.roundResult = "";
+        s.dealerBalance = init_asset_empty;
         s.playerInfo = tempPlayerVec;
     });
 }
@@ -591,7 +483,7 @@ ACTION gamebstsicbo::continuetable(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->dealerBalance >= existing->oneRoundDealerMaxPay * 2, "Can't recover table, dealer balance isn't enough!");
+    //eosio_assert(existing->dealerBalance >= existing->oneRoundDealerMaxPay * 2, "Can't recover table, dealer balance isn't enough!");
     require_auth(existing->dealer);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED, "The tableid not paused, can`t continuetable");
     tableround.modify(existing, _self, [&](auto &s) {
@@ -620,7 +512,7 @@ ACTION gamebstsicbo::depositable(name dealer, uint64_t tableId, asset deposit)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(dealer);
-    eosio_assert(deposit >= existing->minTableDeposit, "Table deposit is not enough!");
+   // eosio_assert(deposit >= existing->minTableDeposit, "Table deposit is not enough!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         "eosio.token"_n, {{dealer, "active"_n}},
@@ -643,7 +535,7 @@ ACTION gamebstsicbo::dealerwitdaw(uint64_t tableId, asset withdraw)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
-    eosio_assert((existing->dealerBalance - withdraw) > existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
+   // eosio_assert((existing->dealerBalance - withdraw) > existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         "eosio.token"_n, {{_self, "active"_n}},
@@ -662,4 +554,35 @@ ACTION gamebstsicbo::changeprivat(bool isPrivate, uint64_t tableId)
         s.isPrivate = isPrivate;
     });
 }
+
+
+bool gamebstsicbo::checkName(string bet) {
+    bool result = false;
+    //std::vector <string> name;
+
+    auto pos = bet.find(":");
+    //eosio::print("........", bet, " !...");
+    auto pos_end = 0;
+    while (pos!=string::npos)
+    {
+        string temp_name = bet.substr(pos_end + 2, pos - pos_end - 3);
+        result = false;
+        for(auto j : gamebstsicbo::initName)
+        {
+            if(j == temp_name)
+            {
+                result = true;
+            }
+        }
+
+        if(!result)
+            return result;
+        eosio::print("temp_name:", temp_name, " !...");
+        pos_end = bet.find(",",pos);
+        pos = bet.find(":", pos_end);
+    }
+
+    return result;
+}
+
 EOSIO_DISPATCH(gamebstsicbo, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))
