@@ -242,6 +242,8 @@ According to the odds in the **Betting options** table as above, calculate pBonu
 ### remove unused codes
 remove unused codes inherit from baccarat.
 
+### support any currency（default SYS）
+
 ## v0.6.1 target
 - Add betPerMin/oneRoundMaxTotalBet control. (including **currRoundBetSum** in table state.)
 
