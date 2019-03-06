@@ -5,6 +5,8 @@ ACTION gamebstsicbo::newtable(name dealer, asset deposit, bool isPrivate)
 {
     require_auth(dealer);
 
+    eosio_assert(deposit >= minTableDeposit, "Table deposit is not enough!");
+
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         "eosio.token"_n, {{dealer, "active"_n}},
@@ -29,6 +31,14 @@ ACTION gamebstsicbo::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END,
                      "tableStatus != end");
         require_auth(existing->dealer);
+        if (existing->dealerBalance < oneRoundDealerMaxPay * 2)
+        {
+            INLINE_ACTION_SENDER(gamebstsicbo, pausetabledea)
+            (
+                 _self, {{existing->dealer, "active"_n}},
+                 {existing->tableId});
+            return;
+        }
         // start a new round. table_round init.
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
@@ -57,7 +67,14 @@ ACTION gamebstsicbo::serverseed(uint64_t tableId, checksum256 encodeSeed)
     if (existing->trusteeship)
     {
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
-
+        if (existing->dealerBalance < oneRoundDealerMaxPay * 2)
+        {
+            INLINE_ACTION_SENDER(gamebstsicbo, pausetablesee)
+            (
+                    _self, {{serveraccount, "active"_n}},
+                    {existing->tableId});
+            return;
+        }
         // start a new round. table_round init.
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
@@ -120,8 +137,10 @@ ACTION gamebstsicbo::playerbet(uint64_t tableId, name player, string bet)
     }
 
     eosio_assert(!flag, "player have bet");
-    bool ret = checkName(bet);
+    asset betAmont = init_asset_empty;
+    bool ret = checkBetOptions(bet, betAmont);
     eosio_assert(ret, "name not exist");
+    eosio::print("betAmont:", betAmont, " .........");
 //    if (depositAmount > init_asset_empty)
 //    {
 //        INLINE_ACTION_SENDER(eosio::token, transfer)
@@ -211,97 +230,123 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
     auto hash_data = hash.extract_as_byte_array();
     string root_seed_64 = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
     eosio::print(" root_seed_64 : ", root_seed_64, " ");
-   /* // Split 6 seeds, parse card info.
-    std::vector<card_info> cardInfo;
-    std::vector<uint16_t> sixPosVec;
+   // Split 3 seeds, get dice result.
+    std::vector<uint16_t> diceResult_temp;
+    auto score = 0;
     auto counter = 0;
-    while (counter < 6)
+    while (counter < 3)
     {
         string sub_seed = root_seed_64.substr(counter * 9, 9);
         wbrng.srand(SDBMHash((char *)sub_seed.c_str()));
-        uint64_t pos = wbrng.rand() % existing->validCardVec.size();
-        uint16_t cardPos = existing->validCardVec[pos]; // value of validCardVec is cardPos(card index).
-        sixPosVec.emplace_back(cardPos);
-        uint16_t deck = (cardPos) / 52 + 1;
-        uint16_t suitcolor = (cardPos + 1) / 13 % 4;
-        uint16_t cardnumber = (cardPos + 1) % 13;
-        if (cardnumber == 0)
-            cardnumber = 13;
-        eosio::print("[pos:", pos, ", cardpos:", cardPos, ", deck:", deck, ", number:", cardnumber, ", suitcolor:", suitcolor, "]");
-        card_info tempCard;
-        tempCard.deck = deck;
-        tempCard.cardNum = cardnumber;
-        tempCard.cardColor = suitcolor;
-        cardInfo.emplace_back(tempCard);
+        uint16_t result = wbrng.rand() % 6 + 1;
+        score += result;
+        diceResult_temp.emplace_back(result);
+        eosio::print("[dice_result:", result, "]");
         counter++;
     }
-    // init first 2 cards.
-    std::vector<card_info> playerHands;
-    playerHands.emplace_back(cardInfo[0]);
-    playerHands.emplace_back(cardInfo[2]);
-    auto sum_p = (cardInfo[0].cardNum + cardInfo[2].cardNum) % 10;
+    sort(diceResult_temp.begin(), diceResult_temp.end());
 
-    std::vector<card_info> bankerHands;
-    bankerHands.emplace_back(cardInfo[1]);
-    bankerHands.emplace_back(cardInfo[3]);
-    auto sum_b = (cardInfo[1].cardNum + cardInfo[3].cardNum) % 10;
-    // 5th/6th card obtain rules.
-    bool fifthCard_flag = false;
-    bool sixthCard_flag = false;
-    // all non-obtain rules
-    if (sum_p == 8 || sum_p == 9 || sum_b == 8 || sum_b == 9)
+    //get roundResult
+    std::vector<string> roundResult_temp;
+    bool tripe_flag = false;
+    if(diceResult_temp[0] == diceResult_temp[1] && diceResult_temp[0] == diceResult_temp[2])
     {
-        eosio::print("4 cards end, don't need extra card obtain!");
+        roundResult_temp.emplace_back("anytri");
+        tripe_flag = true;
+        char itc[5];
+        sprintf(itc,"%d",diceResult_temp[0]);
+        string tri_name = "tri";
+        tri_name += itc;
+        roundResult_temp.emplace_back(tri_name);
+        string pair_name = "pair";
+        pair_name += itc;
+        roundResult_temp.emplace_back(pair_name);
+        string signal_name = "s";
+        signal_name += itc;
+        roundResult_temp.emplace_back(signal_name);
     }
-    else if ((sum_p == 6 || sum_p == 7) && (sum_b == 6 || sum_b == 7))
+    else if(diceResult_temp[0] == diceResult_temp[1] || diceResult_temp[2] == diceResult_temp[1])
     {
-        eosio::print("4 cards end, don't need extra card obtain!");
-    }
-    // all obtain rules.
-    else
-    {
-        if (sum_p < 6)
+        char itc[5];
+        sprintf(itc,"%d",diceResult_temp[1]);
+        string pair_name = "pair";
+        pair_name += itc;
+        roundResult_temp.emplace_back(pair_name);
+
+        if(diceResult_temp[0] == diceResult_temp[1] && diceResult_temp[1] != diceResult_temp[2])
         {
-            playerHands.emplace_back(cardInfo[4]);
-            sum_p = (sum_p + cardInfo[4].cardNum) % 10;
-            fifthCard_flag = true;
-            if (sum_b == 6 && (sum_p == 6 || sum_p == 7))
-            {
-                bankerHands.emplace_back(cardInfo[5]);
-                sum_b = (sum_b + cardInfo[5].cardNum) % 10;
-                sixthCard_flag = true;
-            }
+            sprintf(itc,"%d%d",diceResult_temp[1],diceResult_temp[2]);
+            string com_name = "c";
+            com_name += itc;
+            roundResult_temp.emplace_back(com_name);
+
+            string signal_name1 = "s";
+            sprintf(itc,"%d",diceResult_temp[2]);
+            signal_name1 += itc;
+            roundResult_temp.emplace_back(signal_name1);
         }
-        if (!sixthCard_flag &&
-            (sum_b < 3 || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag)) || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag))))
+        else if(diceResult_temp[1] == diceResult_temp[2] && diceResult_temp[0] != diceResult_temp[1])
         {
-            if (fifthCard_flag)
-            {
-                bankerHands.emplace_back(cardInfo[5]);
-                sum_b = (sum_b + cardInfo[5].cardNum) % 10;
-                sixthCard_flag = true;
-            }
-            else
-            {
-                bankerHands.emplace_back(cardInfo[4]);
-                sum_b = (sum_b + cardInfo[4].cardNum) % 10;
-                fifthCard_flag = true;
-            }
+            sprintf(itc,"%d%d",diceResult_temp[0],diceResult_temp[1]);
+            string com_name = "c";
+            com_name += itc;
+            roundResult_temp.emplace_back(com_name);
+
+            string signal_name1 = "s";
+            sprintf(itc,"%d",diceResult_temp[0]);
+            signal_name1 += itc;
+            roundResult_temp.emplace_back(signal_name1);
+        }
+
+        string signal_name = "s";
+        sprintf(itc,"%d",diceResult_temp[1]);
+        signal_name += itc;
+        roundResult_temp.emplace_back(signal_name);
+
+    }
+    else if(diceResult_temp[0] != diceResult_temp[1] && diceResult_temp[2] != diceResult_temp[1])
+    {
+        char itc[5];
+        sprintf(itc,"%d%d",diceResult_temp[0],diceResult_temp[1]);
+        string com_name = "c";
+        com_name += itc;
+        roundResult_temp.emplace_back(com_name);
+
+        com_name = "c";
+        sprintf(itc,"%d%d",diceResult_temp[0],diceResult_temp[2]);
+        com_name += itc;
+        roundResult_temp.emplace_back(com_name);
+
+        com_name = "c";
+        sprintf(itc,"%d%d",diceResult_temp[1],diceResult_temp[2]);
+        com_name += itc;
+        roundResult_temp.emplace_back(com_name);
+
+        for(auto signal:diceResult_temp)
+        {
+            string signal_name = "s";
+            sprintf(itc,"%d",signal);
+            signal_name += itc;
+            roundResult_temp.emplace_back(signal_name);
         }
     }
-    //round result
-    string roundResult = "00000"; //Banker,Player,Tie,BankerPush,PlayerPush
-    if (sum_p < sum_b)            //Banker
-        roundResult[0] = '1';
-    else if (sum_p > sum_b) //Player
-        roundResult[1] = '1';
-    else if (sum_p == sum_b) //Tie
-        roundResult[2] = '1';
-    if (bankerHands[0].cardNum == bankerHands[1].cardNum) //BankerPush
-        roundResult[3] = '1';
-    if (playerHands[0].cardNum == playerHands[1].cardNum) //PlayerPush
-        roundResult[4] = '1';
-    eosio::print(" round_result: ", roundResult, " ");
+
+    if(score >= 11 && score <= 17 && !tripe_flag)
+        roundResult_temp.emplace_back("big");
+    else if(score >= 4 && score <= 10 && !tripe_flag)
+        roundResult_temp.emplace_back("small");
+
+    if(score%2 == 1 && !tripe_flag)
+        roundResult_temp.emplace_back("odd");
+    else if(score%2 == 0 && !tripe_flag)
+        roundResult_temp.emplace_back("even");
+
+    char itc[5];
+    sprintf(itc,"%d",score);
+    roundResult_temp.emplace_back(itc);
+    for(auto result : roundResult_temp)
+        eosio::print(" round_result: ", result, " ");
+
     //odds token
     std::vector<player_bet_info> tempPlayerVec;
     asset dealerBalance_temp = existing->dealerBalance;
@@ -310,31 +355,38 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
         auto pBonus = init_asset_empty;
         auto dBonus = init_asset_empty;
         // Banker field
-        if (roundResult[0] == '1')
-            pBonus = playerBet.betDealer * (1 + 0.95);
-        else
-            dBonus = playerBet.betDealer;
-        // Player field
-        if (roundResult[1] == '1')
-            pBonus += playerBet.betPlayer * (1 + 1);
-        else
-            dBonus += playerBet.betPlayer;
-        // Tie field
-        if (roundResult[2] == '1')
-            pBonus += playerBet.betTie * (1 + 8);
-        else
-            dBonus += playerBet.betTie;
-        // DealerPush field
-        if (roundResult[3] == '1')
-            pBonus += playerBet.betDealerPush * (1 + 11);
-        else
-            dBonus += playerBet.betDealerPush;
-        // PlayerPush field
-        if (roundResult[4] == '1')
-            pBonus += playerBet.betPlayerPush * (1 + 11);
-        else
-            dBonus += playerBet.betPlayerPush;
+        auto pos = playerBet.bet.find(":");
+        //eosio::print("........", bet, " !...");
+        auto pos_end = 0;
+        bool winNameFlag = false;
+        while (pos!=string::npos) {
+            string temp_name = playerBet.bet.substr(pos_end + 2, pos - pos_end - 3);
+            winNameFlag = false;
+            for (auto j : roundResult_temp) {
+                if (j == temp_name) {
+                    eosio::print("temp_name:", temp_name, " ...");
+                    winNameFlag = true;
+                }
+            }
 
+            pos_end = playerBet.bet.find(",", pos);
+            string temp_amont;
+            if (pos_end != -1) {
+                temp_amont = playerBet.bet.substr(pos + 3, pos_end - pos - 7);
+            } else {
+                pos_end = playerBet.bet.find("}", pos);
+                temp_amont = playerBet.bet.substr(pos + 3, pos_end - pos - 7);
+            }
+            eosio::print("temp_amont:", temp_amont, " ...");
+            pos = playerBet.bet.find(":", pos_end);
+            //odds
+            /*
+            if(result)
+                pBonus += ;
+            else
+                dBonus += ;
+                */
+        }
         eosio::print(" [player:", playerBet.player, ", total bonus:", pBonus, "] ");
 
         if (pBonus > init_asset_empty)
@@ -351,41 +403,22 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
         tempPlayerVec.emplace_back(playerBet);
     }
 
-    // delete cards used.
-    if (!fifthCard_flag && !sixthCard_flag)
+    char diceResultStr[5];
+    sprintf(diceResultStr,"%d%d%d",diceResult_temp[0],diceResult_temp[1],diceResult_temp[2]);
+
+    string roundResultStr = "";
+    char roundResultCh[64];
+    for(auto str : roundResult_temp)
     {
-        sixPosVec.erase(sixPosVec.begin() + 4);
-        sixPosVec.erase(sixPosVec.begin() + 4);
-    }
-    else if (!sixthCard_flag)
-    {
-        sixPosVec.erase(sixPosVec.begin() + 5);
+        roundResultStr += str;
+        roundResultStr += " ";
     }
 
-    std::vector<uint16_t> validCardTemp = existing->validCardVec;
-    for (auto i : sixPosVec)
-    {
-        for (auto itr = validCardTemp.begin(); itr != validCardTemp.end(); itr++)
-        {
-            if (*itr == i)
-            {
-                itr = validCardTemp.erase(itr);
-                eosio::print(" 【erase ", i);
-            }
-            if (itr == validCardTemp.end())
-            {
-                break;
-            }
-        }
-        eosio::print(" tem.size ", validCardTemp.size(), "】");
-    }
-    */
-    std::vector<player_bet_info> tempPlayerVec;
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
-        s.diceResult = "";
-        s.roundResult = "";
-        s.dealerBalance = init_asset_empty;
+        s.diceResult = diceResultStr;
+        s.roundResult = roundResultStr;
+        s.dealerBalance = dealerBalance_temp;
         s.playerInfo = tempPlayerVec;
     });
 }
@@ -483,7 +516,7 @@ ACTION gamebstsicbo::continuetable(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    //eosio_assert(existing->dealerBalance >= existing->oneRoundDealerMaxPay * 2, "Can't recover table, dealer balance isn't enough!");
+    eosio_assert(existing->dealerBalance >= oneRoundDealerMaxPay * 2, "Can't recover table, dealer balance isn't enough!");
     require_auth(existing->dealer);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED, "The tableid not paused, can`t continuetable");
     tableround.modify(existing, _self, [&](auto &s) {
@@ -512,7 +545,7 @@ ACTION gamebstsicbo::depositable(name dealer, uint64_t tableId, asset deposit)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(dealer);
-   // eosio_assert(deposit >= existing->minTableDeposit, "Table deposit is not enough!");
+    eosio_assert(deposit >= minTableDeposit, "Table deposit is not enough!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         "eosio.token"_n, {{dealer, "active"_n}},
@@ -535,7 +568,7 @@ ACTION gamebstsicbo::dealerwitdaw(uint64_t tableId, asset withdraw)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
-   // eosio_assert((existing->dealerBalance - withdraw) > existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
+    eosio_assert((existing->dealerBalance - withdraw) > minTableDeposit, "Table dealerBalance is not enough to support next round!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         "eosio.token"_n, {{_self, "active"_n}},
@@ -553,36 +586,6 @@ ACTION gamebstsicbo::changeprivat(bool isPrivate, uint64_t tableId)
     tableround.modify(existing, _self, [&](auto &s) {
         s.isPrivate = isPrivate;
     });
-}
-
-
-bool gamebstsicbo::checkName(string bet) {
-    bool result = false;
-    //std::vector <string> name;
-
-    auto pos = bet.find(":");
-    //eosio::print("........", bet, " !...");
-    auto pos_end = 0;
-    while (pos!=string::npos)
-    {
-        string temp_name = bet.substr(pos_end + 2, pos - pos_end - 3);
-        result = false;
-        for(auto j : gamebstsicbo::initName)
-        {
-            if(j == temp_name)
-            {
-                result = true;
-            }
-        }
-
-        if(!result)
-            return result;
-        eosio::print("temp_name:", temp_name, " !...");
-        pos_end = bet.find(",",pos);
-        pos = bet.find(":", pos_end);
-    }
-
-    return result;
 }
 
 EOSIO_DISPATCH(gamebstsicbo, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))

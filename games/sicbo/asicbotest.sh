@@ -33,7 +33,7 @@ temptest)
     sleep 3s
     cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo playerbet '['$tableid',useraaaaaaac,"{\"small\": \"0.5000 SYS\",\"total6\": \"2.5000 SYS\",\"tri2\": \"10.0000 SYS\",\"111\": \"10.0000 SYS\"}"]' -p useraaaaaaac useraaaaaaah
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo playerbet '['$tableid',useraaaaaaac,"{\"small\": \"0.5000 SYS\",\"total6\": \"2.5000 SYS\",\"tri2\": \"10.0000 SYS\"}"]' -p useraaaaaaac useraaaaaaah
     #cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo playerbet '['$tableid',useraaaaaaad,""]' -p useraaaaaaad useraaaaaaah
     cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
     sleep 36s
@@ -43,14 +43,14 @@ temptest)
     cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo verserveseed '['$tableid',704]' -p useraaaaaaah
     cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
 
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo dealerwitdaw '['$tableid', "20.0000 SYS"]' -p useraaaaaaab
-    cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
+   # cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo dealerwitdaw '['$tableid', "20.0000 SYS"]' -p useraaaaaaab
+   # cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
 
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo closetable '['$tableid']' -p useraaaaaaab
-    cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
+   # cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo closetable '['$tableid']' -p useraaaaaaab
+   # cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
 
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo changeprivat '[0, '$tableid']' -p useraaaaaaab
-    cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
+   # cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo changeprivat '[0, '$tableid']' -p useraaaaaaab
+   # cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
 
     ;;
 

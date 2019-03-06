@@ -4,6 +4,7 @@
 #include <eosiolib/permission.hpp>
 #include <eosiolib/crypto.hpp>
 #include "../../chain/eosio.token.hpp"
+#include <stdlib.h>
 #include <cstdlib>
 
 using namespace eosio;
@@ -36,8 +37,6 @@ CONTRACT gamebstsicbo : public contract
     ACTION depositable(name dealer, uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
     ACTION changeprivat(bool isPrivate, uint64_t tableId);
-
-    bool checkName(string bet);
 
     struct player_bet_info
     {
@@ -125,6 +124,52 @@ CONTRACT gamebstsicbo : public contract
         return r;
     }
 
+    bool checkBetOptions(string bet, asset &betAmont)
+    {
+        bool result = false;
+
+        auto pos = bet.find(":");
+        auto pos_end = 0;
+        while (pos!=string::npos)
+        {
+            string temp_name = bet.substr(pos_end + 2, pos - pos_end - 3);
+            result = false;
+            for(auto j : gamebstsicbo::betOptions)
+            {
+                if(j == temp_name)
+                {
+                    result = true;
+                }
+            }
+
+            if(!result)
+                return result;
+
+            eosio::print("temp_name:", temp_name, " ...");
+            pos_end = bet.find(",",pos);
+            /*string temp_amont;
+            if(pos_end != -1)
+            {
+                temp_amont = bet.substr(pos + 3, pos_end - pos - 7);
+            }
+            else
+            {
+                pos_end = bet.find("}",pos);
+                temp_amont = bet.substr(pos + 3, pos_end - pos - 7);
+            }
+            eosio::print("temp_amont:", temp_amont, " ...");
+
+            //char* pEnd;
+            //float amontF = strtod(temp_amont.c_str(),&pEnd);
+            // float amontF = atof(temp_amont.c_str());
+            //eosio::print("temp_amont to int:", amontF, " ...");
+            //betAmont += asset(amontF*10000, symbol(symbol_code("SYS"), 4));;
+            */
+            pos = bet.find(":", pos_end);
+        }
+        return result;
+    }
+
     using newtable_action = action_wrapper<"newtable"_n, &gamebstsicbo::newtable>;
     using dealerseed_action = action_wrapper<"dealerseed"_n, &gamebstsicbo::dealerseed>;
     using serverseed_action = action_wrapper<"serverseed"_n, &gamebstsicbo::serverseed>;
@@ -149,8 +194,11 @@ CONTRACT gamebstsicbo : public contract
 
     const uint32_t betPeriod = 30;
     const asset init_asset_empty = asset(0, symbol(symbol_code("SYS"), 4));
+    const uint32_t minTableRounds = 10;
+    const asset oneRoundDealerMaxPay = asset(100000, symbol(symbol_code("SYS"), 4));;
+    const asset minTableDeposit = oneRoundDealerMaxPay * minTableRounds;
 
-    static std::vector<string> createInitName()
+    static std::vector<string> createBetOptions()
     {
         std::vector<string> tempName;
 
@@ -205,11 +253,11 @@ CONTRACT gamebstsicbo : public contract
 
         return tempName;
     };
-    static const std::vector<string> initName;
+    static const std::vector<string> betOptions;
 
     const char *notableerr = "TableId isn't existing!";
 
     singletable_t tableround;
     WBRNG wbrng;
 };
-const std::vector<string> gamebstsicbo::initName = gamebstsicbo::createInitName();
+const std::vector<string> gamebstsicbo::betOptions = gamebstsicbo::createBetOptions();
