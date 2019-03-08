@@ -3,6 +3,8 @@
 #include "eosio.token.hpp"
 #include <eosiolib/crypto.hpp>
 #include <cmath>
+#include <libc/stdlib.h>
+
 using namespace eosio;
 using std::string;
 
@@ -34,12 +36,12 @@ public:
     return r;
   }
   ACTION erasingdata(uint64_t key);
-  ACTION testmultidex(asset money); // asset in multi_index demo
-  ACTION testdispatch(string money);            // asset demo / Sc-> account
-  ACTION testtransfer(asset money); // Sc-> account
-  ACTION testreverse(asset money);  // accounta-> SC
-  ACTION testaccount(asset money);  // accounta-> accountb
-  ACTION testcardobta();            // test card obtain logic.
+  ACTION testmultidex(asset money);  // asset in multi_index demo
+  ACTION testdispatch(string money); // asset demo / Sc-> account
+  ACTION testtransfer(asset money);  // Sc-> account
+  ACTION testreverse(asset money);   // accounta-> SC
+  ACTION testaccount(asset money);   // accounta-> accountb
+  ACTION testcardobta();             // test card obtain logic.
   using erasingdata_action = action_wrapper<"erasingdata"_n, &tina::erasingdata>;
   using testmultidex_action = action_wrapper<"testmultidex"_n, &tina::testmultidex>;
   using testtransfer_action = action_wrapper<"testtransfer"_n, &tina::testtransfer>;
@@ -61,7 +63,7 @@ public:
     string symbol_str = trim(s.substr(space_pos + 1));
     eosio_assert(symbol_str == sym.code().to_string(), "Asset's symbol is not match!");
     auto amount_str = s.substr(0, space_pos);
-    auto amount = Atof(amount_str.c_str());
+    auto amount = atof(amount_str.c_str());
     amount *= pow(10, int64_t(sym.precision()));
     return asset((int)amount, sym);
   }
@@ -76,47 +78,5 @@ public:
     s.erase(0, s.find_first_not_of(" "));
     s.erase(s.find_last_not_of(" ") + 1);
     return s;
-  }
-
-  double Atof(const char *pstr)
-  {
-    double sign = 1.0;
-    double num1 = 0.0;
-    double num2 = 0.0;
-    double point = 0.1;
-
-    while (*pstr == ' ' || *pstr == '\t')
-    {
-      pstr++;
-    }
-
-    if (*pstr == '-')
-    {
-      sign = -1;
-      pstr++;
-    }
-    while (*pstr)
-    {
-      if (*pstr == '.')
-      {
-        pstr++;
-        while (*pstr >= '0' && *pstr <= '9')
-        {
-          num1 += point * (*pstr - '0');
-          point *= 0.1;
-          pstr++;
-        }
-      }
-      else if (*pstr >= '0' && *pstr <= '9')
-      {
-        num2 = num2 * 10 + *pstr - '0';
-      }
-      else
-      {
-        return (num1 + num2) * (sign);
-      }
-      pstr++;
-    }
-    return (num1 + num2) * (sign);
   }
 };
