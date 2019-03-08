@@ -54,12 +54,15 @@ ACTION tina::testmultidex(asset money)
 
 ACTION tina::testdispatch()
 {
+    string betAmount = "1.0000 SYS";
+    auto amount = from_string(betAmount, symbol(symbol_code("SYS"), 4));
+    eosio::print(" [amount] : ", amount);
     auto money = asset(10000, symbol(symbol_code("SYS"), 4)); // money = 1.0000 SYS
     eosio::print(" testtransfer : ", money);
-    INLINE_ACTION_SENDER(eosio::token, transfer)
-    (
-        "eosio.token"_n, {{owner, "active"_n}},
-        {owner, accounta, money, money.to_string()});
+    // INLINE_ACTION_SENDER(eosio::token, transfer)
+    // (
+    //     "eosio.token"_n, {{owner, "active"_n}},
+    //     {owner, accounta, money, money.to_string()});
 }
 
 ACTION tina::testtransfer(asset money)

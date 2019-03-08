@@ -2,7 +2,7 @@
 
 #include "eosio.token.hpp"
 #include <eosiolib/crypto.hpp>
-
+#include <cmath>
 using namespace eosio;
 using std::string;
 
@@ -52,4 +52,69 @@ public:
   name accountb = "useraaaaaaah"_n;
   name owner = "useraaaaaaaj"_n;
   single_t tinatable;
+
+  asset from_string(string & from, symbol sym)
+  {
+    string s = trim(from);
+    auto space_pos = s.find(' ');
+    eosio_assert(space_pos != string::npos, "Asset's amount and symbol should be separated with space");
+    auto amount_str = s.substr(0, space_pos);
+    auto amount = Atof(amount_str.c_str());
+    amount *= pow(10, int64_t(sym.precision()));
+    return asset((int)amount, sym);
+  }
+
+  std::string &trim(std::string & s)
+  {
+    if (s.empty())
+    {
+      return s;
+    }
+
+    s.erase(0, s.find_first_not_of(" "));
+    s.erase(s.find_last_not_of(" ") + 1);
+    return s;
+  }
+
+  double Atof(const char *pstr)
+  {
+    double sign = 1.0;
+    double num1 = 0.0;
+    double num2 = 0.0;
+    double point = 0.1;
+
+    while (*pstr == ' ' || *pstr == '\t')
+    {
+      pstr++;
+    }
+
+    if (*pstr == '-')
+    {
+      sign = -1;
+      pstr++;
+    }
+    while (*pstr)
+    {
+      if (*pstr == '.')
+      {
+        pstr++;
+        while (*pstr >= '0' && *pstr <= '9')
+        {
+          num1 += point * (*pstr - '0');
+          point *= 0.1;
+          pstr++;
+        }
+      }
+      else if (*pstr >= '0' && *pstr <= '9')
+      {
+        num2 = num2 * 10 + *pstr - '0';
+      }
+      else
+      {
+        return (num1 + num2) * (sign);
+      }
+      pstr++;
+    }
+    return (num1 + num2) * (sign);
+  }
 };
