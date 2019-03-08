@@ -6,6 +6,8 @@
 #include "../../chain/eosio.token.hpp"
 #include <stdlib.h>
 #include <cstdlib>
+#include <cmath>
+#include <iomanip>
 
 using namespace eosio;
 using namespace std;
@@ -124,6 +126,75 @@ CONTRACT gamebstsicbo : public contract
         return r;
     }
 
+    asset from_string(string from, symbol sym)
+    {
+        string s = trim(from);
+        auto space_pos = s.find(' ');
+        eosio_assert(space_pos != string::npos, "Asset's amount and symbol should be separated with space");
+        string symbol_str = trim(s.substr(space_pos + 1));
+        eosio_assert(symbol_str == sym.code().to_string(), "Asset's symbol is not match!");
+        auto amount_str = s.substr(0, space_pos);
+        auto amount = Atof(amount_str.c_str());
+        amount *= pow(10, int64_t(sym.precision()));
+        return asset((int)amount, sym);
+    }
+
+    string trim(string s)
+    {
+        if (s.empty())
+        {
+            return s;
+        }
+
+        s.erase(0, s.find_first_not_of(" "));
+        s.erase(s.find_last_not_of(" ") + 1);
+        return s;
+    }
+
+    double Atof(const char *pstr)
+    {
+        double sign = 1.0;
+        double num1 = 0.0;
+        double num2 = 0.0;
+        double point = 0.1;
+
+        while (*pstr == ' ' || *pstr == '\t')
+        {
+            pstr++;
+        }
+
+        if (*pstr == '-')
+        {
+            sign = -1;
+            pstr++;
+        }
+
+        while (*pstr)
+        {
+            if (*pstr == '.')
+            {
+                pstr++;
+                while (*pstr >= '0' && *pstr <= '9')
+                {
+                    num1 += point * (*pstr - '0');
+                    point *= 0.1;
+                    pstr++;
+                }
+            }
+            else if (*pstr >= '0' && *pstr <= '9')
+            {
+                num2 = num2 * 10 + *pstr -'0';
+            }
+            else
+            {
+                return (num1 + num2) * (sign);
+            }
+            pstr++;
+        }
+        return (num1 + num2) * (sign);
+    }
+
+
     bool checkBetOptions(string bet, asset &betAmont)
     {
         bool result = false;
@@ -147,24 +218,20 @@ CONTRACT gamebstsicbo : public contract
 
             eosio::print("temp_name:", temp_name, " ...");
             pos_end = bet.find(",",pos);
-            /*string temp_amont;
+            string temp_amont;
             if(pos_end != -1)
             {
-                temp_amont = bet.substr(pos + 3, pos_end - pos - 7);
+                temp_amont = bet.substr(pos + 3, pos_end - pos - 4);
             }
             else
             {
                 pos_end = bet.find("}",pos);
-                temp_amont = bet.substr(pos + 3, pos_end - pos - 7);
+                temp_amont = bet.substr(pos + 3, pos_end - pos - 4);
             }
             eosio::print("temp_amont:", temp_amont, " ...");
-
-            //char* pEnd;
-            //float amontF = strtod(temp_amont.c_str(),&pEnd);
-            // float amontF = atof(temp_amont.c_str());
-            //eosio::print("temp_amont to int:", amontF, " ...");
-            //betAmont += asset(amontF*10000, symbol(symbol_code("SYS"), 4));;
-            */
+            auto amount = from_string(temp_amont, symbol(symbol_code("SYS"), 4));
+            eosio::print("temp_amont to int:", amount, " ...");
+            betAmont += amount;
             pos = bet.find(":", pos_end);
         }
         return result;

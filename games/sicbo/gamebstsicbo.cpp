@@ -141,13 +141,13 @@ ACTION gamebstsicbo::playerbet(uint64_t tableId, name player, string bet)
     bool ret = checkBetOptions(bet, betAmont);
     eosio_assert(ret, "name not exist");
     eosio::print("betAmont:", betAmont, " .........");
-//    if (depositAmount > init_asset_empty)
-//    {
-//        INLINE_ACTION_SENDER(eosio::token, transfer)
-//        (
-//            "eosio.token"_n, {{player, "active"_n}},
-//            {player, _self, depositAmount, std::string("playerbet")});
-//    }
+    if (betAmont > init_asset_empty)
+    {
+        INLINE_ACTION_SENDER(eosio::token, transfer)
+        (
+            "eosio.token"_n, {{player, "active"_n}},
+            {player, _self, betAmont, std::string("playerbet")});
+    }
 
     player_bet_info temp;
     temp.player = player;
@@ -341,8 +341,8 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
     else if(score%2 == 0 && !tripe_flag)
         roundResult_temp.emplace_back("even");
 
-    char itc[5];
-    sprintf(itc,"%d",score);
+    char itc[15];
+    sprintf(itc,"total%d",score);
     roundResult_temp.emplace_back(itc);
     for(auto result : roundResult_temp)
         eosio::print(" round_result: ", result, " ");
@@ -369,23 +369,79 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
                 }
             }
 
-            pos_end = playerBet.bet.find(",", pos);
+            pos_end = playerBet.bet.find(",",pos);
             string temp_amont;
-            if (pos_end != -1) {
-                temp_amont = playerBet.bet.substr(pos + 3, pos_end - pos - 7);
-            } else {
-                pos_end = playerBet.bet.find("}", pos);
-                temp_amont = playerBet.bet.substr(pos + 3, pos_end - pos - 7);
+            if(pos_end != -1)
+            {
+                temp_amont = playerBet.bet.substr(pos + 3, pos_end - pos - 4);
             }
-            eosio::print("temp_amont:", temp_amont, " ...");
+            else
+            {
+                pos_end = playerBet.bet.find("}",pos);
+                temp_amont = playerBet.bet.substr(pos + 3, pos_end - pos - 4);
+            }
+            auto amount = from_string(temp_amont, symbol(symbol_code("SYS"), 4));
+           // eosio::print("temp_amont to int:", amount, " ...");
             pos = playerBet.bet.find(":", pos_end);
             //odds
-            /*
-            if(result)
-                pBonus += ;
+
+            if(winNameFlag) {
+                if (0 == temp_name.compare("big") || 0 == temp_name.compare("small") || 0 == temp_name.compare("odd") || 0 == temp_name.compare("even") ||
+                    0 == temp_name.compare("s1") || 0 == temp_name.compare("s2") || 0 == temp_name.compare("s3") ||
+                    0 == temp_name.compare("s4") || 0 == temp_name.compare("s5") || 0 == temp_name.compare("s6"))
+                {
+                    pBonus += amount * (1 + 1);
+                }
+                else if(0 == temp_name.compare("c12") || 0 == temp_name.compare("c13") || 0 == temp_name.compare("c14") ||
+                        0 == temp_name.compare("c15") || 0 == temp_name.compare("c16") || 0 == temp_name.compare("c23") ||
+                        0 == temp_name.compare("c24") || 0 == temp_name.compare("c25") || 0 == temp_name.compare("c26") ||
+                        0 == temp_name.compare("c34") || 0 == temp_name.compare("c35") || 0 == temp_name.compare("c36") ||
+                        0 == temp_name.compare("c45") || 0 == temp_name.compare("c46") || 0 == temp_name.compare("c56"))
+                {
+                    pBonus += amount * (1 + 5);
+                }
+                else if(0 == temp_name.compare("total9") || 0 == temp_name.compare("total12") ||
+                        0 == temp_name.compare("total10") || 0 == temp_name.compare("total11"))
+                {
+                    pBonus += amount * (1 + 6);
+                }
+                else if(0 == temp_name.compare("total8") || 0 == temp_name.compare("total13") ||
+                        0 == temp_name.compare("pair1") || 0 == temp_name.compare("pair2") ||
+                        0 == temp_name.compare("pair3") || 0 == temp_name.compare("pair4") ||
+                        0 == temp_name.compare("pair5") || 0 == temp_name.compare("pair6"))
+                {
+                    pBonus += amount * (1 + 8);
+                }
+                else if(0 == temp_name.compare("total7") || 0 == temp_name.compare("total14"))
+                {
+                    pBonus += amount * (1 + 12);
+                }
+                else if(0 == temp_name.compare("total6") || 0 == temp_name.compare("total15"))
+                {
+                    pBonus += amount * (1 + 14);
+                }
+                else if(0 == temp_name.compare("total5") || 0 == temp_name.compare("total16"))
+                {
+                    pBonus += amount * (1 + 18);
+                }
+                else if(0 == temp_name.compare("anytri"))
+                {
+                    pBonus += amount * (1 + 24);
+                }
+                else if(0 == temp_name.compare("total4") || 0 == temp_name.compare("total17"))
+                {
+                    pBonus += amount * (1 + 50);
+                }
+                else if(0 == temp_name.compare("tri1") || 0 == temp_name.compare("tri2") ||
+                        0 == temp_name.compare("tri3") || 0 == temp_name.compare("tri4") ||
+                        0 == temp_name.compare("tri5") || 0 == temp_name.compare("tri6"))
+                {
+                    pBonus += amount * (1 + 150);
+                }
+            }
             else
-                dBonus += ;
-                */
+                dBonus += amount;
+
         }
         eosio::print(" [player:", playerBet.player, ", total bonus:", pBonus, "] ");
 
