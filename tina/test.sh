@@ -1,7 +1,7 @@
 eosio-cpp -abigen tina.cpp -o tina.wasm
 cleos --wallet-url http://127.0.0.1:6666 system buyram useraaaaaaag useraaaaaaaj "10 SYS"
 cleos --wallet-url http://127.0.0.1:6666 set contract useraaaaaaaj ./ tina.wasm tina.abi
-cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj testdispatch '[]' -p useraaaaaaaj
+cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj testdispatch '["1.0000 SYS"]' -p useraaaaaaaj
 
 cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj testcardobta '[]' -p useraaaaaaaj
 cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj erasingdata '[-1]' -p useraaaaaaaj

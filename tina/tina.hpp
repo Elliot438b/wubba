@@ -35,7 +35,7 @@ public:
   }
   ACTION erasingdata(uint64_t key);
   ACTION testmultidex(asset money); // asset in multi_index demo
-  ACTION testdispatch();            // asset demo / Sc-> account
+  ACTION testdispatch(string money);            // asset demo / Sc-> account
   ACTION testtransfer(asset money); // Sc-> account
   ACTION testreverse(asset money);  // accounta-> SC
   ACTION testaccount(asset money);  // accounta-> accountb
@@ -53,18 +53,20 @@ public:
   name owner = "useraaaaaaaj"_n;
   single_t tinatable;
 
-  asset from_string(string & from, symbol sym)
+  asset from_string(string from, symbol sym)
   {
     string s = trim(from);
     auto space_pos = s.find(' ');
     eosio_assert(space_pos != string::npos, "Asset's amount and symbol should be separated with space");
+    string symbol_str = trim(s.substr(space_pos + 1));
+    eosio_assert(symbol_str == sym.code().to_string(), "Asset's symbol is not match!");
     auto amount_str = s.substr(0, space_pos);
     auto amount = Atof(amount_str.c_str());
     amount *= pow(10, int64_t(sym.precision()));
     return asset((int)amount, sym);
   }
 
-  std::string &trim(std::string & s)
+  string trim(string s)
   {
     if (s.empty())
     {
