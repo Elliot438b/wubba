@@ -239,15 +239,15 @@ According to the odds in the **Betting options** table as above, calculate pBonu
     asset pBonus  
     asset dBonus  
 
+## v0.6.1 target
+- **newtable** set the betPerMin/oneRoundMaxTotalBet. (string betConfig)
+- Abstract symbol as a variable could be set. ("SYS","EOS" etc.)
+- Delete unused code/include.
 ### remove unused codes
 remove unused codes inherit from baccarat.
 
 ### support any currency（default SYS）
 
-## v0.6.1 target
-- **newtable** set the betPerMin/oneRoundMaxTotalBet. (string betConfig)
-- Abstract symbol as a variable could be set. ("SYS","EOS" etc.)
-- Delete unused code/include.
 - Add betPerMin/oneRoundMaxTotalBet control. (including **currRoundBetSum** in table state.)
 
 **betPerMin/oneRoundMaxTotalBet control**  
