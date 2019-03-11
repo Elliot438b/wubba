@@ -262,6 +262,10 @@ txx | 1:50/18/14/12/8/6 |  totalxx | 0.5000 SYS | 500.0000 SYS
 twocom | 1:5 |  c12/c13/c14/c15/c16/c23/c24/c25/c26/c34/c35/c36/c45/c46/c56 | 1.0000 SYS | 1500.0000 SYS
 single | 1:1 |  s1/s2/s3/s4/s5/s6 | 10.0000 SYS | 3000.0000 SYS
 
+```math
+oneRoundDealerMaxPay = oneRoundMaxTotalBet_bsoe*2 + oneRoundMaxTotalBet_anytri*24 + oneRoundMaxTotalBet_trinum*150 + oneRoundMaxTotalBet_pairnum*8 + oneRoundMaxTotalBet_txx*14 + oneRoundMaxTotalBet_single*1
+```
+
 betPerMin/oneRoundMaxTotalBet naming  rule, for example:
 
 > betPerMin_bsoe, betPerMin_anytri ... use betPerMin add the name of "control table" as above.
