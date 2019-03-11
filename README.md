@@ -245,6 +245,9 @@ remove unused codes inherit from baccarat.
 ### support any currency（default SYS）
 
 ## v0.6.1 target
+- **newtable** set the betPerMin/oneRoundMaxTotalBet. (string betConfig)
+- Abstract symbol as a variable could be set. ("SYS","EOS" etc.)
+- Delete unused code/include.
 - Add betPerMin/oneRoundMaxTotalBet control. (including **currRoundBetSum** in table state.)
 
 **betPerMin/oneRoundMaxTotalBet control**  
@@ -275,12 +278,11 @@ betPerMin/oneRoundMaxTotalBet naming  rule, for example:
     - asset oneRoundDealerMaxPay;
     - asset minTableDeposit;
 
-### **newtable** no longer set the betPerMin/oneRoundMaxTotalBet
-
 ## v0.7 target
-### add roulette game.
-- modify 3 ACTION: newtable, playerbet, verserveseed(reveal)
-- modify the state table structure.
+### commission flow
+- dealer
+- platform
+- agent
 
 ## v0.8 target
 ### random result uniform distribution
@@ -288,11 +290,3 @@ betPerMin/oneRoundMaxTotalBet naming  rule, for example:
 - Adjust variate of the solution to obtain a best result.
 - Seed source.
 
-## v0.9 target
-### commission flow
-- dealer
-- platform
-- agent
-
-## v0.9.1 target
-agent workflow.
