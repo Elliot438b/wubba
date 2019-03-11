@@ -258,13 +258,7 @@ bsoe | 1:1 | big,small,odd,even | 10.0000 SYS | 3000.0000 SYS
 anytri | 1:24 |  anytri | 0.5000 SYS | 400.0000 SYS
 trinum | 1:150 |  tri1/tri2/tri3/tri4/tri5/tri6 | 0.1000 SYS | 100.0000 SYS
 pairnum | 1:8 |  pair1/pair2/pair3/pair4/pair5/pair6 | 1.0000 SYS | 1000.0000 SYS
-t417 | 1:50 |  total4/total17 | 0.1000 SYS | 200.0000 SYS
-t516 | 1:18 |  total5/total16 | 0.5000 SYS | 500.0000 SYS
-t615 | 1:14 |  total6/total15 | 1.0000 SYS | 700.0000 SYS
-t714 | 1:12 |  total7/total14 | 1.0000 SYS | 800.0000 SYS
-t813 | 1:8 |  total8/total13 | 1.0000 SYS | 1100.0000 SYS
-t912 | 1:6 |  total9/total12 | 1.0000 SYS | 1200.0000 SYS
-t1011 | 1:6 |  total10/total11 | 1.0000 SYS | 1300.0000 SYS
+txx | 1:50/18/14/12/8/6 |  totalxx | 0.5000 SYS | 500.0000 SYS
 twocom | 1:5 |  c12/c13/c14/c15/c16/c23/c24/c25/c26/c34/c35/c36/c45/c46/c56 | 1.0000 SYS | 1500.0000 SYS
 single | 1:1 |  s1/s2/s3/s4/s5/s6 | 10.0000 SYS | 3000.0000 SYS
 
