@@ -21,8 +21,8 @@ CONTRACT gamebaccarat : public contract
     ACTION newtable(name dealer, asset deposit, bool isPrivate, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
-    ACTION endbet(uint64_t tableId);
     ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush);
+    ACTION endbet(uint64_t tableId);
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
     ACTION trusteeship(uint64_t tableId);
