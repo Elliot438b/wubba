@@ -263,7 +263,7 @@ twocom | 1:5 |  c12/c13/c14/c15/c16/c23/c24/c25/c26/c34/c35/c36/c45/c46/c56 | 1.
 single | 1:1 |  s1/s2/s3/s4/s5/s6 | 10.0000 SYS | 3000.0000 SYS
 
 ```math
-oneRoundDealerMaxPay = oneRoundMaxTotalBet_bsoe*2 + oneRoundMaxTotalBet_anytri*24 + oneRoundMaxTotalBet_trinum*150 + oneRoundMaxTotalBet_pairnum*8 + oneRoundMaxTotalBet_txx*14 + oneRoundMaxTotalBet_single*1
+oneRoundDealerMaxPay = max(oneRoundMaxTotalBet_bsoe*2 + oneRoundMaxTotalBet_txx*14 + oneRoundMaxTotalBet_twocom*5*3 + oneRoundMaxTotalBet_single*3, oneRoundMaxTotalBet_bsoe*2 + oneRoundMaxTotalBet_pairnum*8 + oneRoundMaxTotalBet_txx*50 + oneRoundMaxTotalBet_twocom*5 + oneRoundMaxTotalBet_single*2, oneRoundMaxTotalBet_anytri*24 + oneRoundMaxTotalBet_trinum*150 + oneRoundMaxTotalBet_pairnum*8 + oneRoundMaxTotalBet_txx*14 + oneRoundMaxTotalBet_single*1)
 ```
 
 betPerMin/oneRoundMaxTotalBet naming  rule, for example:
