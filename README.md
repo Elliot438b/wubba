@@ -272,7 +272,7 @@ pair_nontri_max = oneRoundMaxTotalBet_bsoe*2 + oneRoundMaxTotalBet_pairnum*8 + o
 
 ```math
 tri_max = oneRoundMaxTotalBet_anytri*24 + oneRoundMaxTotalBet_trinum*150 + oneRoundMaxTotalBet_pairnum*8 + oneRoundMaxTotalBet_txx*14 + oneRoundMaxTotalBet_single*1
-
+```
 
 ```math
 oneRoundDealerMaxPay = max(diff_max, pair_nontri_max, tri_max)
