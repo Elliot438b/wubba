@@ -35,7 +35,6 @@ CONTRACT gamebaccarat : public contract
     ACTION closetable(uint64_t tableId);
     ACTION depositable(name dealer, uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
-    ACTION changeprivat(bool isPrivate, uint64_t tableId);
 
     struct card_info
     {
