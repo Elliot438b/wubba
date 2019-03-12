@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Mar  8 15:46:06 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Mar 12 19:04:10 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -141,6 +141,70 @@
                 {
                     "name": "isPrivate",
                     "type": "bool"
+                },
+                {
+                    "name": "code",
+                    "type": "name"
+                },
+                {
+                    "name": "sym",
+                    "type": "string"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_single",
+                    "type": "asset"
                 }
             ]
         },
@@ -243,12 +307,108 @@
                     "type": "asset"
                 },
                 {
+                    "name": "oneRoundMaxTotalBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundDealerMaxPay",
+                    "type": "asset"
+                },
+                {
+                    "name": "minTableDeposit",
+                    "type": "asset"
+                },
+                {
+                    "name": "amontSymbol",
+                    "type": "symbol"
+                },
+                {
                     "name": "betStartTime",
                     "type": "uint64"
                 },
                 {
                     "name": "tableStatus",
                     "type": "uint64"
+                },
+                {
+                    "name": "currRoundBetSum_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_single",
+                    "type": "asset"
                 },
                 {
                     "name": "dealerSeedHash",

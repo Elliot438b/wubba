@@ -4,10 +4,8 @@
 #include <eosiolib/permission.hpp>
 #include <eosiolib/crypto.hpp>
 #include "../../chain/eosio.token.hpp"
-#include <stdlib.h>
-#include <cstdlib>
 #include <cmath>
-#include <iomanip>
+
 
 using namespace eosio;
 using namespace std;
@@ -21,7 +19,9 @@ CONTRACT gamebstsicbo : public contract
     gamebstsicbo(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value) {}
 
-    ACTION newtable(name dealer, asset deposit, bool isPrivate);
+    ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe , asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri
+            , asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx
+            , asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION endbet(uint64_t tableId);
@@ -50,6 +50,23 @@ CONTRACT gamebstsicbo : public contract
         EOSLIB_SERIALIZE(player_bet_info, (player)(bet)(pBonus)(dBonus))
     };
 
+    struct bet_info
+    {
+        string name;
+        asset amont;
+
+        EOSLIB_SERIALIZE(bet_info, (name)(amont))
+    };
+
+    struct sym_info
+    {
+        uint16_t id;
+        name code;
+        symbol symName;
+
+        EOSLIB_SERIALIZE(sym_info, (id)(code)(symName))
+    };
+
     TABLE table_stats
     {
         // ------------------------------ table field ------------------------------
@@ -58,9 +75,34 @@ CONTRACT gamebstsicbo : public contract
         bool trusteeship;                   // table flag.
         bool isPrivate;                     // table flag.
         asset dealerBalance;                // table filed.
+        asset oneRoundMaxTotalBet_bsoe;
+        asset minPerBet_bsoe;
+        asset oneRoundMaxTotalBet_anytri;
+        asset minPerBet_anytri;
+        asset oneRoundMaxTotalBet_trinum;
+        asset minPerBet_trinum;
+        asset oneRoundMaxTotalBet_pairnum;
+        asset minPerBet_pairnum;
+        asset oneRoundMaxTotalBet_txx;
+        asset minPerBet_txx;
+        asset oneRoundMaxTotalBet_twocom;
+        asset minPerBet_twocom;
+        asset oneRoundMaxTotalBet_single;
+        asset minPerBet_single;
+
+        asset oneRoundDealerMaxPay;
+        asset minTableDeposit;
+        symbol amontSymbol;
             // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
         uint64_t tableStatus;  // round stage.
+        asset currRoundBetSum_bsoe;
+        asset currRoundBetSum_anytri;
+        asset currRoundBetSum_trinum;
+        asset currRoundBetSum_pairnum;
+        asset currRoundBetSum_txx;
+        asset currRoundBetSum_twocom;
+        asset currRoundBetSum_single;
 
         checksum256 dealerSeedHash;
         checksum256 serverSeedHash;
@@ -86,7 +128,7 @@ CONTRACT gamebstsicbo : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(betStartTime)(tableStatus)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(diceResult))
+        EOSLIB_SERIALIZE(table_stats, (tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_bsoe)(minPerBet_bsoe)(oneRoundMaxTotalBet_anytri)(minPerBet_anytri)(oneRoundMaxTotalBet_trinum)(minPerBet_trinum)(oneRoundMaxTotalBet_pairnum)(minPerBet_pairnum)(oneRoundMaxTotalBet_txx)(minPerBet_txx)(oneRoundMaxTotalBet_twocom)(minPerBet_twocom)(oneRoundMaxTotalBet_single)(minPerBet_single)(oneRoundDealerMaxPay)(minTableDeposit)(amontSymbol)(betStartTime)(tableStatus)(currRoundBetSum_bsoe)(currRoundBetSum_anytri)(currRoundBetSum_trinum)(currRoundBetSum_pairnum)(currRoundBetSum_txx)(currRoundBetSum_twocom)(currRoundBetSum_single)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(diceResult))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, gamebstsicbo::table_stats, indexed_by<"dealer"_n, const_mem_fun<gamebstsicbo::table_stats, uint64_t, &gamebstsicbo::table_stats::get_dealer>>> singletable_t;
@@ -195,7 +237,7 @@ CONTRACT gamebstsicbo : public contract
     }
 
 
-    bool checkBetOptions(string bet, asset &betAmont)
+    bool checkBetOptions(string bet, symbol sym, asset &betAmont, std::vector<bet_info> &betVec)
     {
         bool result = false;
 
@@ -229,9 +271,14 @@ CONTRACT gamebstsicbo : public contract
                 temp_amont = bet.substr(pos + 3, pos_end - pos - 4);
             }
             eosio::print("temp_amont:", temp_amont, " ...");
-            auto amount = from_string(temp_amont, symbol(symbol_code("SYS"), 4));
-            eosio::print("temp_amont to int:", amount, " ...");
-            betAmont += amount;
+            //symbol sysDefault = symbol(symbol_code(sym), 4);
+            auto amont = from_string(temp_amont, sym);
+            eosio::print("temp_amont to int:", amont, " ...");
+            betAmont += amont;
+            bet_info bet_info_temp;
+            bet_info_temp.name = temp_name;
+            bet_info_temp.amont = amont;
+            betVec.emplace_back(bet_info_temp);
             pos = bet.find(":", pos_end);
         }
         return result;
@@ -260,10 +307,44 @@ CONTRACT gamebstsicbo : public contract
     name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
 
     const uint32_t betPeriod = 30;
-    const asset init_asset_empty = asset(0, symbol(symbol_code("SYS"), 4));
-    const uint32_t minTableRounds = 10;
-    const asset oneRoundDealerMaxPay = asset(100000, symbol(symbol_code("SYS"), 4));;
-    const asset minTableDeposit = oneRoundDealerMaxPay * minTableRounds;
+    const uint32_t minTableRounds = 2;
+//    const asset oneRoundDealerMaxPay = asset(100000, sysDefault);;
+//    const asset minTableDeposit = oneRoundDealerMaxPay * minTableRounds;
+   // const symbol sysDefault = symbol(symbol_code("SYS"), 4);
+//    const asset init_asset_empty = asset(0, sysDefault);
+
+//    const asset oneRoundMaxTotalBet_bsoe_default = asset(3000 * 10000, sysDefault); //3000
+//    const asset minPerBet_bsoe_default = asset(10 * 10000, sysDefault);            //10
+//    const asset oneRoundMaxTotalBet_anytri_default = asset(400 * 10000, sysDefault); //400
+//    const asset minPerBet_anytri_default = asset(0.5 * 10000, sysDefault);             //0.5
+//    const asset oneRoundMaxTotalBet_trinum_default = asset(100 * 10000, sysDefault); //100
+//    const asset minPerBet_trinum_default = asset(0.1 * 10000, sysDefault);            //0.1
+//    const asset oneRoundMaxTotalBet_pairnum_default = asset(1000 * 10000, sysDefault); //1000
+//    const asset minPerBet_pairnum_default = asset(1 * 10000, sysDefault);            //1
+//    const asset oneRoundMaxTotalBet_txx_default = asset(500 * 10000, sysDefault); //500
+//    const asset minPerBet_txx_default = asset(0.5 * 10000, sysDefault);            //0.5
+//    const asset oneRoundMaxTotalBet_twocom_default = asset(1500 * 10000, sysDefault); //1500
+//    const asset minPerBet_twocom_default = asset(1 * 10000, sysDefault);            //1
+//    const asset oneRoundMaxTotalBet_single_default = asset(3000 * 10000, sysDefault); //3000
+//    const asset minPerBet_single_default = asset(10 * 10000, sysDefault);            //10
+
+    static std::vector<sym_info> createSymOptions()
+    {
+        std::vector<sym_info> tempSym;
+
+        sym_info sym_temp;
+        sym_temp.id = 0;
+        sym_temp.code = "eosio.token"_n;
+        sym_temp.symName = symbol(symbol_code("SYS"), 4);;
+        tempSym.emplace_back(sym_temp);
+
+        sym_temp.id = 1;
+        sym_temp.code = "eosio"_n;
+        sym_temp.symName = symbol(symbol_code("EOS"), 4);;
+        tempSym.emplace_back(sym_temp);
+
+        return tempSym;
+    }
 
     static std::vector<string> createBetOptions()
     {
@@ -320,7 +401,9 @@ CONTRACT gamebstsicbo : public contract
 
         return tempName;
     };
+
     static const std::vector<string> betOptions;
+    static const std::vector<sym_info> symOptions;
 
     const char *notableerr = "TableId isn't existing!";
 
@@ -328,3 +411,4 @@ CONTRACT gamebstsicbo : public contract
     WBRNG wbrng;
 };
 const std::vector<string> gamebstsicbo::betOptions = gamebstsicbo::createBetOptions();
+const std::vector<gamebstsicbo::sym_info> gamebstsicbo::symOptions = gamebstsicbo::createSymOptions();

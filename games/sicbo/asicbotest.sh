@@ -3,7 +3,7 @@
 case $1 in
 chainstart)
     echo "chain restart, set permission"
-    cleos --wallet-url http://127.0.0.1:6666 system newaccount useraaaaaaak gamebstsicbo EOS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr --buy-ram "100 SYS" --stake-net "100 SYS" --stake-cpu "100 SYS" --transfer
+    cleos --wallet-url http://127.0.0.1:6666 system newaccount useraaaaaaak gamebstsicbo EOS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr --buy-ram "1000 SYS" --stake-net "1000 SYS" --stake-cpu "1000 SYS" --transfer
     cleos --wallet-url http://127.0.0.1:6666 transfer useraaaaaaam gamebstsicbo "100000 SYS"
     cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaab active '{"threshold":1,"keys":[{"key":"EOS7yBtksm8Kkg85r4in4uCbfN77uRwe82apM8jjbhFVDgEgz3w8S","weight":1}],"accounts":[{"permission":{"actor":"gamebstsicbo","permission":"eosio.code"},"weight":1}]}' owner -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaac active '{"threshold":1,"keys":[{"key":"EOS7WnhaKwHpbSidYuh2DF1qAExTRUtPEdZCaZqt75cKcixuQUtdA","weight":1}],"accounts":[{"permission":{"actor":"gamebstsicbo","permission":"eosio.code"},"weight":1}]}' owner -p useraaaaaaac
@@ -17,7 +17,7 @@ temptest)
     echo "temptest"
     eosio-cpp -abigen gamebstsicbo.cpp -o gamebstsicbo.wasm
     cleos --wallet-url http://127.0.0.1:6666 set contract gamebstsicbo ./ gamebstsicbo.wasm gamebstsicbo.abi
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo newtable '[useraaaaaaab,"2000.0000 SYS", 1]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo newtable '[useraaaaaaab,"4000.0000 SYS", 1, "eosio.token", "SYS", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
     tableid=`cleos get table gamebstsicbo gamebstsicbo tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
     #for((num=1;num<=1;num++));
@@ -33,8 +33,8 @@ temptest)
     sleep 3s
     cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo playerbet '['$tableid',useraaaaaaac,"{\"small\": \"0.6001 SYS\",\"total6\": \"3.5001 SYS\",\"tri2\": \"10.0000 SYS\"}"]' -p useraaaaaaac useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo playerbet '['$tableid',useraaaaaaad,"{\"big\": \"10.6001 SYS\",\"total9\": \"3.5001 SYS\",\"tri2\": \"10.0000 SYS\"}"]' -p useraaaaaaad useraaaaaaah
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo playerbet '['$tableid',useraaaaaaac,"{\"small\": \"2.6000 SYS\",\"total6\": \"3.5000 SYS\",\"tri2\": \"2.0000 SYS\"}"]' -p useraaaaaaac useraaaaaaah
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo playerbet '['$tableid',useraaaaaaad,"{\"big\": \"2.6001 SYS\",\"total9\": \"3.5001 SYS\",\"tri2\": \"2.0000 SYS\"}"]' -p useraaaaaaad useraaaaaaah
     cleos get table gamebstsicbo gamebstsicbo tablesinfo -L $tableid -U $tableid
     sleep 36s
     cleos --wallet-url http://127.0.0.1:6666 push action gamebstsicbo endbet '['$tableid']' -p useraaaaaaah
