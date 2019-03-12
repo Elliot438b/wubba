@@ -64,6 +64,16 @@ ACTION tina::testdispatch(string betAmount)
     //     {owner, accounta, money, money.to_string()});
 }
 
+ACTION tina::tesexransfer()
+{
+    extended_asset examount = extended_asset(10000, extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n));
+    eosio::print(" tesexransfer : ", examount.contract, " ", examount.quantity);
+    INLINE_ACTION_SENDER(eosio::token, transfer)
+    (
+        examount.contract, {{owner, "active"_n}},
+        {owner, accounta, examount.quantity, examount.quantity.to_string()});
+}
+
 ACTION tina::testtransfer(asset money)
 {
     eosio::print(" testtransfer : ", money);
@@ -159,4 +169,4 @@ ACTION tina::testcardobta()
         }
     }
 }
-EOSIO_DISPATCH(tina, (erasingdata)(testmultidex)(testdispatch)(testtransfer)(testreverse)(testaccount)(testcardobta))
+EOSIO_DISPATCH(tina, (erasingdata)(testmultidex)(testdispatch)(tesexransfer)(testtransfer)(testreverse)(testaccount)(testcardobta))
