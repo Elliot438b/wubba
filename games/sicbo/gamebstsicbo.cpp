@@ -147,7 +147,7 @@ ACTION gamebstsicbo::newtable(name dealer, asset deposit, bool isPrivate, name c
         s.currRoundBetSum_txx = init_asset_empty;
         s.currRoundBetSum_twocom = init_asset_empty;
         s.currRoundBetSum_single = init_asset_empty;
-        s.amontSymbol = symbol(symbol_code(use_sym), 4);
+        s.amountSymbol = symbol(symbol_code(use_sym), 4);
     });
 }
 
@@ -172,7 +172,7 @@ ACTION gamebstsicbo::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         // start a new round. table_round init.
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
-        asset init_asset_empty = asset(0.0000, existing->amontSymbol);
+        asset init_asset_empty = asset(0.0000, existing->amountSymbol);
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = 0;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
@@ -216,7 +216,7 @@ ACTION gamebstsicbo::serverseed(uint64_t tableId, checksum256 encodeSeed)
         // start a new round. table_round init.
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
-        asset init_asset_empty = asset(0.0000, existing->amontSymbol);
+        asset init_asset_empty = asset(0.0000, existing->amountSymbol);
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = now();
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
@@ -281,95 +281,95 @@ ACTION gamebstsicbo::playerbet(uint64_t tableId, name player, string bet)
     }
 
     eosio_assert(!flag, "player have bet");
-    asset init_asset_empty = asset(0.0000, existing->amontSymbol);
-    asset betAmont = init_asset_empty;
-    std::vector<bet_info> betAmontVec;
-    bool ret = checkBetOptions(bet, existing->amontSymbol,betAmont, betAmontVec);
+    asset init_asset_empty = asset(0.0000, existing->amountSymbol);
+    asset betAmount = init_asset_empty;
+    std::vector<bet_info> betAmountVec;
+    bool ret = checkBetOptions(bet, existing->amountSymbol,betAmount, betAmountVec);
     eosio_assert(ret, "name not exist");
-    asset player_amont_sum_bsoe = existing->currRoundBetSum_bsoe;
-    asset player_amont_sum_anytri = existing->currRoundBetSum_anytri;
-    asset player_amont_sum_trinum = existing->currRoundBetSum_trinum;
-    asset player_amont_sum_pairnum = existing->currRoundBetSum_pairnum;
-    asset player_amont_sum_txx = existing->currRoundBetSum_txx;
-    asset player_amont_sum_twocom = existing->currRoundBetSum_twocom;
-    asset player_amont_sum_single = existing->currRoundBetSum_single;
+    asset player_amount_sum_bsoe = existing->currRoundBetSum_bsoe;
+    asset player_amount_sum_anytri = existing->currRoundBetSum_anytri;
+    asset player_amount_sum_trinum = existing->currRoundBetSum_trinum;
+    asset player_amount_sum_pairnum = existing->currRoundBetSum_pairnum;
+    asset player_amount_sum_txx = existing->currRoundBetSum_txx;
+    asset player_amount_sum_twocom = existing->currRoundBetSum_twocom;
+    asset player_amount_sum_single = existing->currRoundBetSum_single;
 
-    for(auto p : betAmontVec)
+    for(auto p : betAmountVec)
     {
         if( 0 == p.name.compare("small") || 0 == p.name.compare("big") || 0 == p.name.compare("odd") || 0 == p.name.compare("even") )
         {
-            //eosio::print(" [amont=]",p.amont,"init_asset_empty=",init_asset_empty);
-            if (p.amont > init_asset_empty)
+            //eosio::print(" [amount=]",p.amount,"init_asset_empty=",init_asset_empty);
+            if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amont >= existing->minPerBet_bsoe, "bsoe bet is too small!");
-                eosio::print("name=",p.name," [amont=]",p.amont," player_amont_sum_bsoe=",player_amont_sum_bsoe, " ...");
-                player_amont_sum_bsoe += p.amont;
-                eosio_assert(player_amont_sum_bsoe < existing->oneRoundMaxTotalBet_bsoe, "Over the peak of total bet_bsoe amont of this round!");
+                eosio_assert(p.amount >= existing->minPerBet_bsoe, "bsoe bet is too small!");
+                eosio::print("name=",p.name," [amount=]",p.amount," player_amount_sum_bsoe=",player_amount_sum_bsoe, " ...");
+                player_amount_sum_bsoe += p.amount;
+                eosio_assert(player_amount_sum_bsoe < existing->oneRoundMaxTotalBet_bsoe, "Over the peak of total bet_bsoe amount of this round!");
             }
         }
         else if( 0 == p.name.compare("anytri") )
         {
-            if (p.amont > init_asset_empty)
+            if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amont >= existing->minPerBet_anytri, "anytri bet is too small!");
-                player_amont_sum_anytri += p.amont;
-                eosio_assert(player_amont_sum_anytri < existing->oneRoundMaxTotalBet_anytri, "Over the peak of total bet_anytri amont of this round!");
+                eosio_assert(p.amount >= existing->minPerBet_anytri, "anytri bet is too small!");
+                player_amount_sum_anytri += p.amount;
+                eosio_assert(player_amount_sum_anytri < existing->oneRoundMaxTotalBet_anytri, "Over the peak of total bet_anytri amount of this round!");
             }
         }
         else if( 0 == p.name.compare("tri1") || 0 == p.name.compare("tri2") || 0 == p.name.compare("tri3") || 0 == p.name.compare("tri4") || 0 == p.name.compare("tri5") || 0 == p.name.compare("tri6"))
         {
-            if (p.amont > init_asset_empty)
+            if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amont >= existing->minPerBet_trinum, "trinum bet is too small!");
-                player_amont_sum_trinum += p.amont;
-                eosio_assert(player_amont_sum_trinum < existing->oneRoundMaxTotalBet_trinum, "Over the peak of total bet_trinum amont of this round!");
+                eosio_assert(p.amount >= existing->minPerBet_trinum, "trinum bet is too small!");
+                player_amount_sum_trinum += p.amount;
+                eosio_assert(player_amount_sum_trinum < existing->oneRoundMaxTotalBet_trinum, "Over the peak of total bet_trinum amount of this round!");
             }
         }
         else if( string::npos != p.name.find("pair"))
         {
-            if (p.amont > init_asset_empty)
+            if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amont >= existing->minPerBet_pairnum, "pairnum bet is too small!");
-                player_amont_sum_pairnum += p.amont;
-                eosio_assert(player_amont_sum_pairnum < existing->oneRoundMaxTotalBet_pairnum, "Over the peak of total bet_pairnum amont of this round!");
+                eosio_assert(p.amount >= existing->minPerBet_pairnum, "pairnum bet is too small!");
+                player_amount_sum_pairnum += p.amount;
+                eosio_assert(player_amount_sum_pairnum < existing->oneRoundMaxTotalBet_pairnum, "Over the peak of total bet_pairnum amount of this round!");
             }
         }
         else if( string::npos != p.name.find("total") )
         {
-            if (p.amont > init_asset_empty)
+            if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amont >= existing->minPerBet_txx, "txx bet is too small!");
-                player_amont_sum_txx += p.amont;
-                eosio_assert(player_amont_sum_txx < existing->oneRoundMaxTotalBet_txx, "Over the peak of total bet_txx amont of this round!");
+                eosio_assert(p.amount >= existing->minPerBet_txx, "txx bet is too small!");
+                player_amount_sum_txx += p.amount;
+                eosio_assert(player_amount_sum_txx < existing->oneRoundMaxTotalBet_txx, "Over the peak of total bet_txx amount of this round!");
             }
         }
         else if( string::npos != p.name.find("c") )
         {
-            if (p.amont > init_asset_empty)
+            if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amont >= existing->minPerBet_twocom, "twocom bet is too small!");
-                player_amont_sum_twocom += p.amont;
-                eosio_assert(player_amont_sum_twocom < existing->oneRoundMaxTotalBet_twocom, "Over the peak of total bet_twocom amont of this round!");
+                eosio_assert(p.amount >= existing->minPerBet_twocom, "twocom bet is too small!");
+                player_amount_sum_twocom += p.amount;
+                eosio_assert(player_amount_sum_twocom < existing->oneRoundMaxTotalBet_twocom, "Over the peak of total bet_twocom amount of this round!");
             }
         }
         else if(0 == p.name.compare("s1") || 0 == p.name.compare("s2") || 0 == p.name.compare("s3") || 0 == p.name.compare("s4") || 0 == p.name.compare("s5") || 0 == p.name.compare("s6"))
         {
-            if (p.amont > init_asset_empty)
+            if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amont >= existing->minPerBet_single, "single bet is too small!");
-                player_amont_sum_single += p.amont;
-                eosio_assert(player_amont_sum_single < existing->oneRoundMaxTotalBet_single, "Over the peak of total bet_single amont of this round!");
+                eosio_assert(p.amount >= existing->minPerBet_single, "single bet is too small!");
+                player_amount_sum_single += p.amount;
+                eosio_assert(player_amount_sum_single < existing->oneRoundMaxTotalBet_single, "Over the peak of total bet_single amount of this round!");
             }
         }
     }
 
-    eosio::print("betAmont:", betAmont, " .........");
-    if (betAmont > init_asset_empty)
+    eosio::print("betAmount:", betAmount, " .........");
+    if (betAmount > init_asset_empty)
     {
         name use_code;
         for(auto p:gamebstsicbo::symOptions)
         {
-            if(p.symName == existing->amontSymbol)
+            if(p.symName == existing->amountSymbol)
             {
                 use_code = p.code;
             }
@@ -378,7 +378,7 @@ ACTION gamebstsicbo::playerbet(uint64_t tableId, name player, string bet)
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (
             use_code, {{player, "active"_n}},
-            {player, _self, betAmont, std::string("playerbet")});
+            {player, _self, betAmount, std::string("playerbet")});
     }
 
     player_bet_info temp;
@@ -389,13 +389,13 @@ ACTION gamebstsicbo::playerbet(uint64_t tableId, name player, string bet)
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
-        s.currRoundBetSum_bsoe = player_amont_sum_bsoe;
-        s.currRoundBetSum_anytri = player_amont_sum_anytri;
-        s.currRoundBetSum_trinum = player_amont_sum_trinum;
-        s.currRoundBetSum_pairnum = player_amont_sum_pairnum;
-        s.currRoundBetSum_txx = player_amont_sum_txx;
-        s.currRoundBetSum_twocom = player_amont_sum_twocom;
-        s.currRoundBetSum_single = player_amont_sum_single;
+        s.currRoundBetSum_bsoe = player_amount_sum_bsoe;
+        s.currRoundBetSum_anytri = player_amount_sum_anytri;
+        s.currRoundBetSum_trinum = player_amount_sum_trinum;
+        s.currRoundBetSum_pairnum = player_amount_sum_pairnum;
+        s.currRoundBetSum_txx = player_amount_sum_txx;
+        s.currRoundBetSum_twocom = player_amount_sum_twocom;
+        s.currRoundBetSum_single = player_amount_sum_single;
     });
 
 }
@@ -588,7 +588,7 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
         eosio::print(" round_result: ", result, " ");
 
     //odds token
-    asset init_asset_empty = asset(0,existing->amontSymbol);
+    asset init_asset_empty = asset(0,existing->amountSymbol);
     std::vector<player_bet_info> tempPlayerVec;
     asset dealerBalance_temp = existing->dealerBalance;
     for (auto playerBet : existing->playerInfo)
@@ -611,18 +611,18 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
             }
 
             pos_end = playerBet.bet.find(",",pos);
-            string temp_amont;
+            string temp_amount;
             if(pos_end != -1)
             {
-                temp_amont = playerBet.bet.substr(pos + 3, pos_end - pos - 4);
+                temp_amount = playerBet.bet.substr(pos + 3, pos_end - pos - 4);
             }
             else
             {
                 pos_end = playerBet.bet.find("}",pos);
-                temp_amont = playerBet.bet.substr(pos + 3, pos_end - pos - 4);
+                temp_amount = playerBet.bet.substr(pos + 3, pos_end - pos - 4);
             }
-            auto amont = from_string(temp_amont, symbol(symbol_code("SYS"), 4));
-           // eosio::print("temp_amont to int:", amont, " ...");
+            auto amount = from_string(temp_amount, symbol(symbol_code("SYS"), 4));
+           // eosio::print("temp_amount to int:", amount, " ...");
             pos = playerBet.bet.find(":", pos_end);
             //odds
 
@@ -631,7 +631,7 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
                     0 == temp_name.compare("s1") || 0 == temp_name.compare("s2") || 0 == temp_name.compare("s3") ||
                     0 == temp_name.compare("s4") || 0 == temp_name.compare("s5") || 0 == temp_name.compare("s6"))
                 {
-                    pBonus += amont * (1 + 1);
+                    pBonus += amount * (1 + 1);
                 }
                 else if(0 == temp_name.compare("c12") || 0 == temp_name.compare("c13") || 0 == temp_name.compare("c14") ||
                         0 == temp_name.compare("c15") || 0 == temp_name.compare("c16") || 0 == temp_name.compare("c23") ||
@@ -639,49 +639,49 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
                         0 == temp_name.compare("c34") || 0 == temp_name.compare("c35") || 0 == temp_name.compare("c36") ||
                         0 == temp_name.compare("c45") || 0 == temp_name.compare("c46") || 0 == temp_name.compare("c56"))
                 {
-                    pBonus += amont * (1 + 5);
+                    pBonus += amount * (1 + 5);
                 }
                 else if(0 == temp_name.compare("total9") || 0 == temp_name.compare("total12") ||
                         0 == temp_name.compare("total10") || 0 == temp_name.compare("total11"))
                 {
-                    pBonus += amont * (1 + 6);
+                    pBonus += amount * (1 + 6);
                 }
                 else if(0 == temp_name.compare("total8") || 0 == temp_name.compare("total13") ||
                         0 == temp_name.compare("pair1") || 0 == temp_name.compare("pair2") ||
                         0 == temp_name.compare("pair3") || 0 == temp_name.compare("pair4") ||
                         0 == temp_name.compare("pair5") || 0 == temp_name.compare("pair6"))
                 {
-                    pBonus += amont * (1 + 8);
+                    pBonus += amount * (1 + 8);
                 }
                 else if(0 == temp_name.compare("total7") || 0 == temp_name.compare("total14"))
                 {
-                    pBonus += amont * (1 + 12);
+                    pBonus += amount * (1 + 12);
                 }
                 else if(0 == temp_name.compare("total6") || 0 == temp_name.compare("total15"))
                 {
-                    pBonus += amont * (1 + 14);
+                    pBonus += amount * (1 + 14);
                 }
                 else if(0 == temp_name.compare("total5") || 0 == temp_name.compare("total16"))
                 {
-                    pBonus += amont * (1 + 18);
+                    pBonus += amount * (1 + 18);
                 }
                 else if(0 == temp_name.compare("anytri"))
                 {
-                    pBonus += amont * (1 + 24);
+                    pBonus += amount * (1 + 24);
                 }
                 else if(0 == temp_name.compare("total4") || 0 == temp_name.compare("total17"))
                 {
-                    pBonus += amont * (1 + 50);
+                    pBonus += amount * (1 + 50);
                 }
                 else if(0 == temp_name.compare("tri1") || 0 == temp_name.compare("tri2") ||
                         0 == temp_name.compare("tri3") || 0 == temp_name.compare("tri4") ||
                         0 == temp_name.compare("tri5") || 0 == temp_name.compare("tri6"))
                 {
-                    pBonus += amont * (1 + 150);
+                    pBonus += amount * (1 + 150);
                 }
             }
             else
-                dBonus += amont;
+                dBonus += amount;
 
         }
         eosio::print(" [player:", playerBet.player, ", total bonus:", pBonus, "] ");
@@ -691,7 +691,7 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
             name use_code;
             for(auto p:gamebstsicbo::symOptions)
             {
-                if(p.symName == existing->amontSymbol)
+                if(p.symName == existing->amountSymbol)
                 {
                     use_code = p.code;
                 }
@@ -840,7 +840,7 @@ ACTION gamebstsicbo::closetable(uint64_t tableId)
     name use_code;
     for(auto p:gamebstsicbo::symOptions)
     {
-        if(p.symName == existing->amontSymbol)
+        if(p.symName == existing->amountSymbol)
         {
             use_code = p.code;
         }
@@ -850,7 +850,7 @@ ACTION gamebstsicbo::closetable(uint64_t tableId)
         use_code, {{_self, "active"_n}},
         {_self, existing->dealer, existing->dealerBalance, std::string("closetable, withdraw all")});
 
-    asset init_asset_empty = asset(0, existing->amontSymbol);
+    asset init_asset_empty = asset(0, existing->amountSymbol);
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::CLOSED;
         s.dealerBalance = init_asset_empty;
@@ -866,7 +866,7 @@ ACTION gamebstsicbo::depositable(name dealer, uint64_t tableId, asset deposit)
     name use_code;
     for(auto p:gamebstsicbo::symOptions)
     {
-        if(p.symName == existing->amontSymbol)
+        if(p.symName == existing->amountSymbol)
         {
             use_code = p.code;
         }
@@ -898,7 +898,7 @@ ACTION gamebstsicbo::dealerwitdaw(uint64_t tableId, asset withdraw)
     name use_code;
     for(auto p:gamebstsicbo::symOptions)
     {
-        if(p.symName == existing->amontSymbol)
+        if(p.symName == existing->amountSymbol)
         {
             use_code = p.code;
         }

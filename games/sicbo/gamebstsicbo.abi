@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Mar 13 14:39:21 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Mar 13 19:29:32 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -371,7 +371,7 @@
                     "type": "asset"
                 },
                 {
-                    "name": "amontSymbol",
+                    "name": "amountSymbol",
                     "type": "symbol"
                 },
                 {

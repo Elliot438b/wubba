@@ -53,9 +53,9 @@ CONTRACT gamebstsicbo : public contract
     struct bet_info
     {
         string name;
-        asset amont;
+        asset amount;
 
-        EOSLIB_SERIALIZE(bet_info, (name)(amont))
+        EOSLIB_SERIALIZE(bet_info, (name)(amount))
     };
 
     struct sym_info
@@ -92,7 +92,7 @@ CONTRACT gamebstsicbo : public contract
 
         asset oneRoundDealerMaxPay;
         asset minTableDeposit;
-        symbol amontSymbol;
+        symbol amountSymbol;
             // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
         uint64_t tableStatus;  // round stage.
@@ -128,7 +128,7 @@ CONTRACT gamebstsicbo : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_bsoe)(minPerBet_bsoe)(oneRoundMaxTotalBet_anytri)(minPerBet_anytri)(oneRoundMaxTotalBet_trinum)(minPerBet_trinum)(oneRoundMaxTotalBet_pairnum)(minPerBet_pairnum)(oneRoundMaxTotalBet_txx)(minPerBet_txx)(oneRoundMaxTotalBet_twocom)(minPerBet_twocom)(oneRoundMaxTotalBet_single)(minPerBet_single)(oneRoundDealerMaxPay)(minTableDeposit)(amontSymbol)(betStartTime)(tableStatus)(currRoundBetSum_bsoe)(currRoundBetSum_anytri)(currRoundBetSum_trinum)(currRoundBetSum_pairnum)(currRoundBetSum_txx)(currRoundBetSum_twocom)(currRoundBetSum_single)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(diceResult))
+        EOSLIB_SERIALIZE(table_stats, (tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_bsoe)(minPerBet_bsoe)(oneRoundMaxTotalBet_anytri)(minPerBet_anytri)(oneRoundMaxTotalBet_trinum)(minPerBet_trinum)(oneRoundMaxTotalBet_pairnum)(minPerBet_pairnum)(oneRoundMaxTotalBet_txx)(minPerBet_txx)(oneRoundMaxTotalBet_twocom)(minPerBet_twocom)(oneRoundMaxTotalBet_single)(minPerBet_single)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(betStartTime)(tableStatus)(currRoundBetSum_bsoe)(currRoundBetSum_anytri)(currRoundBetSum_trinum)(currRoundBetSum_pairnum)(currRoundBetSum_txx)(currRoundBetSum_twocom)(currRoundBetSum_single)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(diceResult))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, gamebstsicbo::table_stats, indexed_by<"dealer"_n, const_mem_fun<gamebstsicbo::table_stats, uint64_t, &gamebstsicbo::table_stats::get_dealer>>> singletable_t;
@@ -172,13 +172,13 @@ CONTRACT gamebstsicbo : public contract
     {
         string s = trim(from);
         auto space_pos = s.find(' ');
-        eosio_assert(space_pos != string::npos, "Asset's amont and symbol should be separated with space");
+        eosio_assert(space_pos != string::npos, "Asset's amount and symbol should be separated with space");
         string symbol_str = trim(s.substr(space_pos + 1));
         eosio_assert(symbol_str == sym.code().to_string(), "Asset's symbol is not match!");
-        auto amont_str = s.substr(0, space_pos);
-        auto amont = Atof(amont_str.c_str());
-        amont *= pow(10, int64_t(sym.precision()));
-        return asset((int)amont, sym);
+        auto amount_str = s.substr(0, space_pos);
+        auto amount = Atof(amount_str.c_str());
+        amount *= pow(10, int64_t(sym.precision()));
+        return asset((int)amount, sym);
     }
 
     string trim(string s)
@@ -237,7 +237,7 @@ CONTRACT gamebstsicbo : public contract
     }
 
 
-    bool checkBetOptions(string bet, symbol sym, asset &betAmont, std::vector<bet_info> &betVec)
+    bool checkBetOptions(string bet, symbol sym, asset &betAmount, std::vector<bet_info> &betVec)
     {
         bool result = false;
 
@@ -260,24 +260,24 @@ CONTRACT gamebstsicbo : public contract
 
             eosio::print("temp_name:", temp_name, " ...");
             pos_end = bet.find(",",pos);
-            string temp_amont;
+            string temp_amount;
             if(pos_end != -1)
             {
-                temp_amont = bet.substr(pos + 3, pos_end - pos - 4);
+                temp_amount = bet.substr(pos + 3, pos_end - pos - 4);
             }
             else
             {
                 pos_end = bet.find("}",pos);
-                temp_amont = bet.substr(pos + 3, pos_end - pos - 4);
+                temp_amount = bet.substr(pos + 3, pos_end - pos - 4);
             }
-            eosio::print("temp_amont:", temp_amont, " ...");
+            eosio::print("temp_amount:", temp_amount, " ...");
             //symbol sysDefault = symbol(symbol_code(sym), 4);
-            auto amont = from_string(temp_amont, sym);
-            eosio::print("temp_amont to int:", amont, " ...");
-            betAmont += amont;
+            auto amount = from_string(temp_amount, sym);
+            eosio::print("temp_amount to int:", amount, " ...");
+            betAmount += amount;
             bet_info bet_info_temp;
             bet_info_temp.name = temp_name;
-            bet_info_temp.amont = amont;
+            bet_info_temp.amount = amount;
             betVec.emplace_back(bet_info_temp);
             pos = bet.find(":", pos_end);
         }
