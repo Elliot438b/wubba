@@ -172,13 +172,13 @@ CONTRACT gamebstsicbo : public contract
     {
         string s = trim(from);
         auto space_pos = s.find(' ');
-        eosio_assert(space_pos != string::npos, "Asset's amount and symbol should be separated with space");
+        eosio_assert(space_pos != string::npos, "Asset's amont and symbol should be separated with space");
         string symbol_str = trim(s.substr(space_pos + 1));
         eosio_assert(symbol_str == sym.code().to_string(), "Asset's symbol is not match!");
-        auto amount_str = s.substr(0, space_pos);
-        auto amount = Atof(amount_str.c_str());
-        amount *= pow(10, int64_t(sym.precision()));
-        return asset((int)amount, sym);
+        auto amont_str = s.substr(0, space_pos);
+        auto amont = Atof(amont_str.c_str());
+        amont *= pow(10, int64_t(sym.precision()));
+        return asset((int)amont, sym);
     }
 
     string trim(string s)
@@ -308,25 +308,6 @@ CONTRACT gamebstsicbo : public contract
 
     const uint32_t betPeriod = 30;
     const uint32_t minTableRounds = 2;
-//    const asset oneRoundDealerMaxPay = asset(100000, sysDefault);;
-//    const asset minTableDeposit = oneRoundDealerMaxPay * minTableRounds;
-   // const symbol sysDefault = symbol(symbol_code("SYS"), 4);
-//    const asset init_asset_empty = asset(0, sysDefault);
-
-//    const asset oneRoundMaxTotalBet_bsoe_default = asset(3000 * 10000, sysDefault); //3000
-//    const asset minPerBet_bsoe_default = asset(10 * 10000, sysDefault);            //10
-//    const asset oneRoundMaxTotalBet_anytri_default = asset(400 * 10000, sysDefault); //400
-//    const asset minPerBet_anytri_default = asset(0.5 * 10000, sysDefault);             //0.5
-//    const asset oneRoundMaxTotalBet_trinum_default = asset(100 * 10000, sysDefault); //100
-//    const asset minPerBet_trinum_default = asset(0.1 * 10000, sysDefault);            //0.1
-//    const asset oneRoundMaxTotalBet_pairnum_default = asset(1000 * 10000, sysDefault); //1000
-//    const asset minPerBet_pairnum_default = asset(1 * 10000, sysDefault);            //1
-//    const asset oneRoundMaxTotalBet_txx_default = asset(500 * 10000, sysDefault); //500
-//    const asset minPerBet_txx_default = asset(0.5 * 10000, sysDefault);            //0.5
-//    const asset oneRoundMaxTotalBet_twocom_default = asset(1500 * 10000, sysDefault); //1500
-//    const asset minPerBet_twocom_default = asset(1 * 10000, sysDefault);            //1
-//    const asset oneRoundMaxTotalBet_single_default = asset(3000 * 10000, sysDefault); //3000
-//    const asset minPerBet_single_default = asset(10 * 10000, sysDefault);            //10
 
     static std::vector<sym_info> createSymOptions()
     {

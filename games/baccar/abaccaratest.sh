@@ -17,7 +17,7 @@ temptest)
     echo "temptest"
     eosio-cpp -abigen gamebaccarat.cpp -o gamebaccarat.wasm
     cleos --wallet-url http://127.0.0.1:6666 set contract gamebaccarat ./ gamebaccarat.wasm gamebaccarat.abi
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat newtable '[useraaaaaaab,"23000.0000 SYS", 1, "1001.0000 SYS","100.0000 SYS","100.0000 SYS","1.0000 SYS","50.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat newtable '[useraaaaaaab,"23000.0000 TES", 1,"useraaaaaaaj","TES", "1001.0000 TES","100.0000 TES","100.0000 TES","1.0000 TES","50.0000 TES","1.0000 TES"]' -p useraaaaaaab
     tableid=`cleos get table gamebaccarat gamebaccarat tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
     for((num=1;num<=1;num++));
@@ -27,14 +27,14 @@ temptest)
         cleos get table gamebaccarat gamebaccarat tablesinfo -L $tableid -U $tableid
     done
 
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat depositable '[useraaaaaaab, '$tableid', "23000.0000 SYS"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat depositable '[useraaaaaaab, '$tableid', "23000.0000 TES"]' -p useraaaaaaab
     cleos get table gamebaccarat gamebaccarat tablesinfo -L $tableid -U $tableid
 
     sleep 3s
     cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat playerbet '['$tableid',useraaaaaaac,"0.0000 SYS","200.0000 SYS","3.0000 SYS","4.0000 SYS","3.0000 SYS"]' -p useraaaaaaac useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat playerbet '['$tableid',useraaaaaaad,"0.0000 SYS","100.0000 SYS","0.0000 SYS","10.0000 SYS","10.0000 SYS"]' -p useraaaaaaad useraaaaaaah
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat playerbet '['$tableid',useraaaaaaac,"0.0000 TES","200.0000 TES","3.0000 TES","4.0000 TES","3.0000 TES"]' -p useraaaaaaac useraaaaaaah
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat playerbet '['$tableid',useraaaaaaad,"0.0000 TES","100.0000 TES","0.0000 TES","10.0000 TES","10.0000 TES"]' -p useraaaaaaad useraaaaaaah
     cleos get table gamebaccarat gamebaccarat tablesinfo -L $tableid -U $tableid
     sleep 36s
     cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat endbet '['$tableid']' -p useraaaaaaah
@@ -43,7 +43,7 @@ temptest)
     cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat verserveseed '['$tableid',704]' -p useraaaaaaah
     cleos get table gamebaccarat gamebaccarat tablesinfo -L $tableid -U $tableid
 
-    cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat dealerwitdaw '['$tableid', "2000.0000 SYS"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat dealerwitdaw '['$tableid', "2000.0000 TES"]' -p useraaaaaaab
     cleos get table gamebaccarat gamebaccarat tablesinfo -L $tableid -U $tableid
 
     cleos --wallet-url http://127.0.0.1:6666 push action gamebaccarat closetable '['$tableid']' -p useraaaaaaab

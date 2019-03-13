@@ -18,7 +18,7 @@ CONTRACT gamebaccarat : public contract
     gamebaccarat(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value) {}
 
-    ACTION newtable(name dealer, asset deposit, bool isPrivate, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
+    ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush);
@@ -35,6 +35,7 @@ CONTRACT gamebaccarat : public contract
     ACTION closetable(uint64_t tableId);
     ACTION depositable(name dealer, uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
+    ACTION changeprivat(bool isPrivate, uint64_t tableId);
 
     struct card_info
     {
@@ -59,6 +60,15 @@ CONTRACT gamebaccarat : public contract
         EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPush)(betPlayerPush)(pBonus)(dBonus))
     };
 
+    struct sym_info
+    {
+        uint16_t id;
+        name code;
+        symbol symName;
+
+        EOSLIB_SERIALIZE(sym_info, (id)(code)(symName))
+    };
+
     TABLE table_stats
     {
         // ------------------------------ table field ------------------------------
@@ -77,6 +87,7 @@ CONTRACT gamebaccarat : public contract
 
         asset oneRoundDealerMaxPay;
         asset minTableDeposit;
+        symbol amontSymbol;
         // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
         uint64_t tableStatus;  // round stage.
@@ -109,7 +120,7 @@ CONTRACT gamebaccarat : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Push)(minPerBet_Push)(oneRoundDealerMaxPay)(minTableDeposit)(betStartTime)(tableStatus)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
+        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Push)(minPerBet_Push)(oneRoundDealerMaxPay)(minTableDeposit)(amontSymbol)(betStartTime)(tableStatus)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, gamebaccarat::table_stats, indexed_by<"dealer"_n, const_mem_fun<gamebaccarat::table_stats, uint64_t, &gamebaccarat::table_stats::get_dealer>>> singletable_t;
@@ -157,6 +168,7 @@ CONTRACT gamebaccarat : public contract
             cardVec.emplace_back(i);
         }
     }
+
     using newtable_action = action_wrapper<"newtable"_n, &gamebaccarat::newtable>;
     using dealerseed_action = action_wrapper<"dealerseed"_n, &gamebaccarat::dealerseed>;
     using serverseed_action = action_wrapper<"serverseed"_n, &gamebaccarat::serverseed>;
@@ -184,16 +196,37 @@ CONTRACT gamebaccarat : public contract
     const uint16_t initDecks = 8;
     const uint32_t minTableRounds = 10;
 
-    const asset oneRoundMaxTotalBet_BP_default = asset(1000 * 10000, symbol(symbol_code("SYS"), 4)); //1000
-    const asset minPerBet_BP_default = asset(100 * 10000, symbol(symbol_code("SYS"), 4));            //100
-    const asset oneRoundMaxTotalBet_Tie_default = asset(100 * 10000, symbol(symbol_code("SYS"), 4)); //100
-    const asset minPerBet_Tie_default = asset(1 * 10000, symbol(symbol_code("SYS"), 4));             //1
-    const asset oneRoundMaxTotalBet_Push_default = asset(50 * 10000, symbol(symbol_code("SYS"), 4)); //50
-    const asset minPerBet_Push_default = asset(1 * 10000, symbol(symbol_code("SYS"), 4));            //1
-    const asset init_asset_empty = asset(0, symbol(symbol_code("SYS"), 4));
+    static std::vector<sym_info> createSymOptions()
+    {
+        std::vector<sym_info> tempSym;
+
+        sym_info sym_temp;
+        sym_temp.id = 0;
+        sym_temp.code = "eosio.token"_n;
+        sym_temp.symName = symbol(symbol_code("SYS"), 4);;
+        tempSym.emplace_back(sym_temp);
+
+        sym_temp.id = 1;
+        sym_temp.code = "useraaaaaaaj"_n;
+        sym_temp.symName = symbol(symbol_code("TES"), 4);;
+        tempSym.emplace_back(sym_temp);
+
+        return tempSym;
+    }
+
+//    const asset oneRoundMaxTotalBet_BP_default = asset(1000 * 10000, symbol(symbol_code("SYS"), 4)); //1000
+//    const asset minPerBet_BP_default = asset(100 * 10000, symbol(symbol_code("SYS"), 4));            //100
+//    const asset oneRoundMaxTotalBet_Tie_default = asset(100 * 10000, symbol(symbol_code("SYS"), 4)); //100
+//    const asset minPerBet_Tie_default = asset(1 * 10000, symbol(symbol_code("SYS"), 4));             //1
+//    const asset oneRoundMaxTotalBet_Push_default = asset(50 * 10000, symbol(symbol_code("SYS"), 4)); //50
+//    const asset minPerBet_Push_default = asset(1 * 10000, symbol(symbol_code("SYS"), 4));            //1
+//    const asset init_asset_empty = asset(0, symbol(symbol_code("SYS"), 4));
 
     const char *notableerr = "TableId isn't existing!";
+
+    static const std::vector<sym_info> symOptions;
 
     singletable_t tableround;
     WBRNG wbrng;
 };
+const std::vector<gamebaccarat::sym_info> gamebaccarat::symOptions = gamebaccarat::createSymOptions();

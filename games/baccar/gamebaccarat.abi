@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Mon Mar  4 13:59:30 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Mar 13 17:51:29 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -159,6 +159,14 @@
                 {
                     "name": "isPrivate",
                     "type": "bool"
+                },
+                {
+                    "name": "code",
+                    "type": "name"
+                },
+                {
+                    "name": "sym",
+                    "type": "string"
                 },
                 {
                     "name": "oneRoundMaxTotalBet_BP",
@@ -351,6 +359,10 @@
                 {
                     "name": "minTableDeposit",
                     "type": "asset"
+                },
+                {
+                    "name": "amontSymbol",
+                    "type": "symbol"
                 },
                 {
                     "name": "betStartTime",

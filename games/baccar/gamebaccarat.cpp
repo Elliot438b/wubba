@@ -1,6 +1,6 @@
 #include "gamebaccarat.hpp"
 
-ACTION gamebaccarat::newtable(name dealer, asset deposit, bool isPrivate, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
+ACTION gamebaccarat::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
                        asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
                        asset oneRoundMaxTotalBet_push, asset minPerBet_push)
 {
@@ -15,6 +15,30 @@ ACTION gamebaccarat::newtable(name dealer, asset deposit, bool isPrivate, asset 
     asset oneRoundDealerMaxPay_temp;
     asset deposit_tmp;
 
+    bool useful_symal_flag = false;
+    for(auto p:gamebaccarat::symOptions)
+    {
+        if(p.code == code && 0 == p.symName.code().to_string().compare(sym))
+        {
+            useful_symal_flag = true;
+        }
+    }
+
+    string use_sym;
+    name useful_code;
+    if(useful_symal_flag)
+    {
+        use_sym = sym;
+        useful_code = code;
+    }
+    else
+    {
+        use_sym = "SYS";
+        useful_code = "eosio.token"_n;
+    }
+
+    asset init_asset_empty = asset(0.0000, symbol(symbol_code(use_sym.c_str()), 4));
+
     if (oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp > init_asset_empty && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie > init_asset_empty && oneRoundMaxTotalBet_push > init_asset_empty && minPerBet_push > init_asset_empty)
     {
         oneRoundMaxTotalBet_BP_temp = oneRoundMaxTotalBet_bp;
@@ -27,12 +51,13 @@ ACTION gamebaccarat::newtable(name dealer, asset deposit, bool isPrivate, asset 
     }
     else
     {
-        oneRoundMaxTotalBet_BP_temp = oneRoundMaxTotalBet_BP_default;
-        minPerBet_BP_temp = minPerBet_BP_default;
-        oneRoundMaxTotalBet_Tie_temp = oneRoundMaxTotalBet_Tie_default;
-        minPerBet_Tie_temp = minPerBet_Tie_default;
-        oneRoundMaxTotalBet_Push_temp = oneRoundMaxTotalBet_Push_default;
-        minPerBet_Push_temp = minPerBet_Push_default;
+        auto sym_temp = symbol(symbol_code(use_sym.c_str()), 4);
+        oneRoundMaxTotalBet_BP_temp = asset(1000 * 10000, sym_temp); //1000;
+        minPerBet_BP_temp = asset(100 * 10000, sym_temp);
+        oneRoundMaxTotalBet_Tie_temp = asset(100 * 10000, sym_temp); //100
+        minPerBet_Tie_temp = asset(1 * 10000, sym_temp);
+        oneRoundMaxTotalBet_Push_temp = asset(50 * 10000, sym_temp); //50;
+        minPerBet_Push_temp = asset(1 * 10000, sym_temp);
         eosio::print(" [deault===deposit limit]");
     }
 
@@ -42,7 +67,7 @@ ACTION gamebaccarat::newtable(name dealer, asset deposit, bool isPrivate, asset 
     eosio_assert(deposit >= deposit_tmp, "Table deposit is not enough!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        "eosio.token"_n, {{dealer, "active"_n}},
+        useful_code, {{dealer, "active"_n}},
         {dealer, _self, deposit, std::string("new:tabledeposit")});
     // table init.
     tableround.emplace(_self, [&](auto &s) {
@@ -60,6 +85,7 @@ ACTION gamebaccarat::newtable(name dealer, asset deposit, bool isPrivate, asset 
         s.minPerBet_Push = minPerBet_Push_temp;
         s.oneRoundDealerMaxPay = oneRoundDealerMaxPay_temp;
         s.minTableDeposit = deposit_tmp;
+        s.amontSymbol = symbol(symbol_code(use_sym), 4);
     });
 }
 
@@ -86,6 +112,7 @@ ACTION gamebaccarat::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
         std::vector<card_info> emptyCards;
+        asset init_asset_empty = asset(0.0000, existing->amontSymbol);
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = 0;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
@@ -133,6 +160,7 @@ ACTION gamebaccarat::serverseed(uint64_t tableId, checksum256 encodeSeed)
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
         std::vector<card_info> emptyCards;
+        asset init_asset_empty = asset(0.0000, existing->amontSymbol);
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = now();
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
@@ -186,6 +214,7 @@ ACTION gamebaccarat::playerbet(uint64_t tableId, name player, asset betDealer, a
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     eosio_assert((now() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
+    asset init_asset_empty = asset(0.0000, existing->amontSymbol);
     if (betDealer > init_asset_empty)
         eosio_assert(betDealer >= existing->minPerBet_BP, "Banker bet is too small!");
     if (betPlayer > init_asset_empty)
@@ -226,9 +255,18 @@ ACTION gamebaccarat::playerbet(uint64_t tableId, name player, asset betDealer, a
     asset depositAmount = (betDealer + betPlayer + betTie + betDealerPush + betPlayerPush);
     if (depositAmount > init_asset_empty)
     {
+        name use_code;
+        for(auto p:gamebaccarat::symOptions)
+        {
+            if(p.symName == existing->amontSymbol)
+            {
+                use_code = p.code;
+            }
+        }
+
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (
-            "eosio.token"_n, {{player, "active"_n}},
+            use_code, {{player, "active"_n}},
             {player, _self, depositAmount, std::string("playerbet")});
     }
     player_bet_info temp;
@@ -413,6 +451,7 @@ ACTION gamebaccarat::verserveseed(uint64_t tableId, string seed)
     //odds token
     std::vector<player_bet_info> tempPlayerVec;
     asset dealerBalance_temp = existing->dealerBalance;
+    asset init_asset_empty = asset(0.0000, existing->amontSymbol);
     for (auto playerBet : existing->playerInfo)
     {
         auto pBonus = init_asset_empty;
@@ -447,9 +486,18 @@ ACTION gamebaccarat::verserveseed(uint64_t tableId, string seed)
 
         if (pBonus > init_asset_empty)
         {
+            name use_code;
+            for(auto p:gamebaccarat::symOptions)
+            {
+                if(p.symName == existing->amontSymbol)
+                {
+                    use_code = p.code;
+                }
+            }
+
             INLINE_ACTION_SENDER(eosio::token, transfer)
             (
-                "eosio.token"_n, {{_self, "active"_n}},
+                use_code, {{_self, "active"_n}},
                 {_self, playerBet.player, pBonus, std::string("playerbet win")});
         }
         dealerBalance_temp -= pBonus;
@@ -605,10 +653,22 @@ ACTION gamebaccarat::closetable(uint64_t tableId)
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't close!");
+
+    name use_code;
+    for(auto p:gamebaccarat::symOptions)
+    {
+        if(p.symName == existing->amontSymbol)
+        {
+            use_code = p.code;
+        }
+    }
+
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        "eosio.token"_n, {{_self, "active"_n}},
+        use_code, {{_self, "active"_n}},
         {_self, existing->dealer, existing->dealerBalance, std::string("closetable, withdraw all")});
+
+    asset init_asset_empty = asset(0.0000, existing->amontSymbol);
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::CLOSED;
         s.dealerBalance = init_asset_empty;
@@ -621,9 +681,19 @@ ACTION gamebaccarat::depositable(name dealer, uint64_t tableId, asset deposit)
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(dealer);
     eosio_assert(deposit >= existing->minTableDeposit, "Table deposit is not enough!");
+
+    name use_code;
+    for(auto p:gamebaccarat::symOptions)
+    {
+        if(p.symName == existing->amontSymbol)
+        {
+            use_code = p.code;
+        }
+    }
+
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        "eosio.token"_n, {{dealer, "active"_n}},
+        use_code, {{dealer, "active"_n}},
         {dealer, _self, deposit, std::string("re:tabledeposit")});
     tableround.modify(existing, _self, [&](auto &s) {
         s.dealerBalance += deposit;
@@ -644,13 +714,32 @@ ACTION gamebaccarat::dealerwitdaw(uint64_t tableId, asset withdraw)
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
     eosio_assert((existing->dealerBalance - withdraw) > existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
+
+    name use_code;
+    for(auto p:gamebaccarat::symOptions)
+    {
+        if(p.symName == existing->amontSymbol)
+        {
+            use_code = p.code;
+        }
+    }
+
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        "eosio.token"_n, {{_self, "active"_n}},
+        use_code, {{_self, "active"_n}},
         {_self, existing->dealer, withdraw, std::string("withdraw")});
     tableround.modify(existing, _self, [&](auto &s) {
         s.dealerBalance -= withdraw;
     });
 }
 
-EOSIO_DISPATCH(gamebaccarat, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw))
+ACTION gamebaccarat::changeprivat(bool isPrivate, uint64_t tableId)
+{
+    auto existing = tableround.find(tableId);
+    eosio_assert(existing != tableround.end(), notableerr);
+    require_auth(existing->dealer);
+    tableround.modify(existing, _self, [&](auto &s) {
+        s.isPrivate = isPrivate;
+    });
+}
+EOSIO_DISPATCH(gamebaccarat, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))
