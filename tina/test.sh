@@ -19,3 +19,9 @@ cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaai act
 cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj testreverse '["1.0000 SYS"]' -p useraaaaaaaj
 cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj testaccount '["1.0000 SYS"]' -p useraaaaaaaj
 
+# custom token issue.
+cleos --wallet-url http://127.0.0.1:6666 system buyram useraaaaaaag useraaaaaaaj "10 SYS"
+cleos --wallet-url http://127.0.0.1:6666 set contract useraaaaaaaj ./ eosio.token.wasm eosio.token.abi
+cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj create '["useraaaaaaai","100000000.0000 HIT"]' -p useraaaaaaaj
+cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj issue '["useraaaaaaaa","1000.0000 HIT","xxx"]' -p useraaaaaaai
+cleos --wallet-url http://127.0.0.1:6666 get currency balance useraaaaaaaj useraaaaaaaa "HIT"
