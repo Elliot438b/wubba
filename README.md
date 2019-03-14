@@ -56,10 +56,6 @@ flag | symbol | full name
 2 | D | Diamonds
 3 | C | Clubs
 
-```
-
-```
-
 ### (3) reveal
 - card apply, 4 cards, or 5 cards, or 6 cards? 
     - player_hands
@@ -289,12 +285,94 @@ betPerMin/oneRoundMaxTotalBet naming  rule, for example:
     - asset minTableDeposit;
 
 ## v0.7 target
-### commission flow
-- dealer
-- platform
-- agent
+agent workflow.
+### add a new state table
+```
+struct alias_info
+{
+    string alias;          
+    name account;  
+}
+```
+### SC::pushaliasnam(string alias, name account)
+Insert the alias info into state table "alias-info".
+
+### SC::playerbet modify
+Add param: 
+- name agent, client get EOS account by given alias through search the "alias-info".
+- string nickname, client allow user to input a nickname just for showing instead of 12 EOS account name(do not care about repetition).
+
+### state table: tableround_info modify
+Add param in struct player_info_bet:
+- name agent, will be used in reveal stage.
+
+### agent commission
+Reveal stage, got player-bet obj:
+- pBonus
+- dBonus
+- agent, if agent exist in "alias-info" && agent != dealer, return the commission to agent account.
+
+transfer type(if dBonus>0, agent got commssion):
+```math
+agenttotransfer = dBonus*5/100
+```
+> default commission rate of agent: 1/1000
+
+### alias_info lifetime
+> rules: delete the item obj in "alias_info" when the item inactive for one month.
+
+TODO: add one field "lastoptime" in "alias_info", add one option in SC::erasingdata, batch delete 
+> now - lastoptime > 30 days.
+
+### spreadcode generate
+- create an alias of EOS account A.
+- if A is a dealer, spreadcode = 
+    - "alias[A]"
+    - "alias[A]-gameid-tableid"
+- if A want to advertise the other dealer B, spreadcode = 
+    - "alias[A]-alias[B]"
+    - "alias[A]-alias[B]-gameid-tableid"
+> if alias[B] is not exsit, use B.
+
+### platform commssion
+```math
+platformtotransfer = (pBonus + dBonus)*2/1000
+```
+```
+pBonus = pBonus*998/1000;
+dBonus = dBonus*998/1000;
+```
+> default commission rate of platform: 2/1000
 
 ## v0.8 target
+seed server.
+
+Nodejs-based server-side executable program load balanced with localDB.
+
+### data structure
+
+field | explaination
+---|---
+tableId | unique identifier, equal with table-state's tableId.
+seed | Locally acquired random number seeds.
+seedHash | result of hash seed
+    
+### Execute {get table} per second to get all tables' state data. Filter with:
+- ROUND_END&&trusteeship  || ROUND_START&&!trusteeship 
+    - table-obj -> tableId, acquired local seed, hash seed. Insert {tableId, seed, seedHash} into localDB.
+    - call SC: serverseed(tableId，seedHash)
+- ROUND_REVEAL
+    - table-obj -> tableId, data obj from localDB with tableId, acquired plaintext seed.
+    - call SC: verserveseed(tableId，seed)
+    - delete the data obj from localDB with the tableId handled.
+
+> If one of the seed servers was attacked, load balancer could switch another server automated . If the time point of attack was during bet stage(ROUND_BET), SC could't acquire serverseed when reveal stage. The result of this round is based on the dealerseed.
+
+### TODO
+- Use dealerseed to reveal when serverseed not exsit.
+- Return all bet amount when no one seed in reveal stage. (both dealer seed and server seed are not exsit)
+
+## v0.9 target
 ### random result uniform distribution
 - Need a big data analysis model by python script. 
 - Adjust variate of the solution to obtain a best result.
