@@ -14,7 +14,7 @@
     - ~~0.2.6 trusteeship/disconnect~~
     - 0.2.7 agent workflow _
 - v0.3 base game version complete. tag release.
-## v0.4 baccarat target
+## v0.4 mallard target
 ### (1) player bet
 - Action params construction. 
 > eg. ("100.0000 SYS", "0.0000 SYS", "3.0000 SYS", "4.0000 SYS", "3.0000 SYS")
@@ -141,7 +141,7 @@ asset minPerBet_Push | *option | 1
     - **NOTE**: table closed can't be recovery any more.
 
 ## v0.6 target
-Add Sicbo.
+Add lizard.
 - modify 3 ACTION: newtable, playerbet, verserveseed(reveal)
 - modify the state table structure. 
 
@@ -240,7 +240,7 @@ According to the odds in the **Betting options** table as above, calculate pBonu
 - Abstract symbol as a variable could be set. ("SYS","EOS" etc.)
 - Delete unused code/include.
 ### remove unused codes
-remove unused codes inherit from baccarat.
+remove unused codes inherit from mallard.
 
 ### support any currency（default SYS）
 
