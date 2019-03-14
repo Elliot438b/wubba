@@ -11,12 +11,12 @@ using namespace eosio;
 using namespace std;
 using std::string;
 
-CONTRACT gamebstsicbo : public contract
+CONTRACT lizard : public contract
 {
   public:
     using contract::contract;
 
-    gamebstsicbo(name receiver, name code, datastream<const char *> ds)
+    lizard(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value) {}
 
     ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe , asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri
@@ -131,7 +131,7 @@ CONTRACT gamebstsicbo : public contract
         EOSLIB_SERIALIZE(table_stats, (tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_bsoe)(minPerBet_bsoe)(oneRoundMaxTotalBet_anytri)(minPerBet_anytri)(oneRoundMaxTotalBet_trinum)(minPerBet_trinum)(oneRoundMaxTotalBet_pairnum)(minPerBet_pairnum)(oneRoundMaxTotalBet_txx)(minPerBet_txx)(oneRoundMaxTotalBet_twocom)(minPerBet_twocom)(oneRoundMaxTotalBet_single)(minPerBet_single)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(betStartTime)(tableStatus)(currRoundBetSum_bsoe)(currRoundBetSum_anytri)(currRoundBetSum_trinum)(currRoundBetSum_pairnum)(currRoundBetSum_txx)(currRoundBetSum_twocom)(currRoundBetSum_single)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(diceResult))
     };
 
-    typedef eosio::multi_index<"tablesinfo"_n, gamebstsicbo::table_stats, indexed_by<"dealer"_n, const_mem_fun<gamebstsicbo::table_stats, uint64_t, &gamebstsicbo::table_stats::get_dealer>>> singletable_t;
+    typedef eosio::multi_index<"tablesinfo"_n, lizard::table_stats, indexed_by<"dealer"_n, const_mem_fun<lizard::table_stats, uint64_t, &lizard::table_stats::get_dealer>>> singletable_t;
     // std random
     struct WBRNG
     {
@@ -247,7 +247,7 @@ CONTRACT gamebstsicbo : public contract
         {
             string temp_name = bet.substr(pos_end + 2, pos - pos_end - 3);
             result = false;
-            for(auto j : gamebstsicbo::betOptions)
+            for(auto j : lizard::betOptions)
             {
                 if(j == temp_name)
                 {
@@ -284,24 +284,24 @@ CONTRACT gamebstsicbo : public contract
         return result;
     }
 
-    using newtable_action = action_wrapper<"newtable"_n, &gamebstsicbo::newtable>;
-    using dealerseed_action = action_wrapper<"dealerseed"_n, &gamebstsicbo::dealerseed>;
-    using serverseed_action = action_wrapper<"serverseed"_n, &gamebstsicbo::serverseed>;
-    using playerbet_action = action_wrapper<"playerbet"_n, &gamebstsicbo::playerbet>;
-    using endbet_action = action_wrapper<"endbet"_n, &gamebstsicbo::endbet>;
-    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &gamebstsicbo::verdealeseed>;
-    using verserveseed_action = action_wrapper<"verserveseed"_n, &gamebstsicbo::verserveseed>;
-    using trusteeship_action = action_wrapper<"trusteeship"_n, &gamebstsicbo::trusteeship>;
-    using exitruteship_action = action_wrapper<"exitruteship"_n, &gamebstsicbo::exitruteship>;
-    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &gamebstsicbo::disconnecthi>;
-    using erasingdata_action = action_wrapper<"erasingdata"_n, &gamebstsicbo::erasingdata>;
-    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &gamebstsicbo::pausetabledea>;
-    using pausetableser_action = action_wrapper<"pausetablesee"_n, &gamebstsicbo::pausetablesee>;
-    using continuetable_action = action_wrapper<"continuetable"_n, &gamebstsicbo::continuetable>;
-    using closetable_action = action_wrapper<"closetable"_n, &gamebstsicbo::closetable>;
-    using depositable_action = action_wrapper<"depositable"_n, &gamebstsicbo::depositable>;
-    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &gamebstsicbo::dealerwitdaw>;
-    using changeprivat_action = action_wrapper<"changeprivat"_n, &gamebstsicbo::changeprivat>;
+    using newtable_action = action_wrapper<"newtable"_n, &lizard::newtable>;
+    using dealerseed_action = action_wrapper<"dealerseed"_n, &lizard::dealerseed>;
+    using serverseed_action = action_wrapper<"serverseed"_n, &lizard::serverseed>;
+    using playerbet_action = action_wrapper<"playerbet"_n, &lizard::playerbet>;
+    using endbet_action = action_wrapper<"endbet"_n, &lizard::endbet>;
+    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &lizard::verdealeseed>;
+    using verserveseed_action = action_wrapper<"verserveseed"_n, &lizard::verserveseed>;
+    using trusteeship_action = action_wrapper<"trusteeship"_n, &lizard::trusteeship>;
+    using exitruteship_action = action_wrapper<"exitruteship"_n, &lizard::exitruteship>;
+    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &lizard::disconnecthi>;
+    using erasingdata_action = action_wrapper<"erasingdata"_n, &lizard::erasingdata>;
+    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &lizard::pausetabledea>;
+    using pausetableser_action = action_wrapper<"pausetablesee"_n, &lizard::pausetablesee>;
+    using continuetable_action = action_wrapper<"continuetable"_n, &lizard::continuetable>;
+    using closetable_action = action_wrapper<"closetable"_n, &lizard::closetable>;
+    using depositable_action = action_wrapper<"depositable"_n, &lizard::depositable>;
+    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &lizard::dealerwitdaw>;
+    using changeprivat_action = action_wrapper<"changeprivat"_n, &lizard::changeprivat>;
 
     name serveraccount = "useraaaaaaah"_n;
     name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
@@ -391,5 +391,5 @@ CONTRACT gamebstsicbo : public contract
     singletable_t tableround;
     WBRNG wbrng;
 };
-const std::vector<string> gamebstsicbo::betOptions = gamebstsicbo::createBetOptions();
-const std::vector<gamebstsicbo::sym_info> gamebstsicbo::symOptions = gamebstsicbo::createSymOptions();
+const std::vector<string> lizard::betOptions = lizard::createBetOptions();
+const std::vector<lizard::sym_info> lizard::symOptions = lizard::createSymOptions();

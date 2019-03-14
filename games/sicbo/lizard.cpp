@@ -1,7 +1,7 @@
-#include "gamebstsicbo.hpp"
+#include "lizard.hpp"
 
 
-ACTION gamebstsicbo::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe , asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri
+ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe , asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri
 , asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx
 , asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
 {
@@ -24,7 +24,7 @@ ACTION gamebstsicbo::newtable(name dealer, asset deposit, bool isPrivate, name c
     asset deposit_tmp;
 
     bool useful_symal_flag = false;
-    for(auto p:gamebstsicbo::symOptions)
+    for(auto p:lizard::symOptions)
     {
         if(p.code == code && 0 == p.symName.code().to_string().compare(sym))
         {
@@ -151,7 +151,7 @@ ACTION gamebstsicbo::newtable(name dealer, asset deposit, bool isPrivate, name c
     });
 }
 
-ACTION gamebstsicbo::dealerseed(uint64_t tableId, checksum256 encodeSeed)
+ACTION lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -163,7 +163,7 @@ ACTION gamebstsicbo::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         require_auth(existing->dealer);
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
-            INLINE_ACTION_SENDER(gamebstsicbo, pausetabledea)
+            INLINE_ACTION_SENDER(lizard, pausetabledea)
             (
                  _self, {{existing->dealer, "active"_n}},
                  {existing->tableId});
@@ -196,7 +196,7 @@ ACTION gamebstsicbo::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     }
 }
 
-ACTION gamebstsicbo::serverseed(uint64_t tableId, checksum256 encodeSeed)
+ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -207,7 +207,7 @@ ACTION gamebstsicbo::serverseed(uint64_t tableId, checksum256 encodeSeed)
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
-            INLINE_ACTION_SENDER(gamebstsicbo, pausetablesee)
+            INLINE_ACTION_SENDER(lizard, pausetablesee)
             (
                     _self, {{serveraccount, "active"_n}},
                     {existing->tableId});
@@ -261,7 +261,7 @@ ACTION gamebstsicbo::serverseed(uint64_t tableId, checksum256 encodeSeed)
     // txn.send(deferred_id, _self, false);
 }
 
-ACTION gamebstsicbo::playerbet(uint64_t tableId, name player, string bet)
+ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
 {
     require_auth(player);
     require_auth(serveraccount);
@@ -367,7 +367,7 @@ ACTION gamebstsicbo::playerbet(uint64_t tableId, name player, string bet)
     if (betAmount > init_asset_empty)
     {
         name use_code;
-        for(auto p:gamebstsicbo::symOptions)
+        for(auto p:lizard::symOptions)
         {
             if(p.symName == existing->amountSymbol)
             {
@@ -401,7 +401,7 @@ ACTION gamebstsicbo::playerbet(uint64_t tableId, name player, string bet)
 }
 
 // server defer action: end bet
-ACTION gamebstsicbo::endbet(uint64_t tableId)
+ACTION lizard::endbet(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -416,7 +416,7 @@ ACTION gamebstsicbo::endbet(uint64_t tableId)
     });
 }
 
-ACTION gamebstsicbo::verdealeseed(uint64_t tableId, string seed)
+ACTION lizard::verdealeseed(uint64_t tableId, string seed)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -434,7 +434,7 @@ ACTION gamebstsicbo::verdealeseed(uint64_t tableId, string seed)
 }
 
 // Server push defer 3' action, once got ROUND_REVEAL.
-ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
+ACTION lizard::verserveseed(uint64_t tableId, string seed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -452,11 +452,11 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
     {
         eosio::print("Dealer trusteeship, don't need dealer seed.");
     }
-    // non-trustee server, so table_round is waiting for ACTION::gamebstsicbo::dealerseed until dealer reconnect.
-    // TODO Can be considered: auto trustee server until dealer reconnect and ACTION::gamebstsicbo::exitruteship.
+    // non-trustee server, so table_round is waiting for ACTION::lizard::dealerseed until dealer reconnect.
+    // TODO Can be considered: auto trustee server until dealer reconnect and ACTION::lizard::exitruteship.
     else if (!existing->dSeedVerity)
     { // dealer disconnect notify
-        INLINE_ACTION_SENDER(gamebstsicbo, disconnecthi)
+        INLINE_ACTION_SENDER(lizard, disconnecthi)
         (
             _self, {{serveraccount, "active"_n}},
             {existing->dealer, existing->tableId});
@@ -689,7 +689,7 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
         if (pBonus > init_asset_empty)
         {
             name use_code;
-            for(auto p:gamebstsicbo::symOptions)
+            for(auto p:lizard::symOptions)
             {
                 if(p.symName == existing->amountSymbol)
                 {
@@ -729,7 +729,7 @@ ACTION gamebstsicbo::verserveseed(uint64_t tableId, string seed)
     });
 }
 
-ACTION gamebstsicbo::trusteeship(uint64_t tableId)
+ACTION lizard::trusteeship(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -740,7 +740,7 @@ ACTION gamebstsicbo::trusteeship(uint64_t tableId)
     });
 }
 
-ACTION gamebstsicbo::exitruteship(uint64_t tableId)
+ACTION lizard::exitruteship(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -751,7 +751,7 @@ ACTION gamebstsicbo::exitruteship(uint64_t tableId)
     });
 }
 
-ACTION gamebstsicbo::disconnecthi(name informed, uint64_t tableId)
+ACTION lizard::disconnecthi(name informed, uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -761,7 +761,7 @@ ACTION gamebstsicbo::disconnecthi(name informed, uint64_t tableId)
     eosio::print("SC disconnecthi has already informed :", informed.to_string());
 }
 
-ACTION gamebstsicbo::erasingdata(uint64_t key)
+ACTION lizard::erasingdata(uint64_t key)
 {
     require_auth(_self);
     if (key == -1)
@@ -796,7 +796,7 @@ ACTION gamebstsicbo::erasingdata(uint64_t key)
     }
 }
 
-ACTION gamebstsicbo::pausetabledea(uint64_t tableId)
+ACTION lizard::pausetabledea(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -807,7 +807,7 @@ ACTION gamebstsicbo::pausetabledea(uint64_t tableId)
     });
 }
 
-ACTION gamebstsicbo::pausetablesee(uint64_t tableId)
+ACTION lizard::pausetablesee(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -818,7 +818,7 @@ ACTION gamebstsicbo::pausetablesee(uint64_t tableId)
     });
 }
 
-ACTION gamebstsicbo::continuetable(uint64_t tableId)
+ACTION lizard::continuetable(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -830,7 +830,7 @@ ACTION gamebstsicbo::continuetable(uint64_t tableId)
     });
 }
 
-ACTION gamebstsicbo::closetable(uint64_t tableId)
+ACTION lizard::closetable(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -838,7 +838,7 @@ ACTION gamebstsicbo::closetable(uint64_t tableId)
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't close!");
 
     name use_code;
-    for(auto p:gamebstsicbo::symOptions)
+    for(auto p:lizard::symOptions)
     {
         if(p.symName == existing->amountSymbol)
         {
@@ -857,14 +857,14 @@ ACTION gamebstsicbo::closetable(uint64_t tableId)
     });
 }
 
-ACTION gamebstsicbo::depositable(name dealer, uint64_t tableId, asset deposit)
+ACTION lizard::depositable(name dealer, uint64_t tableId, asset deposit)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(dealer);
     eosio_assert(deposit >= existing->minTableDeposit, "Table deposit is not enough!");
     name use_code;
-    for(auto p:gamebstsicbo::symOptions)
+    for(auto p:lizard::symOptions)
     {
         if(p.symName == existing->amountSymbol)
         {
@@ -881,14 +881,14 @@ ACTION gamebstsicbo::depositable(name dealer, uint64_t tableId, asset deposit)
     // automate recover the table round.
     if(existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED)
     {
-        INLINE_ACTION_SENDER(gamebstsicbo, continuetable)
+        INLINE_ACTION_SENDER(lizard, continuetable)
         (
             _self, {{existing->dealer, "active"_n}},
             {existing->tableId});
     }
 }
 
-ACTION gamebstsicbo::dealerwitdaw(uint64_t tableId, asset withdraw)
+ACTION lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -896,7 +896,7 @@ ACTION gamebstsicbo::dealerwitdaw(uint64_t tableId, asset withdraw)
     eosio_assert((existing->dealerBalance - withdraw) > existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
 
     name use_code;
-    for(auto p:gamebstsicbo::symOptions)
+    for(auto p:lizard::symOptions)
     {
         if(p.symName == existing->amountSymbol)
         {
@@ -912,7 +912,7 @@ ACTION gamebstsicbo::dealerwitdaw(uint64_t tableId, asset withdraw)
     });
 }
 
-ACTION gamebstsicbo::changeprivat(bool isPrivate, uint64_t tableId)
+ACTION lizard::changeprivat(bool isPrivate, uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -922,4 +922,4 @@ ACTION gamebstsicbo::changeprivat(bool isPrivate, uint64_t tableId)
     });
 }
 
-EOSIO_DISPATCH(gamebstsicbo, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))
+EOSIO_DISPATCH(lizard, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))

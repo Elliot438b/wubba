@@ -1,6 +1,6 @@
-#include "gamebaccarat.hpp"
+#include "mallard.hpp"
 
-ACTION gamebaccarat::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
+ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
                        asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
                        asset oneRoundMaxTotalBet_push, asset minPerBet_push)
 {
@@ -16,7 +16,7 @@ ACTION gamebaccarat::newtable(name dealer, asset deposit, bool isPrivate, name c
     asset deposit_tmp;
 
     bool useful_symal_flag = false;
-    for(auto p:gamebaccarat::symOptions)
+    for(auto p:mallard::symOptions)
     {
         if(p.code == code && 0 == p.symName.code().to_string().compare(sym))
         {
@@ -89,7 +89,7 @@ ACTION gamebaccarat::newtable(name dealer, asset deposit, bool isPrivate, name c
     });
 }
 
-ACTION gamebaccarat::dealerseed(uint64_t tableId, checksum256 encodeSeed)
+ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -101,7 +101,7 @@ ACTION gamebaccarat::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         require_auth(existing->dealer);
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
-            INLINE_ACTION_SENDER(gamebaccarat, pausetabledea)
+            INLINE_ACTION_SENDER(mallard, pausetabledea)
             (
                 _self, {{existing->dealer, "active"_n}},
                 {existing->tableId});
@@ -133,7 +133,7 @@ ACTION gamebaccarat::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     }
 }
 
-ACTION gamebaccarat::serverseed(uint64_t tableId, checksum256 encodeSeed)
+ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -149,7 +149,7 @@ ACTION gamebaccarat::serverseed(uint64_t tableId, checksum256 encodeSeed)
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
-            INLINE_ACTION_SENDER(gamebaccarat, pausetablesee)
+            INLINE_ACTION_SENDER(mallard, pausetablesee)
             (
                 _self, {{serveraccount, "active"_n}},
                 {existing->tableId});
@@ -206,7 +206,7 @@ ACTION gamebaccarat::serverseed(uint64_t tableId, checksum256 encodeSeed)
     // txn.send(deferred_id, _self, false);
 }
 
-ACTION gamebaccarat::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush)
+ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush)
 {
     require_auth(player);
     require_auth(serveraccount);
@@ -256,7 +256,7 @@ ACTION gamebaccarat::playerbet(uint64_t tableId, name player, asset betDealer, a
     if (depositAmount > init_asset_empty)
     {
         name use_code;
-        for(auto p:gamebaccarat::symOptions)
+        for(auto p:mallard::symOptions)
         {
             if(p.symName == existing->amontSymbol)
             {
@@ -288,7 +288,7 @@ ACTION gamebaccarat::playerbet(uint64_t tableId, name player, asset betDealer, a
 }
 
 // server defer action: end bet
-ACTION gamebaccarat::endbet(uint64_t tableId)
+ACTION mallard::endbet(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -303,7 +303,7 @@ ACTION gamebaccarat::endbet(uint64_t tableId)
     });
 }
 
-ACTION gamebaccarat::verdealeseed(uint64_t tableId, string seed)
+ACTION mallard::verdealeseed(uint64_t tableId, string seed)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -321,7 +321,7 @@ ACTION gamebaccarat::verdealeseed(uint64_t tableId, string seed)
 }
 
 // Server push defer 3' action, once got ROUND_REVEAL.
-ACTION gamebaccarat::verserveseed(uint64_t tableId, string seed)
+ACTION mallard::verserveseed(uint64_t tableId, string seed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -339,11 +339,11 @@ ACTION gamebaccarat::verserveseed(uint64_t tableId, string seed)
     {
         eosio::print("Dealer trusteeship, don't need dealer seed.");
     }
-    // non-trustee server, so table_round is waiting for ACTION::gamebaccarat::dealerseed until dealer reconnect.
-    // TODO Can be considered: auto trustee server until dealer reconnect and ACTION::gamebaccarat::exitruteship.
+    // non-trustee server, so table_round is waiting for ACTION::mallard::dealerseed until dealer reconnect.
+    // TODO Can be considered: auto trustee server until dealer reconnect and ACTION::mallard::exitruteship.
     else if (!existing->dSeedVerity)
     { // dealer disconnect notify
-        INLINE_ACTION_SENDER(gamebaccarat, disconnecthi)
+        INLINE_ACTION_SENDER(mallard, disconnecthi)
         (
             _self, {{serveraccount, "active"_n}},
             {existing->dealer, existing->tableId});
@@ -487,7 +487,7 @@ ACTION gamebaccarat::verserveseed(uint64_t tableId, string seed)
         if (pBonus > init_asset_empty)
         {
             name use_code;
-            for(auto p:gamebaccarat::symOptions)
+            for(auto p:mallard::symOptions)
             {
                 if(p.symName == existing->amontSymbol)
                 {
@@ -546,7 +546,7 @@ ACTION gamebaccarat::verserveseed(uint64_t tableId, string seed)
     });
 }
 
-ACTION gamebaccarat::trusteeship(uint64_t tableId)
+ACTION mallard::trusteeship(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -557,7 +557,7 @@ ACTION gamebaccarat::trusteeship(uint64_t tableId)
     });
 }
 
-ACTION gamebaccarat::exitruteship(uint64_t tableId)
+ACTION mallard::exitruteship(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -568,7 +568,7 @@ ACTION gamebaccarat::exitruteship(uint64_t tableId)
     });
 }
 
-ACTION gamebaccarat::disconnecthi(name informed, uint64_t tableId)
+ACTION mallard::disconnecthi(name informed, uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -578,7 +578,7 @@ ACTION gamebaccarat::disconnecthi(name informed, uint64_t tableId)
     eosio::print("SC disconnecthi has already informed :", informed.to_string());
 }
 
-ACTION gamebaccarat::erasingdata(uint64_t key)
+ACTION mallard::erasingdata(uint64_t key)
 {
     require_auth(_self);
     if (key == -1)
@@ -613,7 +613,7 @@ ACTION gamebaccarat::erasingdata(uint64_t key)
     }
 }
 
-ACTION gamebaccarat::pausetabledea(uint64_t tableId)
+ACTION mallard::pausetabledea(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -624,7 +624,7 @@ ACTION gamebaccarat::pausetabledea(uint64_t tableId)
     });
 }
 
-ACTION gamebaccarat::pausetablesee(uint64_t tableId)
+ACTION mallard::pausetablesee(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -635,7 +635,7 @@ ACTION gamebaccarat::pausetablesee(uint64_t tableId)
     });
 }
 
-ACTION gamebaccarat::continuetable(uint64_t tableId)
+ACTION mallard::continuetable(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -647,7 +647,7 @@ ACTION gamebaccarat::continuetable(uint64_t tableId)
     });
 }
 
-ACTION gamebaccarat::closetable(uint64_t tableId)
+ACTION mallard::closetable(uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -655,7 +655,7 @@ ACTION gamebaccarat::closetable(uint64_t tableId)
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't close!");
 
     name use_code;
-    for(auto p:gamebaccarat::symOptions)
+    for(auto p:mallard::symOptions)
     {
         if(p.symName == existing->amontSymbol)
         {
@@ -675,7 +675,7 @@ ACTION gamebaccarat::closetable(uint64_t tableId)
     });
 }
 
-ACTION gamebaccarat::depositable(name dealer, uint64_t tableId, asset deposit)
+ACTION mallard::depositable(name dealer, uint64_t tableId, asset deposit)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -683,7 +683,7 @@ ACTION gamebaccarat::depositable(name dealer, uint64_t tableId, asset deposit)
     eosio_assert(deposit >= existing->minTableDeposit, "Table deposit is not enough!");
 
     name use_code;
-    for(auto p:gamebaccarat::symOptions)
+    for(auto p:mallard::symOptions)
     {
         if(p.symName == existing->amontSymbol)
         {
@@ -701,14 +701,14 @@ ACTION gamebaccarat::depositable(name dealer, uint64_t tableId, asset deposit)
     // automate recover the table round.
     if(existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED)
     {
-        INLINE_ACTION_SENDER(gamebaccarat, continuetable)
+        INLINE_ACTION_SENDER(mallard, continuetable)
         (
             _self, {{existing->dealer, "active"_n}},
             {existing->tableId});
     }
 }
 
-ACTION gamebaccarat::dealerwitdaw(uint64_t tableId, asset withdraw)
+ACTION mallard::dealerwitdaw(uint64_t tableId, asset withdraw)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -716,7 +716,7 @@ ACTION gamebaccarat::dealerwitdaw(uint64_t tableId, asset withdraw)
     eosio_assert((existing->dealerBalance - withdraw) > existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
 
     name use_code;
-    for(auto p:gamebaccarat::symOptions)
+    for(auto p:mallard::symOptions)
     {
         if(p.symName == existing->amontSymbol)
         {
@@ -733,7 +733,7 @@ ACTION gamebaccarat::dealerwitdaw(uint64_t tableId, asset withdraw)
     });
 }
 
-ACTION gamebaccarat::changeprivat(bool isPrivate, uint64_t tableId)
+ACTION mallard::changeprivat(bool isPrivate, uint64_t tableId)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -742,4 +742,4 @@ ACTION gamebaccarat::changeprivat(bool isPrivate, uint64_t tableId)
         s.isPrivate = isPrivate;
     });
 }
-EOSIO_DISPATCH(gamebaccarat, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))
+EOSIO_DISPATCH(mallard, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))
