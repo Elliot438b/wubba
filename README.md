@@ -303,9 +303,19 @@ Add param:
 - string nickname, client allow user to input a nickname just for showing instead of 12 EOS account name.
 
 ### state table: tableround_info modify
-Add param in struct player_info_bet:
+Add fields in struct player_info_bet:
 - name agent, will be used in reveal stage.
 - string nickname, for showing.(do not care about repetition)
+
+### platform commssion
+```math
+platformtotransfer = (pBonus + dBonus)*2/1000
+```
+```
+pBonus = pBonus*998/1000;
+dBonus = dBonus*998/1000;
+```
+> default commission rate of platform: 2/1000
 
 ### agent commission
 Reveal stage, got player-bet obj:
@@ -317,8 +327,9 @@ transfer type(if dBonus>0, agent got commssion):
 ```math
 agenttotransfer = dBonus*5/100
 ```
-> default commission rate of agent: 1/1000
+> default commission rate of agent: 5/100
 
+## v0.7.1 target
 ### alias_info lifetime
 > rules: delete the item obj in "alias_info" when the item inactive for one month.
 
@@ -334,16 +345,6 @@ TODO: add one field "lastoptime" in "alias_info", add one option in SC::erasingd
     - "alias[A]-alias[B]"
     - "alias[A]-alias[B]-gameid-tableid"
 > if alias[B] is not exsit, use B.
-
-### platform commssion
-```math
-platformtotransfer = (pBonus + dBonus)*2/1000
-```
-```
-pBonus = pBonus*998/1000;
-dBonus = dBonus*998/1000;
-```
-> default commission rate of platform: 2/1000
 
 ## v0.8 target
 seed server.
