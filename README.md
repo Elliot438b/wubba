@@ -300,11 +300,12 @@ Insert the alias info into state table "alias-info".
 ### SC::playerbet modify
 Add param: 
 - name agent, client get EOS account by given alias through search the "alias-info".
-- string nickname, client allow user to input a nickname just for showing instead of 12 EOS account name(do not care about repetition).
+- string nickname, client allow user to input a nickname just for showing instead of 12 EOS account name.
 
 ### state table: tableround_info modify
 Add param in struct player_info_bet:
 - name agent, will be used in reveal stage.
+- string nickname, for showing.(do not care about repetition)
 
 ### agent commission
 Reveal stage, got player-bet obj:
