@@ -35,7 +35,6 @@ CONTRACT mallard : public contract
     ACTION closetable(uint64_t tableId);
     ACTION depositable(name dealer, uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
-    ACTION changeprivat(bool isPrivate, uint64_t tableId);
 
     struct card_info
     {
@@ -77,7 +76,7 @@ CONTRACT mallard : public contract
         name dealer;                        // table owner.
         bool trusteeship;                   // table flag.
         bool isPrivate;                     // table flag.
-        asset dealerBalance;                // table filed.
+        asset dealerBalance;                // table field.
         asset oneRoundMaxTotalBet_BP;
         asset minPerBet_BP;
         asset oneRoundMaxTotalBet_Tie;
@@ -87,7 +86,7 @@ CONTRACT mallard : public contract
 
         asset oneRoundDealerMaxPay;
         asset minTableDeposit;
-        symbol amontSymbol;
+        extended_symbol amontSymbol;
         // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
         uint64_t tableStatus;  // round stage.
@@ -186,7 +185,6 @@ CONTRACT mallard : public contract
     using closetable_action = action_wrapper<"closetable"_n, &mallard::closetable>;
     using depositable_action = action_wrapper<"depositable"_n, &mallard::depositable>;
     using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &mallard::dealerwitdaw>;
-    using changeprivat_action = action_wrapper<"changeprivat"_n, &mallard::changeprivat>;
 
     name serveraccount = "useraaaaaaah"_n;
     name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
@@ -203,30 +201,24 @@ CONTRACT mallard : public contract
         sym_info sym_temp;
         sym_temp.id = 0;
         sym_temp.code = "eosio.token"_n;
-        sym_temp.symName = symbol(symbol_code("SYS"), 4);;
+        sym_temp.symName = symbol(symbol_code("SYS"), 4);
+        ;
         tempSym.emplace_back(sym_temp);
 
         sym_temp.id = 1;
         sym_temp.code = "useraaaaaaaj"_n;
-        sym_temp.symName = symbol(symbol_code("TES"), 4);;
+        sym_temp.symName = symbol(symbol_code("TES"), 4);
+        ;
         tempSym.emplace_back(sym_temp);
 
         return tempSym;
     }
 
-//    const asset oneRoundMaxTotalBet_BP_default = asset(1000 * 10000, symbol(symbol_code("SYS"), 4)); //1000
-//    const asset minPerBet_BP_default = asset(100 * 10000, symbol(symbol_code("SYS"), 4));            //100
-//    const asset oneRoundMaxTotalBet_Tie_default = asset(100 * 10000, symbol(symbol_code("SYS"), 4)); //100
-//    const asset minPerBet_Tie_default = asset(1 * 10000, symbol(symbol_code("SYS"), 4));             //1
-//    const asset oneRoundMaxTotalBet_Push_default = asset(50 * 10000, symbol(symbol_code("SYS"), 4)); //50
-//    const asset minPerBet_Push_default = asset(1 * 10000, symbol(symbol_code("SYS"), 4));            //1
-//    const asset init_asset_empty = asset(0, symbol(symbol_code("SYS"), 4));
-
     const char *notableerr = "TableId isn't existing!";
-
     static const std::vector<sym_info> symOptions;
 
     singletable_t tableround;
     WBRNG wbrng;
+    extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 };
 const std::vector<mallard::sym_info> mallard::symOptions = mallard::createSymOptions();
