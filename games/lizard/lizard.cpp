@@ -1,9 +1,6 @@
 #include "lizard.hpp"
 
-
-ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe , asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri
-, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx
-, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
+ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
 {
     require_auth(dealer);
     asset oneRoundMaxTotalBet_bsoe_temp;
@@ -24,23 +21,20 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
     asset deposit_tmp;
 
     bool symbol_exist_flag = false; // flag if user symbol(code,sym) is including in sysconfig(symOptions).
-    for(auto p:lizard::symOptions)
+    for (auto p : lizard::symOptions)
     {
-        if(p.code == code && 0 == p.symName.code().to_string().compare(sym))
+        if (p.code == code && 0 == p.symName.code().to_string().compare(sym))
         { // found, exist
             symbol_exist_flag = true;
         }
     }
     extended_symbol cur_ex_sym = defaultSym;
-    if(symbol_exist_flag)
+    if (symbol_exist_flag)
     {
         cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
     }
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
-    if (oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe > init_asset_empty && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri > init_asset_empty
-        && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum > init_asset_empty && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum > init_asset_empty
-        && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx > init_asset_empty && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom > init_asset_empty
-        && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single > init_asset_empty)
+    if (oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe > init_asset_empty && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri > init_asset_empty && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum > init_asset_empty && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum > init_asset_empty && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx > init_asset_empty && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom > init_asset_empty && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single > init_asset_empty)
     {
         oneRoundMaxTotalBet_bsoe_temp = oneRoundMaxTotalBet_bsoe;
         minPerBet_bsoe_temp = minPerBet_bsoe;
@@ -61,9 +55,12 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
     else
     {
         auto sym_temp = cur_ex_sym.get_symbol();
-        oneRoundMaxTotalBet_bsoe_temp = asset(3000 * 10000, sym_temp);;
-        minPerBet_bsoe_temp = asset(10 * 10000, sym_temp);;
-        oneRoundMaxTotalBet_anytri_temp = asset(400 * 10000, sym_temp);;
+        oneRoundMaxTotalBet_bsoe_temp = asset(3000 * 10000, sym_temp);
+        ;
+        minPerBet_bsoe_temp = asset(10 * 10000, sym_temp);
+        ;
+        oneRoundMaxTotalBet_anytri_temp = asset(400 * 10000, sym_temp);
+        ;
         minPerBet_anytri_temp = asset(0.5 * 10000, sym_temp);
         oneRoundMaxTotalBet_trinum_temp = asset(100 * 10000, sym_temp);
         minPerBet_trinum_temp = asset(0.1 * 10000, sym_temp);
@@ -77,10 +74,10 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
         minPerBet_single_temp = asset(10 * 10000, sym_temp);
         eosio::print(" [deault===deposit limit]");
     }
-    auto diff_max = oneRoundMaxTotalBet_bsoe*2 + oneRoundMaxTotalBet_txx*14 + oneRoundMaxTotalBet_twocom*5*3 + oneRoundMaxTotalBet_single*3;
-    auto pair_nontri_max = oneRoundMaxTotalBet_bsoe*2 + oneRoundMaxTotalBet_pairnum*8 + oneRoundMaxTotalBet_txx*50 + oneRoundMaxTotalBet_twocom*5 + oneRoundMaxTotalBet_single*2;
-    auto tri_max = oneRoundMaxTotalBet_anytri*24 + oneRoundMaxTotalBet_trinum*150 + oneRoundMaxTotalBet_pairnum*8 + oneRoundMaxTotalBet_txx*14 + oneRoundMaxTotalBet_single*1;
-    eosio::print("diff_max=", diff_max," pair_nontri_max=", pair_nontri_max, " tri_max=", tri_max,"   ");
+    auto diff_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_txx * 14 + oneRoundMaxTotalBet_twocom * 5 * 3 + oneRoundMaxTotalBet_single * 3;
+    auto pair_nontri_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_pairnum * 8 + oneRoundMaxTotalBet_txx * 50 + oneRoundMaxTotalBet_twocom * 5 + oneRoundMaxTotalBet_single * 2;
+    auto tri_max = oneRoundMaxTotalBet_anytri * 24 + oneRoundMaxTotalBet_trinum * 150 + oneRoundMaxTotalBet_pairnum * 8 + oneRoundMaxTotalBet_txx * 14 + oneRoundMaxTotalBet_single * 1;
+    eosio::print("diff_max=", diff_max, " pair_nontri_max=", pair_nontri_max, " tri_max=", tri_max, "   ");
 
     oneRoundDealerMaxPay_temp = max(diff_max, pair_nontri_max);
     oneRoundDealerMaxPay_temp = max(oneRoundDealerMaxPay_temp, tri_max);
@@ -90,7 +87,7 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        existing->amontSymbol.get_contract(), {{dealer, "active"_n}},
+        cur_ex_sym.get_contract(), {{dealer, "active"_n}},
         {dealer, _self, deposit, std::string("new:tabledeposit")});
 
     // table init.
@@ -141,8 +138,8 @@ ACTION lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         {
             INLINE_ACTION_SENDER(lizard, pausetabledea)
             (
-                 _self, {{existing->dealer, "active"_n}},
-                 {existing->tableId});
+                _self, {{existing->dealer, "active"_n}},
+                {existing->tableId});
             return;
         }
         // start a new round. table_round init.
@@ -185,8 +182,8 @@ ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
         {
             INLINE_ACTION_SENDER(lizard, pausetablesee)
             (
-                    _self, {{serveraccount, "active"_n}},
-                    {existing->tableId});
+                _self, {{serveraccount, "active"_n}},
+                {existing->tableId});
             return;
         }
         // start a new round. table_round init.
@@ -248,7 +245,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     asset betAmount = init_asset_empty;
     std::vector<bet_info> betAmountVec;
-    bool ret = checkBetOptions(bet, existing->amountSymbol,betAmount, betAmountVec);
+    bool ret = checkBetOptions(bet, existing->amountSymbol.get_symbol(), betAmount, betAmountVec);
     eosio_assert(ret, "name not exist");
     asset player_amount_sum_bsoe = existing->currRoundBetSum_bsoe;
     asset player_amount_sum_anytri = existing->currRoundBetSum_anytri;
@@ -258,20 +255,20 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
     asset player_amount_sum_twocom = existing->currRoundBetSum_twocom;
     asset player_amount_sum_single = existing->currRoundBetSum_single;
 
-    for(auto p : betAmountVec)
+    for (auto p : betAmountVec)
     {
-        if( 0 == p.name.compare("small") || 0 == p.name.compare("big") || 0 == p.name.compare("odd") || 0 == p.name.compare("even") )
+        if (0 == p.name.compare("small") || 0 == p.name.compare("big") || 0 == p.name.compare("odd") || 0 == p.name.compare("even"))
         {
             //eosio::print(" [amount=]",p.amount,"init_asset_empty=",init_asset_empty);
             if (p.amount > init_asset_empty)
             {
                 eosio_assert(p.amount >= existing->minPerBet_bsoe, "bsoe bet is too small!");
-                eosio::print("name=",p.name," [amount=]",p.amount," player_amount_sum_bsoe=",player_amount_sum_bsoe, " ...");
+                eosio::print("name=", p.name, " [amount=]", p.amount, " player_amount_sum_bsoe=", player_amount_sum_bsoe, " ...");
                 player_amount_sum_bsoe += p.amount;
                 eosio_assert(player_amount_sum_bsoe < existing->oneRoundMaxTotalBet_bsoe, "Over the peak of total bet_bsoe amount of this round!");
             }
         }
-        else if( 0 == p.name.compare("anytri") )
+        else if (0 == p.name.compare("anytri"))
         {
             if (p.amount > init_asset_empty)
             {
@@ -280,7 +277,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
                 eosio_assert(player_amount_sum_anytri < existing->oneRoundMaxTotalBet_anytri, "Over the peak of total bet_anytri amount of this round!");
             }
         }
-        else if( 0 == p.name.compare("tri1") || 0 == p.name.compare("tri2") || 0 == p.name.compare("tri3") || 0 == p.name.compare("tri4") || 0 == p.name.compare("tri5") || 0 == p.name.compare("tri6"))
+        else if (0 == p.name.compare("tri1") || 0 == p.name.compare("tri2") || 0 == p.name.compare("tri3") || 0 == p.name.compare("tri4") || 0 == p.name.compare("tri5") || 0 == p.name.compare("tri6"))
         {
             if (p.amount > init_asset_empty)
             {
@@ -289,7 +286,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
                 eosio_assert(player_amount_sum_trinum < existing->oneRoundMaxTotalBet_trinum, "Over the peak of total bet_trinum amount of this round!");
             }
         }
-        else if( string::npos != p.name.find("pair"))
+        else if (string::npos != p.name.find("pair"))
         {
             if (p.amount > init_asset_empty)
             {
@@ -298,7 +295,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
                 eosio_assert(player_amount_sum_pairnum < existing->oneRoundMaxTotalBet_pairnum, "Over the peak of total bet_pairnum amount of this round!");
             }
         }
-        else if( string::npos != p.name.find("total") )
+        else if (string::npos != p.name.find("total"))
         {
             if (p.amount > init_asset_empty)
             {
@@ -307,7 +304,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
                 eosio_assert(player_amount_sum_txx < existing->oneRoundMaxTotalBet_txx, "Over the peak of total bet_txx amount of this round!");
             }
         }
-        else if( string::npos != p.name.find("c") )
+        else if (string::npos != p.name.find("c"))
         {
             if (p.amount > init_asset_empty)
             {
@@ -316,7 +313,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
                 eosio_assert(player_amount_sum_twocom < existing->oneRoundMaxTotalBet_twocom, "Over the peak of total bet_twocom amount of this round!");
             }
         }
-        else if(0 == p.name.compare("s1") || 0 == p.name.compare("s2") || 0 == p.name.compare("s3") || 0 == p.name.compare("s4") || 0 == p.name.compare("s5") || 0 == p.name.compare("s6"))
+        else if (0 == p.name.compare("s1") || 0 == p.name.compare("s2") || 0 == p.name.compare("s3") || 0 == p.name.compare("s4") || 0 == p.name.compare("s5") || 0 == p.name.compare("s6"))
         {
             if (p.amount > init_asset_empty)
             {
@@ -332,7 +329,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
     {
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (
-            existing->amontSymbol.get_contract(), {{player, "active"_n}},
+            existing->amountSymbol.get_contract(), {{player, "active"_n}},
             {player, _self, betAmount, std::string("playerbet")});
     }
 
@@ -352,7 +349,6 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
         s.currRoundBetSum_twocom = player_amount_sum_twocom;
         s.currRoundBetSum_single = player_amount_sum_single;
     });
-
 }
 
 // server defer action: end bet
@@ -425,7 +421,7 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
     auto hash_data = hash.extract_as_byte_array();
     string root_seed_64 = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
     eosio::print(" root_seed_64 : ", root_seed_64, " ");
-   // Split 3 seeds, get dice result.
+    // Split 3 seeds, get dice result.
     std::vector<uint16_t> diceResult_temp;
     auto score = 0;
     auto counter = 0;
@@ -444,12 +440,12 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
     //get roundResult
     std::vector<string> roundResult_temp;
     bool tripe_flag = false;
-    if(diceResult_temp[0] == diceResult_temp[1] && diceResult_temp[0] == diceResult_temp[2])
+    if (diceResult_temp[0] == diceResult_temp[2])
     {
         roundResult_temp.emplace_back("anytri");
         tripe_flag = true;
         char itc[5];
-        sprintf(itc,"%d",diceResult_temp[0]); // transformation, number -> char.
+        sprintf(itc, "%d", diceResult_temp[0]); // transformation, number -> char.
         string tri_name = "tri";
         tri_name += itc;
         roundResult_temp.emplace_back(tri_name);
@@ -460,192 +456,185 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
         signal_name += itc;
         roundResult_temp.emplace_back(signal_name);
     }
-    else if(diceResult_temp[0] == diceResult_temp[1] || diceResult_temp[2] == diceResult_temp[1])
+    else if (diceResult_temp[0] == diceResult_temp[1] || diceResult_temp[2] == diceResult_temp[1])
     {
         char itc[5];
-        sprintf(itc,"%d",diceResult_temp[1]);
+        sprintf(itc, "%d", diceResult_temp[1]);
         string pair_name = "pair";
         pair_name += itc;
         roundResult_temp.emplace_back(pair_name);
 
-        if(diceResult_temp[0] == diceResult_temp[1] && diceResult_temp[1] != diceResult_temp[2])
+        if (diceResult_temp[0] == diceResult_temp[1] && diceResult_temp[1] != diceResult_temp[2])
         {
-            sprintf(itc,"%d%d",diceResult_temp[1],diceResult_temp[2]);
+            sprintf(itc, "%d%d", diceResult_temp[1], diceResult_temp[2]);
             string com_name = "c";
             com_name += itc;
             roundResult_temp.emplace_back(com_name);
 
             string signal_name1 = "s";
-            sprintf(itc,"%d",diceResult_temp[2]);
+            sprintf(itc, "%d", diceResult_temp[2]);
             signal_name1 += itc;
             roundResult_temp.emplace_back(signal_name1);
         }
-        else if(diceResult_temp[1] == diceResult_temp[2] && diceResult_temp[0] != diceResult_temp[1])
+        else if (diceResult_temp[1] == diceResult_temp[2] && diceResult_temp[0] != diceResult_temp[1])
         {
-            sprintf(itc,"%d%d",diceResult_temp[0],diceResult_temp[1]);
+            sprintf(itc, "%d%d", diceResult_temp[0], diceResult_temp[1]);
             string com_name = "c";
             com_name += itc;
             roundResult_temp.emplace_back(com_name);
 
             string signal_name1 = "s";
-            sprintf(itc,"%d",diceResult_temp[0]);
+            sprintf(itc, "%d", diceResult_temp[0]);
             signal_name1 += itc;
             roundResult_temp.emplace_back(signal_name1);
         }
 
         string signal_name = "s";
-        sprintf(itc,"%d",diceResult_temp[1]);
+        sprintf(itc, "%d", diceResult_temp[1]);
         signal_name += itc;
         roundResult_temp.emplace_back(signal_name);
-
     }
-    else if(diceResult_temp[0] != diceResult_temp[1] && diceResult_temp[2] != diceResult_temp[1])
+    else if (diceResult_temp[0] != diceResult_temp[1] && diceResult_temp[2] != diceResult_temp[1])
     {
         char itc[5];
-        sprintf(itc,"%d%d",diceResult_temp[0],diceResult_temp[1]);
+        sprintf(itc, "%d%d", diceResult_temp[0], diceResult_temp[1]);
         string com_name = "c";
         com_name += itc;
         roundResult_temp.emplace_back(com_name);
 
         com_name = "c";
-        sprintf(itc,"%d%d",diceResult_temp[0],diceResult_temp[2]);
+        sprintf(itc, "%d%d", diceResult_temp[0], diceResult_temp[2]);
         com_name += itc;
         roundResult_temp.emplace_back(com_name);
 
         com_name = "c";
-        sprintf(itc,"%d%d",diceResult_temp[1],diceResult_temp[2]);
+        sprintf(itc, "%d%d", diceResult_temp[1], diceResult_temp[2]);
         com_name += itc;
         roundResult_temp.emplace_back(com_name);
 
-        for(auto signal:diceResult_temp)
+        for (auto signal : diceResult_temp)
         {
             string signal_name = "s";
-            sprintf(itc,"%d",signal);
+            sprintf(itc, "%d", signal);
             signal_name += itc;
             roundResult_temp.emplace_back(signal_name);
         }
     }
 
-    if(score >= 11 && score <= 17 && !tripe_flag)
+    if (score >= 11 && score <= 17 && !tripe_flag)
         roundResult_temp.emplace_back("big");
-    else if(score >= 4 && score <= 10 && !tripe_flag)
+    else if (score >= 4 && score <= 10 && !tripe_flag)
         roundResult_temp.emplace_back("small");
 
-    if(score%2 == 1 && !tripe_flag)
+    if (score % 2 == 1 && !tripe_flag)
         roundResult_temp.emplace_back("odd");
-    else if(score%2 == 0 && !tripe_flag)
+    else if (score % 2 == 0 && !tripe_flag)
         roundResult_temp.emplace_back("even");
 
     char itc[15];
-    sprintf(itc,"total%d",score);
+    sprintf(itc, "total%d", score);
     roundResult_temp.emplace_back(itc);
-    for(auto result : roundResult_temp)
+    for (auto result : roundResult_temp)
         eosio::print(" round_result: ", result, " ");
 
     //odds token
-    asset init_asset_empty = asset(0,existing->amountSymbol.get_symbol());
+    asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     std::vector<player_bet_info> tempPlayerVec;
     asset dealerBalance_temp = existing->dealerBalance;
     for (auto playerBet : existing->playerInfo)
     {
         auto pBonus = init_asset_empty;
         auto dBonus = init_asset_empty;
-        // Banker field
         auto pos = playerBet.bet.find(":");
-        //eosio::print("........", bet, " !...");
         auto pos_end = 0;
-        bool winNameFlag = false;
-        while (pos!=string::npos) {
+        while (pos != string::npos)
+        {
             string temp_name = playerBet.bet.substr(pos_end + 2, pos - pos_end - 3);
-            winNameFlag = false;
-            for (auto j : roundResult_temp) {
-                if (j == temp_name) {
+            bool bet_match_result = false;
+            for (auto j : roundResult_temp)
+            {
+                if (j == temp_name)
+                {
                     eosio::print("temp_name:", temp_name, " ...");
-                    winNameFlag = true;
+                    bet_match_result = true;
                 }
             }
 
-            pos_end = playerBet.bet.find(",",pos);
-            string temp_amount;
-            if(pos_end != -1)
+            pos_end = playerBet.bet.find(",", pos);
+            if (pos_end == -1)
             {
-                temp_amount = playerBet.bet.substr(pos + 3, pos_end - pos - 4);
+                pos_end = playerBet.bet.find("}", pos);
             }
-            else
-            {
-                pos_end = playerBet.bet.find("}",pos);
-                temp_amount = playerBet.bet.substr(pos + 3, pos_end - pos - 4);
-            }
+            string temp_amount = playerBet.bet.substr(pos + 3, pos_end - pos - 4);
             auto amount = from_string(temp_amount, symbol(symbol_code("SYS"), 4));
-           // eosio::print("temp_amount to int:", amount, " ...");
+            eosio::print("temp_amount:[", temp_amount, "] to int:[", amount, "] ...");
             pos = playerBet.bet.find(":", pos_end);
             //odds
-
-            if(winNameFlag) {
+            if (bet_match_result)
+            {
                 if (0 == temp_name.compare("big") || 0 == temp_name.compare("small") || 0 == temp_name.compare("odd") || 0 == temp_name.compare("even") ||
                     0 == temp_name.compare("s1") || 0 == temp_name.compare("s2") || 0 == temp_name.compare("s3") ||
                     0 == temp_name.compare("s4") || 0 == temp_name.compare("s5") || 0 == temp_name.compare("s6"))
                 {
                     pBonus += amount * (1 + 1);
                 }
-                else if(0 == temp_name.compare("c12") || 0 == temp_name.compare("c13") || 0 == temp_name.compare("c14") ||
-                        0 == temp_name.compare("c15") || 0 == temp_name.compare("c16") || 0 == temp_name.compare("c23") ||
-                        0 == temp_name.compare("c24") || 0 == temp_name.compare("c25") || 0 == temp_name.compare("c26") ||
-                        0 == temp_name.compare("c34") || 0 == temp_name.compare("c35") || 0 == temp_name.compare("c36") ||
-                        0 == temp_name.compare("c45") || 0 == temp_name.compare("c46") || 0 == temp_name.compare("c56"))
+                else if (0 == temp_name.compare("c12") || 0 == temp_name.compare("c13") || 0 == temp_name.compare("c14") ||
+                         0 == temp_name.compare("c15") || 0 == temp_name.compare("c16") || 0 == temp_name.compare("c23") ||
+                         0 == temp_name.compare("c24") || 0 == temp_name.compare("c25") || 0 == temp_name.compare("c26") ||
+                         0 == temp_name.compare("c34") || 0 == temp_name.compare("c35") || 0 == temp_name.compare("c36") ||
+                         0 == temp_name.compare("c45") || 0 == temp_name.compare("c46") || 0 == temp_name.compare("c56"))
                 {
                     pBonus += amount * (1 + 5);
                 }
-                else if(0 == temp_name.compare("total9") || 0 == temp_name.compare("total12") ||
-                        0 == temp_name.compare("total10") || 0 == temp_name.compare("total11"))
+                else if (0 == temp_name.compare("total9") || 0 == temp_name.compare("total12") ||
+                         0 == temp_name.compare("total10") || 0 == temp_name.compare("total11"))
                 {
                     pBonus += amount * (1 + 6);
                 }
-                else if(0 == temp_name.compare("total8") || 0 == temp_name.compare("total13") ||
-                        0 == temp_name.compare("pair1") || 0 == temp_name.compare("pair2") ||
-                        0 == temp_name.compare("pair3") || 0 == temp_name.compare("pair4") ||
-                        0 == temp_name.compare("pair5") || 0 == temp_name.compare("pair6"))
+                else if (0 == temp_name.compare("total8") || 0 == temp_name.compare("total13") ||
+                         0 == temp_name.compare("pair1") || 0 == temp_name.compare("pair2") ||
+                         0 == temp_name.compare("pair3") || 0 == temp_name.compare("pair4") ||
+                         0 == temp_name.compare("pair5") || 0 == temp_name.compare("pair6"))
                 {
                     pBonus += amount * (1 + 8);
                 }
-                else if(0 == temp_name.compare("total7") || 0 == temp_name.compare("total14"))
+                else if (0 == temp_name.compare("total7") || 0 == temp_name.compare("total14"))
                 {
                     pBonus += amount * (1 + 12);
                 }
-                else if(0 == temp_name.compare("total6") || 0 == temp_name.compare("total15"))
+                else if (0 == temp_name.compare("total6") || 0 == temp_name.compare("total15"))
                 {
                     pBonus += amount * (1 + 14);
                 }
-                else if(0 == temp_name.compare("total5") || 0 == temp_name.compare("total16"))
+                else if (0 == temp_name.compare("total5") || 0 == temp_name.compare("total16"))
                 {
                     pBonus += amount * (1 + 18);
                 }
-                else if(0 == temp_name.compare("anytri"))
+                else if (0 == temp_name.compare("anytri"))
                 {
                     pBonus += amount * (1 + 24);
                 }
-                else if(0 == temp_name.compare("total4") || 0 == temp_name.compare("total17"))
+                else if (0 == temp_name.compare("total4") || 0 == temp_name.compare("total17"))
                 {
                     pBonus += amount * (1 + 50);
                 }
-                else if(0 == temp_name.compare("tri1") || 0 == temp_name.compare("tri2") ||
-                        0 == temp_name.compare("tri3") || 0 == temp_name.compare("tri4") ||
-                        0 == temp_name.compare("tri5") || 0 == temp_name.compare("tri6"))
+                else if (0 == temp_name.compare("tri1") || 0 == temp_name.compare("tri2") ||
+                         0 == temp_name.compare("tri3") || 0 == temp_name.compare("tri4") ||
+                         0 == temp_name.compare("tri5") || 0 == temp_name.compare("tri6"))
                 {
                     pBonus += amount * (1 + 150);
                 }
             }
             else
                 dBonus += amount;
-
         }
         eosio::print(" [player:", playerBet.player, ", total bonus:", pBonus, "] ");
-
+        eosio::print(" [dealer:", existing->dealer, ", total bonus:", dBonus, "] ");
         if (pBonus > init_asset_empty)
         {
             INLINE_ACTION_SENDER(eosio::token, transfer)
             (
-                existing->amontSymbol.get_contract(), {{_self, "active"_n}},
+                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
                 {_self, playerBet.player, pBonus, std::string("playerbet win")});
         }
         dealerBalance_temp -= pBonus;
@@ -656,11 +645,10 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
     }
 
     char diceResultStr[5];
-    sprintf(diceResultStr,"%d%d%d",diceResult_temp[0],diceResult_temp[1],diceResult_temp[2]);
+    sprintf(diceResultStr, "%d%d%d", diceResult_temp[0], diceResult_temp[1], diceResult_temp[2]);
 
     string roundResultStr = "";
-    char roundResultCh[64];
-    for(auto str : roundResult_temp)
+    for (auto str : roundResult_temp)
     {
         roundResultStr += str;
         roundResultStr += " ";
@@ -785,7 +773,7 @@ ACTION lizard::closetable(uint64_t tableId)
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        existing->amontSymbol.get_contract(), {{_self, "active"_n}},
+        existing->amountSymbol.get_contract(), {{_self, "active"_n}},
         {_self, existing->dealer, existing->dealerBalance, std::string("closetable, withdraw all")});
 
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
@@ -803,13 +791,13 @@ ACTION lizard::depositable(name dealer, uint64_t tableId, asset deposit)
     eosio_assert(deposit >= existing->minTableDeposit, "Table deposit is not enough!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        existing->amontSymbol.get_contract(), {{dealer, "active"_n}},
+        existing->amountSymbol.get_contract(), {{dealer, "active"_n}},
         {dealer, _self, deposit, std::string("re:tabledeposit")});
     tableround.modify(existing, _self, [&](auto &s) {
         s.dealerBalance += deposit;
     });
     // automate recover the table round.
-    if(existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED)
+    if (existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED)
     {
         INLINE_ACTION_SENDER(lizard, continuetable)
         (
@@ -827,7 +815,7 @@ ACTION lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        existing->amontSymbol.get_contract(), {{_self, "active"_n}},
+        existing->amountSymbol.get_contract(), {{_self, "active"_n}},
         {_self, existing->dealer, withdraw, std::string("withdraw")});
     tableround.modify(existing, _self, [&](auto &s) {
         s.dealerBalance -= withdraw;

@@ -77,7 +77,7 @@ ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, 
         s.minPerBet_Push = minPerBet_Push_temp;
         s.oneRoundDealerMaxPay = oneRoundDealerMaxPay_temp;
         s.minTableDeposit = deposit_tmp;
-        s.amontSymbol = cur_ex_sym;
+        s.amountSymbol = cur_ex_sym;
     });
 }
 
@@ -104,7 +104,7 @@ ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
         std::vector<card_info> emptyCards;
-        asset init_asset_empty = asset(0, existing->amontSymbol.get_symbol());
+        asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = 0;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
@@ -152,7 +152,7 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
         std::vector<card_info> emptyCards;
-        asset init_asset_empty = asset(0, existing->amontSymbol.get_symbol());
+        asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = now();
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
@@ -194,7 +194,7 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     eosio_assert((now() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
-    asset init_asset_empty = asset(0, existing->amontSymbol.get_symbol());
+    asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     if (betDealer > init_asset_empty)
         eosio_assert(betDealer >= existing->minPerBet_BP, "Banker bet is too small!");
     if (betPlayer > init_asset_empty)
@@ -237,7 +237,7 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
     {
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (
-            existing->amontSymbol.get_contract(), {{player, "active"_n}},
+            existing->amountSymbol.get_contract(), {{player, "active"_n}},
             {player, _self, depositAmount, std::string("playerbet")});
     }
     player_bet_info temp;
@@ -422,7 +422,7 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed)
     //odds token
     std::vector<player_bet_info> tempPlayerVec;
     asset dealerBalance_temp = existing->dealerBalance;
-    asset init_asset_empty = asset(0, existing->amontSymbol.get_symbol());
+    asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     for (auto playerBet : existing->playerInfo)
     {
         auto pBonus = init_asset_empty;
@@ -459,7 +459,7 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed)
         {
             INLINE_ACTION_SENDER(eosio::token, transfer)
             (
-                existing->amontSymbol.get_contract(), {{_self, "active"_n}},
+                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
                 {_self, playerBet.player, pBonus, std::string("playerbet win")});
         }
         dealerBalance_temp -= pBonus;
@@ -618,10 +618,10 @@ ACTION mallard::closetable(uint64_t tableId)
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        existing->amontSymbol.get_contract(), {{_self, "active"_n}},
+        existing->amountSymbol.get_contract(), {{_self, "active"_n}},
         {_self, existing->dealer, existing->dealerBalance, std::string("closetable, withdraw all")});
 
-    asset init_asset_empty = asset(0, existing->amontSymbol.get_symbol());
+    asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::CLOSED;
         s.dealerBalance = init_asset_empty;
@@ -637,7 +637,7 @@ ACTION mallard::depositable(name dealer, uint64_t tableId, asset deposit)
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        existing->amontSymbol.get_contract(), {{dealer, "active"_n}},
+        existing->amountSymbol.get_contract(), {{dealer, "active"_n}},
         {dealer, _self, deposit, std::string("re:tabledeposit")});
     tableround.modify(existing, _self, [&](auto &s) {
         s.dealerBalance += deposit;
@@ -661,7 +661,7 @@ ACTION mallard::dealerwitdaw(uint64_t tableId, asset withdraw)
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        existing->amontSymbol.get_contract(), {{_self, "active"_n}},
+        existing->amountSymbol.get_contract(), {{_self, "active"_n}},
         {_self, existing->dealer, withdraw, std::string("withdraw")});
     tableround.modify(existing, _self, [&](auto &s) {
         s.dealerBalance -= withdraw;

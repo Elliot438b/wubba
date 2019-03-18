@@ -71,7 +71,7 @@ CONTRACT lizard : public contract
 
         asset oneRoundDealerMaxPay;
         asset minTableDeposit;
-        symbol amountSymbol;
+        extended_symbol amountSymbol;
         // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
         uint64_t tableStatus;  // round stage.
