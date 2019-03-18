@@ -23,34 +23,20 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
     asset oneRoundDealerMaxPay_temp;
     asset deposit_tmp;
 
-    bool useful_symal_flag = false;
+    bool symbol_exist_flag = false; // flag if user symbol(code,sym) is including in sysconfig(symOptions).
     for(auto p:lizard::symOptions)
     {
         if(p.code == code && 0 == p.symName.code().to_string().compare(sym))
-        {
-            useful_symal_flag = true;
+        { // found, exist
+            symbol_exist_flag = true;
         }
     }
-
-    string use_sym;
-    name useful_code;
-    if(useful_symal_flag)
+    extended_symbol cur_ex_sym = defaultSym;
+    if(symbol_exist_flag)
     {
-        use_sym = sym;
-        useful_code = code;
+        cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
     }
-    else
-    {
-        use_sym = "SYS";
-        useful_code = "eosio.token"_n;
-    }
-
-
-    eosio::print(" USE_SYMBOL = ", use_sym, "USE_CODE= ", useful_code," useful_symal_flag =", useful_symal_flag, "  ");
-
-    asset init_asset_empty = asset(0.0000, symbol(symbol_code(use_sym.c_str()), 4));
-
-   // bool symbol_flag_default = false;
+    asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
     if (oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe > init_asset_empty && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri > init_asset_empty
         && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum > init_asset_empty && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum > init_asset_empty
         && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx > init_asset_empty && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom > init_asset_empty
@@ -74,8 +60,7 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
     }
     else
     {
-        //symbol_flag_default = true;
-        auto sym_temp = symbol(symbol_code(use_sym.c_str()), 4);
+        auto sym_temp = cur_ex_sym.get_symbol();
         oneRoundMaxTotalBet_bsoe_temp = asset(3000 * 10000, sym_temp);;
         minPerBet_bsoe_temp = asset(10 * 10000, sym_temp);;
         oneRoundMaxTotalBet_anytri_temp = asset(400 * 10000, sym_temp);;
@@ -92,11 +77,9 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
         minPerBet_single_temp = asset(10 * 10000, sym_temp);
         eosio::print(" [deault===deposit limit]");
     }
-
     auto diff_max = oneRoundMaxTotalBet_bsoe*2 + oneRoundMaxTotalBet_txx*14 + oneRoundMaxTotalBet_twocom*5*3 + oneRoundMaxTotalBet_single*3;
     auto pair_nontri_max = oneRoundMaxTotalBet_bsoe*2 + oneRoundMaxTotalBet_pairnum*8 + oneRoundMaxTotalBet_txx*50 + oneRoundMaxTotalBet_twocom*5 + oneRoundMaxTotalBet_single*2;
     auto tri_max = oneRoundMaxTotalBet_anytri*24 + oneRoundMaxTotalBet_trinum*150 + oneRoundMaxTotalBet_pairnum*8 + oneRoundMaxTotalBet_txx*14 + oneRoundMaxTotalBet_single*1;
-
     eosio::print("diff_max=", diff_max," pair_nontri_max=", pair_nontri_max, " tri_max=", tri_max,"   ");
 
     oneRoundDealerMaxPay_temp = max(diff_max, pair_nontri_max);
@@ -105,16 +88,9 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
 
     eosio_assert(deposit >= deposit_tmp, "Table deposit is not enough!");
 
-//    extended_asset examont = extended_asset(10000, extended_symbol(symbol(symbol_code("SYS"), 4), (useful_code.c_str()_n)));
-//    INLINE_ACTION_SENDER(eosio::token, transfer)
-//    (
-//        examont.contract, {{dealer, "active"_n}},
-//        {dealer, _self, examont.quantity, examont.quantity.to_string()});
-
-
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        useful_code, {{dealer, "active"_n}},
+        existing->amontSymbol.get_contract(), {{dealer, "active"_n}},
         {dealer, _self, deposit, std::string("new:tabledeposit")});
 
     // table init.
@@ -147,7 +123,7 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
         s.currRoundBetSum_txx = init_asset_empty;
         s.currRoundBetSum_twocom = init_asset_empty;
         s.currRoundBetSum_single = init_asset_empty;
-        s.amountSymbol = symbol(symbol_code(use_sym), 4);
+        s.amountSymbol = cur_ex_sym;
     });
 }
 
@@ -172,7 +148,7 @@ ACTION lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         // start a new round. table_round init.
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
-        asset init_asset_empty = asset(0.0000, existing->amountSymbol);
+        asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = 0;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
@@ -216,7 +192,7 @@ ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
         // start a new round. table_round init.
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
-        asset init_asset_empty = asset(0.0000, existing->amountSymbol);
+        asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = now();
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
@@ -247,18 +223,6 @@ ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
             s.betStartTime = now();
         });
     }
-
-    //TODO:defer 30 ,bet->reveal
-    // eosio::transaction txn;
-    // txn.actions.emplace_back(
-    //     permission_level{serveraccount, "active"_n},
-    //     _self,
-    //     "endbet"_n,
-    //     tableId);
-    // txn.delay_sec = 30; //defer 30s
-    // uint128_t deferred_id = (uint128_t(tableId) << 64);
-    // cancel_deferred(deferred_id);
-    // txn.send(deferred_id, _self, false);
 }
 
 ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
@@ -281,7 +245,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
     }
 
     eosio_assert(!flag, "player have bet");
-    asset init_asset_empty = asset(0.0000, existing->amountSymbol);
+    asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     asset betAmount = init_asset_empty;
     std::vector<bet_info> betAmountVec;
     bool ret = checkBetOptions(bet, existing->amountSymbol,betAmount, betAmountVec);
@@ -366,18 +330,9 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
     eosio::print("betAmount:", betAmount, " .........");
     if (betAmount > init_asset_empty)
     {
-        name use_code;
-        for(auto p:lizard::symOptions)
-        {
-            if(p.symName == existing->amountSymbol)
-            {
-                use_code = p.code;
-            }
-        }
-
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (
-            use_code, {{player, "active"_n}},
+            existing->amontSymbol.get_contract(), {{player, "active"_n}},
             {player, _self, betAmount, std::string("playerbet")});
     }
 
@@ -476,7 +431,7 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
     auto counter = 0;
     while (counter < 3)
     {
-        string sub_seed = root_seed_64.substr(counter * 9, 9);
+        string sub_seed = root_seed_64.substr(counter * 21, 21);
         wbrng.srand(SDBMHash((char *)sub_seed.c_str()));
         uint16_t result = wbrng.rand() % 6 + 1;
         score += result;
@@ -494,7 +449,7 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
         roundResult_temp.emplace_back("anytri");
         tripe_flag = true;
         char itc[5];
-        sprintf(itc,"%d",diceResult_temp[0]);
+        sprintf(itc,"%d",diceResult_temp[0]); // transformation, number -> char.
         string tri_name = "tri";
         tri_name += itc;
         roundResult_temp.emplace_back(tri_name);
@@ -588,7 +543,7 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
         eosio::print(" round_result: ", result, " ");
 
     //odds token
-    asset init_asset_empty = asset(0,existing->amountSymbol);
+    asset init_asset_empty = asset(0,existing->amountSymbol.get_symbol());
     std::vector<player_bet_info> tempPlayerVec;
     asset dealerBalance_temp = existing->dealerBalance;
     for (auto playerBet : existing->playerInfo)
@@ -688,18 +643,9 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
 
         if (pBonus > init_asset_empty)
         {
-            name use_code;
-            for(auto p:lizard::symOptions)
-            {
-                if(p.symName == existing->amountSymbol)
-                {
-                    use_code = p.code;
-                }
-            }
-
             INLINE_ACTION_SENDER(eosio::token, transfer)
             (
-                use_code, {{_self, "active"_n}},
+                existing->amontSymbol.get_contract(), {{_self, "active"_n}},
                 {_self, playerBet.player, pBonus, std::string("playerbet win")});
         }
         dealerBalance_temp -= pBonus;
@@ -837,20 +783,12 @@ ACTION lizard::closetable(uint64_t tableId)
     require_auth(existing->dealer);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't close!");
 
-    name use_code;
-    for(auto p:lizard::symOptions)
-    {
-        if(p.symName == existing->amountSymbol)
-        {
-            use_code = p.code;
-        }
-    }
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        use_code, {{_self, "active"_n}},
+        existing->amontSymbol.get_contract(), {{_self, "active"_n}},
         {_self, existing->dealer, existing->dealerBalance, std::string("closetable, withdraw all")});
 
-    asset init_asset_empty = asset(0, existing->amountSymbol);
+    asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::CLOSED;
         s.dealerBalance = init_asset_empty;
@@ -863,17 +801,9 @@ ACTION lizard::depositable(name dealer, uint64_t tableId, asset deposit)
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(dealer);
     eosio_assert(deposit >= existing->minTableDeposit, "Table deposit is not enough!");
-    name use_code;
-    for(auto p:lizard::symOptions)
-    {
-        if(p.symName == existing->amountSymbol)
-        {
-            use_code = p.code;
-        }
-    }
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        use_code, {{dealer, "active"_n}},
+        existing->amontSymbol.get_contract(), {{dealer, "active"_n}},
         {dealer, _self, deposit, std::string("re:tabledeposit")});
     tableround.modify(existing, _self, [&](auto &s) {
         s.dealerBalance += deposit;
@@ -895,17 +825,9 @@ ACTION lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
     require_auth(existing->dealer);
     eosio_assert((existing->dealerBalance - withdraw) > existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
 
-    name use_code;
-    for(auto p:lizard::symOptions)
-    {
-        if(p.symName == existing->amountSymbol)
-        {
-            use_code = p.code;
-        }
-    }
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        use_code, {{_self, "active"_n}},
+        existing->amontSymbol.get_contract(), {{_self, "active"_n}},
         {_self, existing->dealer, withdraw, std::string("withdraw")});
     tableround.modify(existing, _self, [&](auto &s) {
         s.dealerBalance -= withdraw;

@@ -6,7 +6,6 @@
 #include "../../chain/eosio.token.hpp"
 #include <cmath>
 
-
 using namespace eosio;
 using namespace std;
 using std::string;
@@ -19,9 +18,7 @@ CONTRACT lizard : public contract
     lizard(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value) {}
 
-    ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe , asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri
-            , asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx
-            , asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single);
+    ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION endbet(uint64_t tableId);
@@ -49,31 +46,14 @@ CONTRACT lizard : public contract
         EOSLIB_SERIALIZE(player_bet_info, (player)(bet)(pBonus)(dBonus))
     };
 
-    struct bet_info
-    {
-        string name;
-        asset amount;
-
-        EOSLIB_SERIALIZE(bet_info, (name)(amount))
-    };
-
-    struct sym_info
-    {
-        uint16_t id;
-        name code;
-        symbol symName;
-
-        EOSLIB_SERIALIZE(sym_info, (id)(code)(symName))
-    };
-
     TABLE table_stats
     {
         // ------------------------------ table field ------------------------------
-        uint64_t tableId;                   // table fix.
-        name dealer;                        // table owner.
-        bool trusteeship;                   // table flag.
-        bool isPrivate;                     // table flag.
-        asset dealerBalance;                // table field.
+        uint64_t tableId;    // table fix.
+        name dealer;         // table owner.
+        bool trusteeship;    // table flag.
+        bool isPrivate;      // table flag.
+        asset dealerBalance; // table field.
         asset oneRoundMaxTotalBet_bsoe;
         asset minPerBet_bsoe;
         asset oneRoundMaxTotalBet_anytri;
@@ -92,7 +72,7 @@ CONTRACT lizard : public contract
         asset oneRoundDealerMaxPay;
         asset minTableDeposit;
         symbol amountSymbol;
-            // ------------------------------ round field ------------------------------
+        // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
         uint64_t tableStatus;  // round stage.
         asset currRoundBetSum_bsoe;
@@ -131,6 +111,159 @@ CONTRACT lizard : public contract
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, lizard::table_stats, indexed_by<"dealer"_n, const_mem_fun<lizard::table_stats, uint64_t, &lizard::table_stats::get_dealer>>> singletable_t;
+
+    using newtable_action = action_wrapper<"newtable"_n, &lizard::newtable>;
+    using dealerseed_action = action_wrapper<"dealerseed"_n, &lizard::dealerseed>;
+    using serverseed_action = action_wrapper<"serverseed"_n, &lizard::serverseed>;
+    using playerbet_action = action_wrapper<"playerbet"_n, &lizard::playerbet>;
+    using endbet_action = action_wrapper<"endbet"_n, &lizard::endbet>;
+    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &lizard::verdealeseed>;
+    using verserveseed_action = action_wrapper<"verserveseed"_n, &lizard::verserveseed>;
+    using trusteeship_action = action_wrapper<"trusteeship"_n, &lizard::trusteeship>;
+    using exitruteship_action = action_wrapper<"exitruteship"_n, &lizard::exitruteship>;
+    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &lizard::disconnecthi>;
+    using erasingdata_action = action_wrapper<"erasingdata"_n, &lizard::erasingdata>;
+    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &lizard::pausetabledea>;
+    using pausetableser_action = action_wrapper<"pausetablesee"_n, &lizard::pausetablesee>;
+    using continuetable_action = action_wrapper<"continuetable"_n, &lizard::continuetable>;
+    using closetable_action = action_wrapper<"closetable"_n, &lizard::closetable>;
+    using depositable_action = action_wrapper<"depositable"_n, &lizard::depositable>;
+    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &lizard::dealerwitdaw>;
+
+    struct sym_info
+    {
+        uint16_t id;
+        name code;
+        symbol symName;
+
+        EOSLIB_SERIALIZE(sym_info, (id)(code)(symName))
+    };
+
+    static std::vector<sym_info> createSymOptions()
+    {
+        std::vector<sym_info> tempSym;
+
+        sym_info sym_temp;
+        sym_temp.id = 0;
+        sym_temp.code = "eosio.token"_n;
+        sym_temp.symName = symbol(symbol_code("SYS"), 4);
+        ;
+        tempSym.emplace_back(sym_temp);
+
+        sym_temp.id = 1;
+        sym_temp.code = "eosio"_n;
+        sym_temp.symName = symbol(symbol_code("EOS"), 4);
+        ;
+        tempSym.emplace_back(sym_temp);
+
+        return tempSym;
+    }
+
+    struct bet_info
+    {
+        string name;
+        asset amount;
+
+        EOSLIB_SERIALIZE(bet_info, (name)(amount))
+    };
+
+    bool checkBetOptions(string bet, symbol sym, asset & betAmount, std::vector<bet_info> & betVec)
+    {
+        bool result = false;
+
+        auto pos = bet.find(":");
+        auto pos_end = 0;
+        while (pos != string::npos)
+        {
+            string temp_name = bet.substr(pos_end + 2, pos - pos_end - 3);
+            result = false;
+            for (auto j : lizard::betOptions)
+            {
+                if (j == temp_name)
+                {
+                    result = true;
+                }
+            }
+
+            if (!result)
+                return result;
+
+            eosio::print("temp_name:", temp_name, " ...");
+            pos_end = bet.find(",", pos);
+            string temp_amount;
+            if (pos_end == -1)
+            {
+                pos_end = bet.find("}", pos);
+            }
+            temp_amount = bet.substr(pos + 3, pos_end - pos - 4);
+            auto amount = from_string(temp_amount, sym);
+            eosio::print("temp_amount:[", temp_amount, "] to int:[", amount, "] ...");
+            betAmount += amount;
+            bet_info bet_info_temp;
+            bet_info_temp.name = temp_name;
+            bet_info_temp.amount = amount;
+            betVec.emplace_back(bet_info_temp);
+            pos = bet.find(":", pos_end);
+        }
+        return result;
+    }
+
+    static std::vector<string> createBetOptions()
+    {
+        std::vector<string> tempName;
+
+        tempName.emplace_back("big");
+        tempName.emplace_back("small");
+        tempName.emplace_back("odd");
+        tempName.emplace_back("even");
+        tempName.emplace_back("anytri");
+        auto count = 1;
+        while (count <= 6)
+        {
+            string tri_name = "tri";
+            string pair_name = "pair";
+            string signal_name = "s";
+            char itc[3];
+            sprintf(itc, "%d", count);
+            tri_name += itc;
+            pair_name += itc;
+            signal_name += itc;
+            //eosio::print("tri_name:", tri_name, " pair_name:", pair_name, " signal_name:", signal_name, " !");
+            tempName.emplace_back(tri_name);
+            tempName.emplace_back(pair_name);
+            tempName.emplace_back(signal_name);
+            count++;
+        }
+
+        count = 4;
+        while (count <= 17)
+        {
+            string total_name = "total";
+            char itc[3];
+            sprintf(itc, "%d", count);
+            total_name += itc;
+            tempName.emplace_back(total_name);
+            count++;
+        }
+
+        count = 1;
+        for (; count <= 5; count++)
+        {
+            auto j = count + 1;
+            while (j <= 6)
+            {
+                string com_name = "c";
+                char itc[3];
+                sprintf(itc, "%d%d", count, j);
+                com_name += itc;
+                tempName.emplace_back(com_name);
+                j++;
+            }
+        }
+
+        return tempName;
+    };
+
     // std random
     struct WBRNG
     {
@@ -167,7 +300,7 @@ CONTRACT lizard : public contract
         return r;
     }
 
-    asset from_string(string from, symbol sym)
+    asset from_string(string from, symbol sym) // json resolver.
     {
         string s = trim(from);
         auto space_pos = s.find(' ');
@@ -224,7 +357,7 @@ CONTRACT lizard : public contract
             }
             else if (*pstr >= '0' && *pstr <= '9')
             {
-                num2 = num2 * 10 + *pstr -'0';
+                num2 = num2 * 10 + *pstr - '0';
             }
             else
             {
@@ -235,159 +368,17 @@ CONTRACT lizard : public contract
         return (num1 + num2) * (sign);
     }
 
-
-    bool checkBetOptions(string bet, symbol sym, asset &betAmount, std::vector<bet_info> &betVec)
-    {
-        bool result = false;
-
-        auto pos = bet.find(":");
-        auto pos_end = 0;
-        while (pos!=string::npos)
-        {
-            string temp_name = bet.substr(pos_end + 2, pos - pos_end - 3);
-            result = false;
-            for(auto j : lizard::betOptions)
-            {
-                if(j == temp_name)
-                {
-                    result = true;
-                }
-            }
-
-            if(!result)
-                return result;
-
-            eosio::print("temp_name:", temp_name, " ...");
-            pos_end = bet.find(",",pos);
-            string temp_amount;
-            if(pos_end != -1)
-            {
-                temp_amount = bet.substr(pos + 3, pos_end - pos - 4);
-            }
-            else
-            {
-                pos_end = bet.find("}",pos);
-                temp_amount = bet.substr(pos + 3, pos_end - pos - 4);
-            }
-            eosio::print("temp_amount:", temp_amount, " ...");
-            //symbol sysDefault = symbol(symbol_code(sym), 4);
-            auto amount = from_string(temp_amount, sym);
-            eosio::print("temp_amount to int:", amount, " ...");
-            betAmount += amount;
-            bet_info bet_info_temp;
-            bet_info_temp.name = temp_name;
-            bet_info_temp.amount = amount;
-            betVec.emplace_back(bet_info_temp);
-            pos = bet.find(":", pos_end);
-        }
-        return result;
-    }
-
-    using newtable_action = action_wrapper<"newtable"_n, &lizard::newtable>;
-    using dealerseed_action = action_wrapper<"dealerseed"_n, &lizard::dealerseed>;
-    using serverseed_action = action_wrapper<"serverseed"_n, &lizard::serverseed>;
-    using playerbet_action = action_wrapper<"playerbet"_n, &lizard::playerbet>;
-    using endbet_action = action_wrapper<"endbet"_n, &lizard::endbet>;
-    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &lizard::verdealeseed>;
-    using verserveseed_action = action_wrapper<"verserveseed"_n, &lizard::verserveseed>;
-    using trusteeship_action = action_wrapper<"trusteeship"_n, &lizard::trusteeship>;
-    using exitruteship_action = action_wrapper<"exitruteship"_n, &lizard::exitruteship>;
-    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &lizard::disconnecthi>;
-    using erasingdata_action = action_wrapper<"erasingdata"_n, &lizard::erasingdata>;
-    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &lizard::pausetabledea>;
-    using pausetableser_action = action_wrapper<"pausetablesee"_n, &lizard::pausetablesee>;
-    using continuetable_action = action_wrapper<"continuetable"_n, &lizard::continuetable>;
-    using closetable_action = action_wrapper<"closetable"_n, &lizard::closetable>;
-    using depositable_action = action_wrapper<"depositable"_n, &lizard::depositable>;
-    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &lizard::dealerwitdaw>;
+    static const std::vector<string> betOptions;
+    static const std::vector<sym_info> symOptions;
+    singletable_t tableround;
+    WBRNG wbrng;
 
     name serveraccount = "useraaaaaaah"_n;
     name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
-
     const uint32_t betPeriod = 30;
     const uint32_t minTableRounds = 2;
-
-    static std::vector<sym_info> createSymOptions()
-    {
-        std::vector<sym_info> tempSym;
-
-        sym_info sym_temp;
-        sym_temp.id = 0;
-        sym_temp.code = "eosio.token"_n;
-        sym_temp.symName = symbol(symbol_code("SYS"), 4);;
-        tempSym.emplace_back(sym_temp);
-
-        sym_temp.id = 1;
-        sym_temp.code = "eosio"_n;
-        sym_temp.symName = symbol(symbol_code("EOS"), 4);;
-        tempSym.emplace_back(sym_temp);
-
-        return tempSym;
-    }
-
-    static std::vector<string> createBetOptions()
-    {
-        std::vector<string> tempName;
-
-        tempName.emplace_back("big");
-        tempName.emplace_back("small");
-        tempName.emplace_back("odd");
-        tempName.emplace_back("even");
-        tempName.emplace_back("anytri");
-        auto count = 1;
-        while(count <= 6)
-        {
-            string tri_name = "tri";
-            string pair_name = "pair";
-            string signal_name = "s";
-            char itc[3];
-            sprintf(itc,"%d",count);
-            tri_name += itc;
-            pair_name += itc;
-            signal_name += itc;
-            //eosio::print("tri_name:", tri_name, " pair_name:", pair_name, " signal_name:", signal_name, " !");
-            tempName.emplace_back(tri_name);
-            tempName.emplace_back(pair_name);
-            tempName.emplace_back(signal_name);
-            count ++;
-        }
-
-        count = 4;
-        while(count <= 17)
-        {
-            string total_name = "total";
-            char itc[3];
-            sprintf(itc,"%d",count);
-            total_name += itc;
-            tempName.emplace_back(total_name);
-            count ++;
-        }
-
-        count = 1;
-        for(; count <= 5; count ++)
-        {
-            auto j = count + 1;
-            while(j <= 6)
-            {
-                string com_name = "c";
-                char itc[3];
-                sprintf(itc,"%d%d",count,j);
-                com_name += itc;
-                tempName.emplace_back(com_name);
-                j++;
-            }
-        }
-
-        return tempName;
-    };
-
-    static const std::vector<string> betOptions;
-    static const std::vector<sym_info> symOptions;
-
     const char *notableerr = "TableId isn't existing!";
-
-    singletable_t tableround;
-    WBRNG wbrng;
+    extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 };
 const std::vector<string> lizard::betOptions = lizard::createBetOptions();
 const std::vector<lizard::sym_info> lizard::symOptions = lizard::createSymOptions();
