@@ -38,7 +38,6 @@ CONTRACT lizard : public contract
     ACTION closetable(uint64_t tableId);
     ACTION depositable(name dealer, uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
-    ACTION changeprivat(bool isPrivate, uint64_t tableId);
 
     struct player_bet_info
     {
@@ -74,7 +73,7 @@ CONTRACT lizard : public contract
         name dealer;                        // table owner.
         bool trusteeship;                   // table flag.
         bool isPrivate;                     // table flag.
-        asset dealerBalance;                // table filed.
+        asset dealerBalance;                // table field.
         asset oneRoundMaxTotalBet_bsoe;
         asset minPerBet_bsoe;
         asset oneRoundMaxTotalBet_anytri;
@@ -301,7 +300,6 @@ CONTRACT lizard : public contract
     using closetable_action = action_wrapper<"closetable"_n, &lizard::closetable>;
     using depositable_action = action_wrapper<"depositable"_n, &lizard::depositable>;
     using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &lizard::dealerwitdaw>;
-    using changeprivat_action = action_wrapper<"changeprivat"_n, &lizard::changeprivat>;
 
     name serveraccount = "useraaaaaaah"_n;
     name platfrmacnt = "useraaaaaaah"_n; // platform commission account.

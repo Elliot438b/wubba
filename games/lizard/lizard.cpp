@@ -912,14 +912,4 @@ ACTION lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
     });
 }
 
-ACTION lizard::changeprivat(bool isPrivate, uint64_t tableId)
-{
-    auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer);
-    tableround.modify(existing, _self, [&](auto &s) {
-        s.isPrivate = isPrivate;
-    });
-}
-
-EOSIO_DISPATCH(lizard, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(changeprivat))
+EOSIO_DISPATCH(lizard, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw))
