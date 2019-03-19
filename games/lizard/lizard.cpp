@@ -222,7 +222,7 @@ ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     }
 }
 
-ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
+ACTION lizard::playerbet(uint64_t tableId, name player, string bet, name agent, string nickname)
 {
     require_auth(player);
     require_auth(serveraccount);
@@ -338,6 +338,8 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet)
     temp.bet = bet;
     temp.pBonus = init_asset_empty;
     temp.dBonus = init_asset_empty;
+    temp.agent = agent;
+    temp.nickname = nickname;
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
@@ -630,6 +632,37 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
         }
         eosio::print(" [player:", playerBet.player, ", total bonus:", pBonus, "] ");
         eosio::print(" [dealer:", existing->dealer, ", total bonus:", dBonus, "] ");
+        asset platformtotransfer = (pBonus + dBonus)*2/1000;
+        if (platformtotransfer > init_asset_empty)
+        {
+            INLINE_ACTION_SENDER(eosio::token, transfer)
+            (
+                 existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                 {_self, platformaccount, platformtotransfer, std::string("platform odds")});
+        }
+        pBonus = pBonus*998/1000;
+        dBonus = dBonus*998/1000;
+
+        asset agenttransfer = init_asset_empty;
+        auto existalias = tablealias.find(playerBet.agent.value);
+        if(existalias != tablealias.end() && playerBet.agent != existing->dealer)
+        {
+            agenttransfer = dBonus*5/100;
+            if (agenttransfer > init_asset_empty)
+            {
+                INLINE_ACTION_SENDER(eosio::token, transfer)
+                (
+                        existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                        {_self, playerBet.agent, agenttransfer, std::string("agent odds")});
+            }
+        }
+
+        if(agenttransfer > init_asset_empty)
+            dBonus -= agenttransfer;
+
+        eosio::print(" ===[player:", playerBet.player, ", total bonus:", pBonus, "] ");
+        eosio::print(" ===[dealer:", existing->dealer, ", total bonus:", dBonus, "] ");
+
         if (pBonus > init_asset_empty)
         {
             INLINE_ACTION_SENDER(eosio::token, transfer)
@@ -637,6 +670,7 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
                 existing->amountSymbol.get_contract(), {{_self, "active"_n}},
                 {_self, playerBet.player, pBonus, std::string("playerbet win")});
         }
+
         dealerBalance_temp -= pBonus;
         dealerBalance_temp += dBonus;
         playerBet.pBonus = pBonus;
@@ -822,4 +856,15 @@ ACTION lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
     });
 }
 
-EOSIO_DISPATCH(lizard, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw))
+ACTION lizard::pushaliasnam(string alias, name account)
+{
+    auto existing = tablealias.find(account.value);
+    eosio_assert(existing == tablealias.end(), "account exist...");
+    require_auth(account);
+
+    tablealias.emplace(_self, [&](auto &s) {
+        s.alias = alias;
+        s.account = account;
+    });
+}
+EOSIO_DISPATCH(lizard, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam))

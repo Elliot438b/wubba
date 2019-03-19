@@ -16,13 +16,13 @@ CONTRACT lizard : public contract
     using contract::contract;
 
     lizard(name receiver, name code, datastream<const char *> ds)
-        : contract(receiver, code, ds), tableround(receiver, receiver.value) {}
+        : contract(receiver, code, ds), tableround(receiver, receiver.value), tablealias(receiver, receiver.value) {}
 
     ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION endbet(uint64_t tableId);
-    ACTION playerbet(uint64_t tableId, name player, string bet);
+    ACTION playerbet(uint64_t tableId, name player, string bet, name agent, string nickname);
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
     ACTION trusteeship(uint64_t tableId);
@@ -35,6 +35,7 @@ CONTRACT lizard : public contract
     ACTION closetable(uint64_t tableId);
     ACTION depositable(name dealer, uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
+    ACTION pushaliasnam(string alias, name account);
 
     struct player_bet_info
     {
@@ -42,8 +43,10 @@ CONTRACT lizard : public contract
         string bet;
         asset pBonus;
         asset dBonus;
+        name agent;
+        string nickname;
 
-        EOSLIB_SERIALIZE(player_bet_info, (player)(bet)(pBonus)(dBonus))
+        EOSLIB_SERIALIZE(player_bet_info, (player)(bet)(pBonus)(dBonus)(agent)(nickname))
     };
 
     TABLE table_stats
@@ -110,7 +113,19 @@ CONTRACT lizard : public contract
         EOSLIB_SERIALIZE(table_stats, (tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_bsoe)(minPerBet_bsoe)(oneRoundMaxTotalBet_anytri)(minPerBet_anytri)(oneRoundMaxTotalBet_trinum)(minPerBet_trinum)(oneRoundMaxTotalBet_pairnum)(minPerBet_pairnum)(oneRoundMaxTotalBet_txx)(minPerBet_txx)(oneRoundMaxTotalBet_twocom)(minPerBet_twocom)(oneRoundMaxTotalBet_single)(minPerBet_single)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(betStartTime)(tableStatus)(currRoundBetSum_bsoe)(currRoundBetSum_anytri)(currRoundBetSum_trinum)(currRoundBetSum_pairnum)(currRoundBetSum_txx)(currRoundBetSum_twocom)(currRoundBetSum_single)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(diceResult))
     };
 
+    TABLE alias_info
+    {
+        name account;
+        string alias;
+
+        uint64_t primary_key() const { return account.value; }
+
+        EOSLIB_SERIALIZE(alias_info, (account)(alias))
+    };
+
+
     typedef eosio::multi_index<"tablesinfo"_n, lizard::table_stats, indexed_by<"dealer"_n, const_mem_fun<lizard::table_stats, uint64_t, &lizard::table_stats::get_dealer>>> singletable_t;
+    typedef eosio::multi_index<"aliasinfo"_n, lizard::alias_info> aliasinfos;
 
     using newtable_action = action_wrapper<"newtable"_n, &lizard::newtable>;
     using dealerseed_action = action_wrapper<"dealerseed"_n, &lizard::dealerseed>;
@@ -129,6 +144,7 @@ CONTRACT lizard : public contract
     using closetable_action = action_wrapper<"closetable"_n, &lizard::closetable>;
     using depositable_action = action_wrapper<"depositable"_n, &lizard::depositable>;
     using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &lizard::dealerwitdaw>;
+    using pushaliasnam_action = action_wrapper<"pushaliasnam"_n, &lizard::pushaliasnam>;
 
     struct sym_info
     {
@@ -371,10 +387,14 @@ CONTRACT lizard : public contract
     static const std::vector<string> betOptions;
     static const std::vector<sym_info> symOptions;
     singletable_t tableround;
+    aliasinfos tablealias;
+
     WBRNG wbrng;
 
     name serveraccount = "useraaaaaaah"_n;
     name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
+    name platformaccount = "useraaaaaaae"_n;
+
     const uint32_t betPeriod = 30;
     const uint32_t minTableRounds = 2;
     const char *notableerr = "TableId isn't existing!";

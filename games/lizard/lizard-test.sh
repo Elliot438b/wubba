@@ -18,6 +18,8 @@ temptest)
     eosio-cpp -abigen lizard.cpp -o lizard.wasm
     cleos --wallet-url http://127.0.0.1:6666 set contract game12lizard ./ lizard.wasm lizard.abi
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '[useraaaaaaab,"4000.0000 SYS", 1, "eosio.token", "SYS", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard pushaliasnam '["wls", "useraaaaaaah"]' -p useraaaaaaah
+
     tableid=`cleos get table game12lizard game12lizard tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
     #for((num=1;num<=1;num++));
@@ -33,9 +35,12 @@ temptest)
     sleep 3s
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard playerbet '['$tableid',useraaaaaaac,"{\"small\": \"2.6000 SYS\",\"total6\": \"3.5000 SYS\",\"tri2\": \"2.0000 SYS\"}"]' -p useraaaaaaac useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard playerbet '['$tableid',useraaaaaaad,"{\"big\": \"2.6001 SYS\",\"total9\": \"3.5001 SYS\",\"tri2\": \"2.0000 SYS\"}"]' -p useraaaaaaad useraaaaaaah
+    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard playerbet '['$tableid',useraaaaaaac,"{\"small\": \"2.6000 SYS\",\"total6\": \"3.5000 SYS\",\"tri2\": \"2.0000 SYS\"}", "useraaaaaaah", "王丽"]' -p useraaaaaaac useraaaaaaah
+    #cleos --wallet-url http://127.0.0.1:6666 push action game12lizard playerbet '['$tableid',useraaaaaaad,"{\"big\": \"2.6001 SYS\",\"total9\": \"3.5001 SYS\",\"tri2\": \"2.0000 SYS\"}"]' -p useraaaaaaad useraaaaaaah
     cleos get table game12lizard game12lizard tablesinfo -L $tableid -U $tableid
+
+    cleos get table game12lizard game12lizard aliasinfo
+
     sleep 36s
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard endbet '['$tableid']' -p useraaaaaaah
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard verdealeseed '['$tableid',10]' -p useraaaaaaab

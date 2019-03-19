@@ -1,18 +1,18 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Mar 14 18:26:06 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Mar 19 14:13:55 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
-            "name": "changeprivat",
+            "name": "alias_info",
             "base": "",
             "fields": [
                 {
-                    "name": "isPrivate",
-                    "type": "bool"
+                    "name": "account",
+                    "type": "name"
                 },
                 {
-                    "name": "tableId",
-                    "type": "uint64"
+                    "name": "alias",
+                    "type": "string"
                 }
             ]
         },
@@ -123,6 +123,20 @@
                 {
                     "name": "tableId",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "extended_symbol",
+            "base": "",
+            "fields": [
+                {
+                    "name": "symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "contract",
+                    "type": "name"
                 }
             ]
         },
@@ -247,6 +261,14 @@
                 {
                     "name": "dBonus",
                     "type": "asset"
+                },
+                {
+                    "name": "agent",
+                    "type": "name"
+                },
+                {
+                    "name": "nickname",
+                    "type": "string"
                 }
             ]
         },
@@ -265,6 +287,28 @@
                 {
                     "name": "bet",
                     "type": "string"
+                },
+                {
+                    "name": "agent",
+                    "type": "name"
+                },
+                {
+                    "name": "nickname",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "pushaliasnam",
+            "base": "",
+            "fields": [
+                {
+                    "name": "alias",
+                    "type": "string"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
                 }
             ]
         },
@@ -372,7 +416,7 @@
                 },
                 {
                     "name": "amountSymbol",
-                    "type": "symbol"
+                    "type": "extended_symbol"
                 },
                 {
                     "name": "betStartTime",
@@ -490,11 +534,6 @@
     "types": [],
     "actions": [
         {
-            "name": "changeprivat",
-            "type": "changeprivat",
-            "ricardian_contract": ""
-        },
-        {
             "name": "closetable",
             "type": "closetable",
             "ricardian_contract": ""
@@ -560,6 +599,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "pushaliasnam",
+            "type": "pushaliasnam",
+            "ricardian_contract": ""
+        },
+        {
             "name": "serverseed",
             "type": "serverseed",
             "ricardian_contract": ""
@@ -581,6 +625,13 @@
         }
     ],
     "tables": [
+        {
+            "name": "aliasinfo",
+            "type": "alias_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
         {
             "name": "tablesinfo",
             "type": "table_stats",
