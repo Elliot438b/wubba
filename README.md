@@ -380,9 +380,7 @@ TABLE shuffle_info
 - 增加参数 commission_rate_agent 和 commission_rate_player （这两个参数没有默认值），均有dealer设置
 - oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_tie + oneRoundMaxTotalBet_bp + oneRoundMaxTotalBet_push)*(comission_rate_platform_default + commission_rate_agent + commission_rate_player);
 
-### add sc::edittable(uint64_t tableId, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
-                      asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
-                      asset oneRoundMaxTotalBet_push, asset minPerBet_push)
+### add sc::edittable(uint64_t tableId, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,asset oneRoundMaxTotalBet_push, asset minPerBet_push)
 
 ## 反佣逻辑
 - player/agent/platform 反佣全部由dealerbalance出资
