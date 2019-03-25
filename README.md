@@ -330,24 +330,25 @@ agenttotransfer = dBonus*5/100
 > default commission rate of agent: 5/100
 
 ## v0.8 target
-## 洗牌:mallard
-#### 修改table_state
+### 1.shuffle(mallard)
+#### table status modify
 ```enum class status_fields : uint64_t
         {
             ROUND_START = 1,
             ROUND_BET = 2,
             ROUND_REVEAL = 4,
             ROUND_END = 0,
-            ROUND_SHUFFLE = 6,
+            ROUND_SHUFFLE = 6, // shuffle stage for mallard game.
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
 ```
-#### verserverseed修改
-- (validCardVec.size() <= CardsMinLimit)
+#### sc::verserverseed modify
+reveal stage, end of this sc:
+- if (validCardVec.size() <= CardsMinLimit)
     - tableStatus = ROUND_SHUFFLE;
 
-#### add table shuffle_info
+#### add state table: shuffle_info
 ```
 TABLE shuffle_info
     {
@@ -359,32 +360,40 @@ TABLE shuffle_info
     };
 ```
 
-#### table_stats表中增加cardboot字段
-#### 将开奖流程单独提取出来
-
+#### table_stats add a field: cardboot(init/default with 1)
+#### abstract the reveal logic as a function, used by normal workflow and shuffle 3 non-bet workflow.
 #### add sc::shuffle
-- 初始化416张牌
-- 随机生成416以内的随机数，并获取validCardVec中对应的牌的点数
-- 随机抽取上一步中对应点数的牌数 并删除
-- 删除shufflez_info中对应tableId的数据
-- 开奖三次，并把对应的结果保存到shuffle_info表中
-- table_stats对应的cardboot字段加一，并将tableStatus = ROUND_END
+- Re construct 416 size vector.
+- Random one card, according to the point of this card, random the same amount cards and delete them.
+- Empty the item of current tableId in table:shuffle_info.
+- Call reveal function 3 times without bet and settlement. Storage the result into table:shuffle_info.
+- table_stats->cardboot +1;
+- tableStatus = ROUND_END;
 
-## 桌属性
-### 增加默认常量
-    - 最小抵押额 minPerBet_default = ”0.10000 SYS“
-    - comission_rate_platform_default = 2/1000
+### 2.table fields(two games)
+#### add global const var:
+- minPerBet_default = "0.1000 SYS"
+- comission_rate_platform_default = 2/1000
 
-### newtable
-- 修改原来所有 min max参数，都没有默认值（代码中判断 只要有一个为0 就中assert中断）,并且最小的min跟minPerBet_default进行判断
-- 增加参数 commission_rate_agent 和 commission_rate_player （这两个参数没有默认值），均有dealer设置
-- oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_tie + oneRoundMaxTotalBet_bp + oneRoundMaxTotalBet_push)*(comission_rate_platform_default + commission_rate_agent + commission_rate_player);
+#### newtable
+- Delete all the default value of params with "min" and "max", which set by dealer. Assert the params' value >0 and assert the mininum value must great than or equal to **minPerBet_default**.
+- Add two agent related params, which have no default value and set by dealer, >=0:
+    - commission_rate_agent
+    - commission_rate_player
+- mallard::oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_tie + oneRoundMaxTotalBet_bp + oneRoundMaxTotalBet_push)*(comission_rate_platform_default + commission_rate_agent + commission_rate_player);
+- lizard::oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_bsoe + oneRoundMaxTotalBet_anytri + oneRoundMaxTotalBet_trinum + oneRoundMaxTotalBet_pairnum + oneRoundMaxTotalBet_txx + oneRoundMaxTotalBet_twocom + oneRoundMaxTotalBet_single)*(comission_rate_platform_default + commission_rate_agent + commission_rate_player);
 
-### add sc::edittable(uint64_t tableId, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,asset oneRoundMaxTotalBet_push, asset minPerBet_push)
+#### add sc::edittable
+- mallard: uint64_t tableId, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,asset oneRoundMaxTotalBet_push, asset minPerBet_push
+- lizard: uint64_t tableId, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single
 
-## 反佣逻辑
-- player/agent/platform 反佣全部由dealerbalance出资
+### 3.commission logic
+SC::playerbet add a commission settlement logic:
+- player/agent/platform, all paid by the banker(**dealerBalance**).
 
+---
+
+# NOTE
 ## spreadcode
 ### alias_info lifetime
 > rules: delete the item obj in "alias_info" when the item inactive for one month.
