@@ -329,7 +329,10 @@ agenttotransfer = dBonus*5/100
 ```
 > default commission rate of agent: 5/100
 
-## v0.7.1 target
+## v0.8 target
+
+
+## spreadcode
 ### alias_info lifetime
 > rules: delete the item obj in "alias_info" when the item inactive for one month.
 
@@ -346,9 +349,7 @@ TODO: add one field "lastoptime" in "alias_info", add one option in SC::erasingd
     - "alias[A]-alias[B]-gameid-tableid"
 > if alias[B] is not exsit, use B.
 
-## v0.8 target
-seed server.
-
+## seed server
 Nodejs-based server-side executable program load balanced with localDB.
 
 ### data structure
@@ -374,8 +375,7 @@ seedHash | result of hash seed
 - Use dealerseed to reveal when serverseed not exsit.
 - Return all bet amount when no one seed in reveal stage. (both dealer seed and server seed are not exsit)
 
-## v0.9 target
-### random result uniform distribution
+## random result uniform distribution
 - Need a big data analysis model by python script. 
 - Adjust variate of the solution to obtain a best result.
 - Seed source.
