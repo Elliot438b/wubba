@@ -372,15 +372,17 @@ TABLE shuffle_info
 
 ## 桌属性
 ### 增加默认常量
-    - 最小抵押额 minPerBet_default
+    - 最小抵押额 minPerBet_default = ”0.10000 SYS“
     - comission_rate_platform_default = 2/1000
 
 ### newtable
-- 修改原来所有 min max参数，都没有默认值（代码中判断 只要有一个为0 就中asset中断）
-- 增加参数 commission_rate_agent 和 commission_rate_player （这两个参数没有默认值）
-- oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_Push_temp * 11 * 2 + max(oneRoundMaxTotalBet_BP_temp * 1, oneRoundMaxTotalBet_Tie_temp * 8) + delerbalance*(comission_rate_platform_default + commission_rate_agent + commission_rate_player);
+- 修改原来所有 min max参数，都没有默认值（代码中判断 只要有一个为0 就中assert中断）,并且最小的min跟minPerBet_default进行判断
+- 增加参数 commission_rate_agent 和 commission_rate_player （这两个参数没有默认值），均有dealer设置
+- oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_tie + oneRoundMaxTotalBet_bp + oneRoundMaxTotalBet_push)*(comission_rate_platform_default + commission_rate_agent + commission_rate_player);
 
-### add sc::edittable(uint64_t tableId)
+### add sc::edittable(uint64_t tableId, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
+                      asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
+                      asset oneRoundMaxTotalBet_push, asset minPerBet_push)
 
 ## 反佣逻辑
 - player/agent/platform 反佣全部由dealerbalance出资
