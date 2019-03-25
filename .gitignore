@@ -5,5 +5,6 @@ chain/output.log
 chain/wallet/
 chain/xxx.pwd
 cmake-build-debug
+test/.~lock.*
 test/.~lock.testcase.xlsx#
 test/.~lock.lizard_testcase.xlsx#
