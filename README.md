@@ -330,7 +330,7 @@ agenttotransfer = dBonus*5/100
 > default commission rate of agent: 5/100
 
 ## v0.8 target
-## 洗牌
+## 洗牌:mallard
 #### 修改table_state
 ```enum class status_fields : uint64_t
         {
@@ -344,7 +344,7 @@ agenttotransfer = dBonus*5/100
         };
 ```
 #### verserverseed修改
-- (validCardVec.size() <= CardsMinLimit) && (tableStatus = ROUND_END)
+- (validCardVec.size() <= CardsMinLimit)
     - tableStatus = ROUND_SHUFFLE;
 
 #### add table shuffle_info
