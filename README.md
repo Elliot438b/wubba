@@ -329,7 +329,7 @@ agenttotransfer = dBonus*5/100
 ```
 > default commission rate of agent: 5/100
 
-## v0.8 target
+## v0.7.1 target
 ### 1.shuffle(mallard)
 #### table status modify
 ```enum class status_fields : uint64_t
