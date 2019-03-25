@@ -330,7 +330,60 @@ agenttotransfer = dBonus*5/100
 > default commission rate of agent: 5/100
 
 ## v0.8 target
+## 洗牌
+#### 修改table_state
+```enum class status_fields : uint64_t
+        {
+            ROUND_START = 1,
+            ROUND_BET = 2,
+            ROUND_REVEAL = 4,
+            ROUND_END = 0,
+            ROUND_SUFFER = 6,
+            PAUSED = 3, // must be changed under ROUND_END status.
+            CLOSED = 5
+        };
+```
+#### verserverseed修改
+- (validCardVec.size() <= CardsMinLimit) && (tableStatus = ROUND_END)
+    - tableStatus = ROUND_SHUFFLE;
 
+#### add table shuffle_info
+```
+TABLE shuffle_info
+    {
+        uint64_t tableId;
+        uint64_t roundNum;
+        string roundResult;
+        std::vector<card_info> playerHands;
+        std::vector<card_info> bankerHands;
+    };
+```
+
+#### table_stats表中增加cardboot字段
+#### 将开奖流程单独提取出来
+
+#### add sc::shuffle
+- 初始化416张牌
+- 随机生成416以内的随机数，并获取validCardVec中对应的牌的点数
+- 随机抽取上一步中对应点数的牌数 并删除
+- 删除shufflez_info中对应tableId的数据
+- 开奖三次，并把对应的结果保存到shuffle_info表中
+- table_stats对应的cardboot字段加一，并将tableStatus = ROUND_END
+
+## 桌属性
+### 增加默认常量
+    - 最小抵押额 minPerBet_default
+    - comission_rate_platform_default = 2/1000
+
+### newtable
+- 修改原来所有 min max参数，都没有默认值（代码中判断 只要有一个为0 就中asset中断）
+- 增加参数 commission_rate_agent 和 commission_rate_player （这两个参数没有默认值）
+- oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_Push_temp * 11 * 2 + max(oneRoundMaxTotalBet_BP_temp * 1, oneRoundMaxTotalBet_Tie_temp * 8) + delerbalance*(comission_rate_platform_default + commission_rate_agent + commission_rate_player);
+
+### add sc::edittable(uint64_t tableId)
+
+## 反佣逻辑
+- player/agent/platform 反佣全部由dealerbalance出资
 
 ## spreadcode
 ### alias_info lifetime
