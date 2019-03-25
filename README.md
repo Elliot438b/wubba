@@ -338,7 +338,7 @@ agenttotransfer = dBonus*5/100
             ROUND_BET = 2,
             ROUND_REVEAL = 4,
             ROUND_END = 0,
-            ROUND_SUFFER = 6,
+            ROUND_SHUFFLE = 6,
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
