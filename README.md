@@ -379,7 +379,7 @@ TABLE shuffle_info
 
 #### newtable
 - Delete all the default value of params with "min" and "max", which set by dealer. Assert the params' value >0 and assert the mininum value must great than or equal to **minPerBet_default**.
-- Add two agent related params, which have no default value and set by dealer, >=0:
+- Add two agent related params, which have no default value and set by dealer, >=0, storage them into 'tablesinfo':
     - commission_rate_agent
     - commission_rate_player
 - mallard::oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_tie + oneRoundMaxTotalBet_bp + oneRoundMaxTotalBet_push)*(comission_rate_platform_default + commission_rate_agent + commission_rate_player);
