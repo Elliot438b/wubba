@@ -372,8 +372,10 @@ TABLE shuffle_info
 
 ### 2.table fields(two games)
 #### add global const var:
-- minPerBet_default = "0.1000 SYS"
 - comission_rate_platform_default = 2/1000
+
+#### modify sym_info
+- add one field: **minPerBet_default**
 
 #### newtable
 - Delete all the default value of params with "min" and "max", which set by dealer. Assert the params' value >0 and assert the mininum value must great than or equal to **minPerBet_default**.
