@@ -18,7 +18,7 @@ CONTRACT lizard : public contract
     lizard(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value), tablealias(receiver, receiver.value) {}
 
-    ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single);
+    ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION endbet(uint64_t tableId);
@@ -36,6 +36,7 @@ CONTRACT lizard : public contract
     ACTION depositable(name dealer, uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
     ACTION pushaliasnam(string alias, name account);
+    ACTION edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single);
 
     struct player_bet_info
     {
@@ -75,6 +76,8 @@ CONTRACT lizard : public contract
         asset oneRoundDealerMaxPay;
         asset minTableDeposit;
         extended_symbol amountSymbol;
+        double commission_rate_agent;
+        double commission_rate_player;
         // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
         uint64_t tableStatus;  // round stage.
@@ -110,7 +113,7 @@ CONTRACT lizard : public contract
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_bsoe)(minPerBet_bsoe)(oneRoundMaxTotalBet_anytri)(minPerBet_anytri)(oneRoundMaxTotalBet_trinum)(minPerBet_trinum)(oneRoundMaxTotalBet_pairnum)(minPerBet_pairnum)(oneRoundMaxTotalBet_txx)(minPerBet_txx)(oneRoundMaxTotalBet_twocom)(minPerBet_twocom)(oneRoundMaxTotalBet_single)(minPerBet_single)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(betStartTime)(tableStatus)(currRoundBetSum_bsoe)(currRoundBetSum_anytri)(currRoundBetSum_trinum)(currRoundBetSum_pairnum)(currRoundBetSum_txx)(currRoundBetSum_twocom)(currRoundBetSum_single)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(diceResult))
+        EOSLIB_SERIALIZE(table_stats, (tableId)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_bsoe)(minPerBet_bsoe)(oneRoundMaxTotalBet_anytri)(minPerBet_anytri)(oneRoundMaxTotalBet_trinum)(minPerBet_trinum)(oneRoundMaxTotalBet_pairnum)(minPerBet_pairnum)(oneRoundMaxTotalBet_txx)(minPerBet_txx)(oneRoundMaxTotalBet_twocom)(minPerBet_twocom)(oneRoundMaxTotalBet_single)(minPerBet_single)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(commission_rate_agent)(commission_rate_player)(betStartTime)(tableStatus)(currRoundBetSum_bsoe)(currRoundBetSum_anytri)(currRoundBetSum_trinum)(currRoundBetSum_pairnum)(currRoundBetSum_txx)(currRoundBetSum_twocom)(currRoundBetSum_single)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(diceResult))
     };
 
     TABLE alias_info
@@ -151,8 +154,9 @@ CONTRACT lizard : public contract
         uint16_t id;
         name code;
         symbol symName;
+        asset minPerBet_default;
 
-        EOSLIB_SERIALIZE(sym_info, (id)(code)(symName))
+        EOSLIB_SERIALIZE(sym_info, (id)(code)(symName)(minPerBet_default))
     };
 
     static std::vector<sym_info> createSymOptions()
@@ -163,13 +167,13 @@ CONTRACT lizard : public contract
         sym_temp.id = 0;
         sym_temp.code = "eosio.token"_n;
         sym_temp.symName = symbol(symbol_code("SYS"), 4);
-        ;
+        sym_temp.minPerBet_default = asset(1000, sym_temp.symName);
         tempSym.emplace_back(sym_temp);
 
         sym_temp.id = 1;
-        sym_temp.code = "eosio"_n;
-        sym_temp.symName = symbol(symbol_code("EOS"), 4);
-        ;
+        sym_temp.code = "useraaaaaaaj"_n;
+        sym_temp.symName = symbol(symbol_code("TES"), 4);
+        sym_temp.minPerBet_default = asset(1000, sym_temp.symName);
         tempSym.emplace_back(sym_temp);
 
         return tempSym;
@@ -397,6 +401,7 @@ CONTRACT lizard : public contract
 
     const uint32_t betPeriod = 30;
     const uint32_t minTableRounds = 2;
+    float comission_rate_platform_default = 0.005;
     const char *notableerr = "TableId isn't existing!";
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 };

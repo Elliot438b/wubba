@@ -17,7 +17,7 @@ temptest)
     echo "temptest"
     eosio-cpp -abigen lizard.cpp -o lizard.wasm
     cleos --wallet-url http://127.0.0.1:6666 set contract game12lizard ./ lizard.wasm lizard.abi
-    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '[useraaaaaaab,"4000.0000 SYS", 1, "eosio.token", "SYS", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '[useraaaaaaab,"4000.0000 SYS", 1, "eosio.token", "SYS", "0.5000", "0.2000", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard pushaliasnam '["wls", "useraaaaaaah"]' -p useraaaaaaah
 
     tableid=`cleos get table game12lizard game12lizard tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
@@ -48,6 +48,7 @@ temptest)
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard verserveseed '['$tableid',704]' -p useraaaaaaah
     cleos get table game12lizard game12lizard tablesinfo -L $tableid -U $tableid
 
+    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard edittable '['$tableid', 1, "eosio.token", "SYS", "0.8000", "0.2000", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
    # cleos --wallet-url http://127.0.0.1:6666 push action game12lizard dealerwitdaw '['$tableid', "20.0000 SYS"]' -p useraaaaaaab
    # cleos get table game12lizard game12lizard tablesinfo -L $tableid -U $tableid
 

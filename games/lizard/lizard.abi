@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Tue Mar 19 14:13:55 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Mar 27 17:31:31 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -97,6 +97,92 @@
             ]
         },
         {
+            "name": "edittable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "isPrivate",
+                    "type": "bool"
+                },
+                {
+                    "name": "code",
+                    "type": "name"
+                },
+                {
+                    "name": "sym",
+                    "type": "string"
+                },
+                {
+                    "name": "commission_rate_agent",
+                    "type": "string"
+                },
+                {
+                    "name": "commission_rate_player",
+                    "type": "string"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_single",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
             "name": "endbet",
             "base": "",
             "fields": [
@@ -162,6 +248,14 @@
                 },
                 {
                     "name": "sym",
+                    "type": "string"
+                },
+                {
+                    "name": "commission_rate_agent",
+                    "type": "string"
+                },
+                {
+                    "name": "commission_rate_player",
                     "type": "string"
                 },
                 {
@@ -419,6 +513,14 @@
                     "type": "extended_symbol"
                 },
                 {
+                    "name": "commission_rate_agent",
+                    "type": "float64"
+                },
+                {
+                    "name": "commission_rate_player",
+                    "type": "float64"
+                },
+                {
                     "name": "betStartTime",
                     "type": "uint64"
                 },
@@ -561,6 +663,11 @@
         {
             "name": "disconnecthi",
             "type": "disconnecthi",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "edittable",
+            "type": "edittable",
             "ricardian_contract": ""
         },
         {

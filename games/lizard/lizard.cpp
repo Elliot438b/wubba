@@ -1,22 +1,10 @@
 #include "lizard.hpp"
 
-ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
+ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
 {
     require_auth(dealer);
-    asset oneRoundMaxTotalBet_bsoe_temp;
-    asset minPerBet_bsoe_temp;
-    asset oneRoundMaxTotalBet_anytri_temp;
-    asset minPerBet_anytri_temp;
-    asset oneRoundMaxTotalBet_trinum_temp;
-    asset minPerBet_trinum_temp;
-    asset oneRoundMaxTotalBet_pairnum_temp;
-    asset minPerBet_pairnum_temp;
-    asset oneRoundMaxTotalBet_txx_temp;
-    asset minPerBet_txx_temp;
-    asset oneRoundMaxTotalBet_twocom_temp;
-    asset minPerBet_twocom_temp;
-    asset oneRoundMaxTotalBet_single_temp;
-    asset minPerBet_single_temp;
+
+    asset minPerBet_default_temp;
     asset oneRoundDealerMaxPay_temp;
     asset deposit_tmp;
 
@@ -26,6 +14,7 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
         if (p.code == code && 0 == p.symName.code().to_string().compare(sym))
         { // found, exist
             symbol_exist_flag = true;
+            minPerBet_default_temp = p.minPerBet_default;
         }
     }
     extended_symbol cur_ex_sym = defaultSym;
@@ -34,53 +23,23 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
         cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
     }
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
-    if (oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe > init_asset_empty && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri > init_asset_empty && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum > init_asset_empty && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum > init_asset_empty && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx > init_asset_empty && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom > init_asset_empty && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single > init_asset_empty)
-    {
-        oneRoundMaxTotalBet_bsoe_temp = oneRoundMaxTotalBet_bsoe;
-        minPerBet_bsoe_temp = minPerBet_bsoe;
-        oneRoundMaxTotalBet_anytri_temp = oneRoundMaxTotalBet_anytri;
-        minPerBet_anytri_temp = minPerBet_anytri;
-        oneRoundMaxTotalBet_trinum_temp = oneRoundMaxTotalBet_trinum;
-        minPerBet_trinum_temp = minPerBet_trinum;
-        oneRoundMaxTotalBet_pairnum_temp = oneRoundMaxTotalBet_pairnum;
-        minPerBet_pairnum_temp = minPerBet_pairnum;
-        oneRoundMaxTotalBet_txx_temp = oneRoundMaxTotalBet_txx;
-        minPerBet_txx_temp = minPerBet_txx;
-        oneRoundMaxTotalBet_twocom_temp = oneRoundMaxTotalBet_twocom;
-        minPerBet_twocom_temp = minPerBet_twocom;
-        oneRoundMaxTotalBet_single_temp = oneRoundMaxTotalBet_single;
-        minPerBet_single_temp = minPerBet_single;
-        eosio::print(" [userset===deposit limit]");
-    }
-    else
-    {
-        auto sym_temp = cur_ex_sym.get_symbol();
-        oneRoundMaxTotalBet_bsoe_temp = asset(3000 * 10000, sym_temp);
-        ;
-        minPerBet_bsoe_temp = asset(10 * 10000, sym_temp);
-        ;
-        oneRoundMaxTotalBet_anytri_temp = asset(400 * 10000, sym_temp);
-        ;
-        minPerBet_anytri_temp = asset(0.5 * 10000, sym_temp);
-        oneRoundMaxTotalBet_trinum_temp = asset(100 * 10000, sym_temp);
-        minPerBet_trinum_temp = asset(0.1 * 10000, sym_temp);
-        oneRoundMaxTotalBet_pairnum_temp = asset(1000 * 10000, sym_temp);
-        minPerBet_pairnum_temp = asset(1 * 10000, sym_temp);
-        oneRoundMaxTotalBet_txx_temp = asset(500 * 10000, sym_temp);
-        minPerBet_txx_temp = asset(0.5 * 10000, sym_temp);
-        oneRoundMaxTotalBet_twocom_temp = asset(1500 * 10000, sym_temp);
-        minPerBet_twocom_temp = asset(1 * 10000, sym_temp);
-        oneRoundMaxTotalBet_single_temp = asset(3000 * 10000, sym_temp);
-        minPerBet_single_temp = asset(10 * 10000, sym_temp);
-        eosio::print(" [deault===deposit limit]");
-    }
+    eosio_assert(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe > minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri > minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum > minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum > minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx > minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom > minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
+
+    auto temp_rate_agent = Atof(commission_rate_agent.c_str());
+    //temp_rate_agent = Round(temp_rate_agent, 4);
+
+    auto temp_rate_player = Atof(commission_rate_player.c_str());
+    //temp_rate_player = Round(temp_rate_player, 4);
+
     auto diff_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_txx * 14 + oneRoundMaxTotalBet_twocom * 5 * 3 + oneRoundMaxTotalBet_single * 3;
     auto pair_nontri_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_pairnum * 8 + oneRoundMaxTotalBet_txx * 50 + oneRoundMaxTotalBet_twocom * 5 + oneRoundMaxTotalBet_single * 2;
     auto tri_max = oneRoundMaxTotalBet_anytri * 24 + oneRoundMaxTotalBet_trinum * 150 + oneRoundMaxTotalBet_pairnum * 8 + oneRoundMaxTotalBet_txx * 14 + oneRoundMaxTotalBet_single * 1;
+
     eosio::print("diff_max=", diff_max, " pair_nontri_max=", pair_nontri_max, " tri_max=", tri_max, "   ");
 
     oneRoundDealerMaxPay_temp = max(diff_max, pair_nontri_max);
     oneRoundDealerMaxPay_temp = max(oneRoundDealerMaxPay_temp, tri_max);
+    oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_bsoe + oneRoundMaxTotalBet_anytri + oneRoundMaxTotalBet_trinum + oneRoundMaxTotalBet_pairnum + oneRoundMaxTotalBet_txx + oneRoundMaxTotalBet_twocom + oneRoundMaxTotalBet_single)*(comission_rate_platform_default + temp_rate_agent + temp_rate_player);
     deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
 
     eosio_assert(deposit >= deposit_tmp, "Table deposit is not enough!");
@@ -97,20 +56,20 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
         s.dealer = dealer;
         s.dealerBalance = deposit;
         s.isPrivate = isPrivate;
-        s.oneRoundMaxTotalBet_bsoe = oneRoundMaxTotalBet_bsoe_temp;
-        s.minPerBet_bsoe = minPerBet_bsoe_temp;
-        s.oneRoundMaxTotalBet_anytri = oneRoundMaxTotalBet_anytri_temp;
-        s.minPerBet_anytri = minPerBet_anytri_temp;
-        s.oneRoundMaxTotalBet_trinum = oneRoundMaxTotalBet_trinum_temp;
-        s.minPerBet_trinum = minPerBet_trinum_temp;
-        s.oneRoundMaxTotalBet_pairnum = oneRoundMaxTotalBet_pairnum_temp;
-        s.minPerBet_pairnum = minPerBet_pairnum_temp;
-        s.oneRoundMaxTotalBet_txx = oneRoundMaxTotalBet_txx_temp;
-        s.minPerBet_txx = minPerBet_txx_temp;
-        s.oneRoundMaxTotalBet_twocom = oneRoundMaxTotalBet_twocom_temp;
-        s.minPerBet_twocom = minPerBet_twocom_temp;
-        s.oneRoundMaxTotalBet_single = oneRoundMaxTotalBet_single_temp;
-        s.minPerBet_single = minPerBet_single_temp;
+        s.oneRoundMaxTotalBet_bsoe = oneRoundMaxTotalBet_bsoe;
+        s.minPerBet_bsoe = minPerBet_bsoe;
+        s.oneRoundMaxTotalBet_anytri = oneRoundMaxTotalBet_anytri;
+        s.minPerBet_anytri = minPerBet_anytri;
+        s.oneRoundMaxTotalBet_trinum = oneRoundMaxTotalBet_trinum;
+        s.minPerBet_trinum = minPerBet_trinum;
+        s.oneRoundMaxTotalBet_pairnum = oneRoundMaxTotalBet_pairnum;
+        s.minPerBet_pairnum = minPerBet_pairnum;
+        s.oneRoundMaxTotalBet_txx = oneRoundMaxTotalBet_txx;
+        s.minPerBet_txx = minPerBet_txx;
+        s.oneRoundMaxTotalBet_twocom = oneRoundMaxTotalBet_twocom;
+        s.minPerBet_twocom = minPerBet_twocom;
+        s.oneRoundMaxTotalBet_single = oneRoundMaxTotalBet_single;
+        s.minPerBet_single = minPerBet_single;
         s.oneRoundDealerMaxPay = oneRoundDealerMaxPay_temp;
         s.minTableDeposit = deposit_tmp;
         s.currRoundBetSum_bsoe = init_asset_empty;
@@ -121,9 +80,78 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
         s.currRoundBetSum_twocom = init_asset_empty;
         s.currRoundBetSum_single = init_asset_empty;
         s.amountSymbol = cur_ex_sym;
+        s.commission_rate_agent = temp_rate_agent;
+        s.commission_rate_player = temp_rate_player;
     });
 }
 
+ACTION lizard::edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
+{
+    auto existing = tableround.find(tableId);
+    eosio_assert(existing != tableround.end(), notableerr);
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
+
+    bool symbol_exist_flag = false; // flag if user symbol(code,sym) is including in sysconfig(symOptions).
+    asset minPerBet_default_temp;
+    for (auto p : lizard::symOptions)
+    {
+        if (p.code == code && 0 == p.symName.code().to_string().compare(sym))
+        { // found, exist
+            symbol_exist_flag = true;
+            minPerBet_default_temp = p.minPerBet_default;
+        }
+    }
+
+    extended_symbol cur_ex_sym = defaultSym;
+    if (symbol_exist_flag)
+    {
+        cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
+    }
+    asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
+    eosio_assert(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe > minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri > minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum > minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum > minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx > minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom > minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
+
+    auto temp_rate_agent = Atof(commission_rate_agent.c_str());
+    //temp_rate_agent = Round(temp_rate_agent, 4);
+
+    auto temp_rate_player = Atof(commission_rate_player.c_str());
+    //temp_rate_player = Round(temp_rate_player, 4);
+
+    auto diff_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_txx * 14 + oneRoundMaxTotalBet_twocom * 5 * 3 + oneRoundMaxTotalBet_single * 3;
+    auto pair_nontri_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_pairnum * 8 + oneRoundMaxTotalBet_txx * 50 + oneRoundMaxTotalBet_twocom * 5 + oneRoundMaxTotalBet_single * 2;
+    auto tri_max = oneRoundMaxTotalBet_anytri * 24 + oneRoundMaxTotalBet_trinum * 150 + oneRoundMaxTotalBet_pairnum * 8 + oneRoundMaxTotalBet_txx * 14 + oneRoundMaxTotalBet_single * 1;
+
+    eosio::print("diff_max=", diff_max, " pair_nontri_max=", pair_nontri_max, " tri_max=", tri_max, "   ");
+
+    auto oneRoundDealerMaxPay_temp = max(diff_max, pair_nontri_max);
+    oneRoundDealerMaxPay_temp = max(oneRoundDealerMaxPay_temp, tri_max);
+    oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_bsoe + oneRoundMaxTotalBet_anytri + oneRoundMaxTotalBet_trinum + oneRoundMaxTotalBet_pairnum + oneRoundMaxTotalBet_txx + oneRoundMaxTotalBet_twocom + oneRoundMaxTotalBet_single)*(comission_rate_platform_default + temp_rate_agent + temp_rate_player);
+    auto deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
+
+    // table modify.
+    tableround.modify(existing, _self, [&](auto &s) {
+        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
+        s.isPrivate = isPrivate;
+        s.oneRoundMaxTotalBet_bsoe = oneRoundMaxTotalBet_bsoe;
+        s.minPerBet_bsoe = minPerBet_bsoe;
+        s.oneRoundMaxTotalBet_anytri = oneRoundMaxTotalBet_anytri;
+        s.minPerBet_anytri = minPerBet_anytri;
+        s.oneRoundMaxTotalBet_trinum = oneRoundMaxTotalBet_trinum;
+        s.minPerBet_trinum = minPerBet_trinum;
+        s.oneRoundMaxTotalBet_pairnum = oneRoundMaxTotalBet_pairnum;
+        s.minPerBet_pairnum = minPerBet_pairnum;
+        s.oneRoundMaxTotalBet_txx = oneRoundMaxTotalBet_txx;
+        s.minPerBet_txx = minPerBet_txx;
+        s.oneRoundMaxTotalBet_twocom = oneRoundMaxTotalBet_twocom;
+        s.minPerBet_twocom = minPerBet_twocom;
+        s.oneRoundMaxTotalBet_single = oneRoundMaxTotalBet_single;
+        s.minPerBet_single = minPerBet_single;
+        s.oneRoundDealerMaxPay = oneRoundDealerMaxPay_temp;
+        s.minTableDeposit = deposit_tmp;
+        s.amountSymbol = cur_ex_sym;
+        s.commission_rate_agent = temp_rate_agent;
+        s.commission_rate_player = temp_rate_player;
+    });
+}
 ACTION lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 {
     auto existing = tableround.find(tableId);
@@ -247,6 +275,39 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, name agent, 
     std::vector<bet_info> betAmountVec;
     bool ret = checkBetOptions(bet, existing->amountSymbol.get_symbol(), betAmount, betAmountVec);
     eosio_assert(ret, "name not exist");
+
+    auto temp_rate_platform = comission_rate_platform_default;
+    asset platformtotransfer = asset(betAmount.amount*comission_rate_platform_default, existing->amountSymbol.get_symbol());
+
+    eosio::print(" sum_bet_amount:", betAmount.amount, " platformtotransfer:", platformtotransfer, " temp_rate_platform:", temp_rate_platform, " ");
+    if (platformtotransfer > init_asset_empty)
+    {
+        INLINE_ACTION_SENDER(eosio::token, transfer)
+        (
+             existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+             {_self, platformaccount, platformtotransfer, std::string("platform odds")});
+    }
+
+    asset agenttransfer = asset(betAmount.amount*existing->commission_rate_agent, existing->amountSymbol.get_symbol());
+
+    eosio::print(" sum_bet_amount:", betAmount, " agenttransfer:", agenttransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
+    if (agenttransfer > init_asset_empty)
+    {
+        INLINE_ACTION_SENDER(eosio::token, transfer)
+        (
+             existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+             {_self, agent, agenttransfer, std::string("platform odds")});
+    }
+    asset playertransfer = asset(betAmount.amount*existing->commission_rate_player, existing->amountSymbol.get_symbol());
+    eosio::print(" sum_bet_amount:", betAmount, " playertransfer:", playertransfer, " commission_rate_player:", existing->commission_rate_player, " ");
+    if (playertransfer > init_asset_empty)
+    {
+        INLINE_ACTION_SENDER(eosio::token, transfer)
+        (
+              existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+              {_self, player, playertransfer, std::string("platform odds")});
+    }
+
     asset player_amount_sum_bsoe = existing->currRoundBetSum_bsoe;
     asset player_amount_sum_anytri = existing->currRoundBetSum_anytri;
     asset player_amount_sum_trinum = existing->currRoundBetSum_trinum;
@@ -340,6 +401,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, name agent, 
     temp.dBonus = init_asset_empty;
     temp.agent = agent;
     temp.nickname = nickname;
+
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
@@ -867,4 +929,4 @@ ACTION lizard::pushaliasnam(string alias, name account)
         s.account = account;
     });
 }
-EOSIO_DISPATCH(lizard, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam))
+EOSIO_DISPATCH(lizard, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam)(edittable))
