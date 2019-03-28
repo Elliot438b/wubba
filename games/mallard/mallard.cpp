@@ -53,11 +53,10 @@ ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, 
         s.tableId = tableround.available_primary_key();
         tableId_temp = s.tableId;
         s.cardBoot = 1;
-        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
+        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_SHUFFLE;
         s.dealer = dealer;
         s.dealerBalance = deposit;
         s.isPrivate = isPrivate;
-        s.first_round_flag = true;
         s.validCardVec = validCardVec_empty;
         s.oneRoundMaxTotalBet_BP = oneRoundMaxTotalBet_bp;
         s.minPerBet_BP = minPerBet_bp;
@@ -146,14 +145,6 @@ ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         }
         // start a new round. table_round init.
         eosio::print(" before===validCardVec.size:", existing->validCardVec.size());
-        bool first_round_flag_tmep = existing->first_round_flag;
-        std::vector<uint16_t> validCardVec_empty;
-        if(existing->first_round_flag)
-        {
-            shuffleFun(tableId, validCardVec_empty);
-            first_round_flag_tmep = false;
-        }
-        eosio::print(" after===validCardVec.size:", validCardVec_empty.size());
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
         std::vector<card_info> emptyCards;
@@ -174,10 +165,6 @@ ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
             s.roundResult = "";
             s.playerHands = emptyCards;
             s.bankerHands = emptyCards;
-            if(existing->first_round_flag) {
-                s.validCardVec = validCardVec_empty;
-                s.first_round_flag = first_round_flag_tmep;
-            }
         });
     }
 }
@@ -201,14 +188,7 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
         }
         // start a new round. table_round init.
         eosio::print(" before===validCardVec.size:", existing->validCardVec.size());
-        bool first_round_flag_tmep = existing->first_round_flag;
-        std::vector<uint16_t> validCardVec_empty;
-        if(existing->first_round_flag)
-        {
-            shuffleFun(tableId, validCardVec_empty);
-            first_round_flag_tmep = false;
-        }
-        eosio::print(" after===validCardVec.size:", validCardVec_empty.size());
+
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
         std::vector<card_info> emptyCards;
@@ -229,10 +209,6 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
             s.roundResult = "";
             s.playerHands = emptyCards;
             s.bankerHands = emptyCards;
-            if(existing->first_round_flag) {
-                s.validCardVec = validCardVec_empty;
-                s.first_round_flag = first_round_flag_tmep;
-            }
         });
     }
     else
