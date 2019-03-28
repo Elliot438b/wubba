@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Mar 27 16:49:16 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Mar 28 16:23:14 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -7,12 +7,12 @@
             "base": "",
             "fields": [
                 {
-                    "name": "account",
-                    "type": "name"
+                    "name": "aliasId",
+                    "type": "uint32"
                 },
                 {
-                    "name": "alias",
-                    "type": "string"
+                    "name": "account",
+                    "type": "name"
                 }
             ]
         },
@@ -328,7 +328,7 @@
                 },
                 {
                     "name": "agent",
-                    "type": "name"
+                    "type": "string"
                 },
                 {
                     "name": "nickname",
@@ -369,8 +369,8 @@
                     "type": "asset"
                 },
                 {
-                    "name": "agent",
-                    "type": "name"
+                    "name": "agentalias",
+                    "type": "string"
                 },
                 {
                     "name": "nickname",
@@ -425,13 +425,17 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "not_use_shuffle",
-                    "type": "shuffle_test_result[]"
+                    "name": "firstCard",
+                    "type": "card_info"
+                },
+                {
+                    "name": "threeResults",
+                    "type": "shuffle_round_result[]"
                 }
             ]
         },
         {
-            "name": "shuffle_test_result",
+            "name": "shuffle_round_result",
             "base": "",
             "fields": [
                 {
@@ -481,10 +485,6 @@
                     "type": "bool"
                 },
                 {
-                    "name": "first_round_flag",
-                    "type": "bool"
-                },
-                {
                     "name": "dealerBalance",
                     "type": "asset"
                 },
@@ -526,11 +526,11 @@
                 },
                 {
                     "name": "commission_rate_agent",
-                    "type": "float64"
+                    "type": "float32"
                 },
                 {
                     "name": "commission_rate_player",
-                    "type": "float64"
+                    "type": "float32"
                 },
                 {
                     "name": "betStartTime",

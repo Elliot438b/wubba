@@ -27,8 +27,8 @@ temptest)
     #test shuffle for baccarat
     echo "temptest"
     eosio-cpp -abigen mallard.cpp -o mallard.wasm
-    #cleos --wallet-url http://127.0.0.1:6666 set contract gamemallards ./ mallard.wasm mallard.abi
-    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '[useraaaaaaab,"23000.0000 TES", 1,"useraaaaaaaj","TES", "0.5000", "0.2000", "1001.0000 TES","100.0000 TES","100.0000 TES","1.0000 TES","50.0000 TES","1.0000 TES"]' -p useraaaaaaab
+    cleos --wallet-url http://127.0.0.1:6666 set contract gamemallards ./ mallard.wasm mallard.abi
+    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '[useraaaaaaab,"4000.0000 TES", 1,"useraaaaaaaj","TES", "0.5000", "0.2000", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaab
     tableid=`cleos get table gamemallards gamemallards tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
     cleos --wallet-url http://127.0.0.1:6666 push action gamemallards shuffle '['$tableid']' -p useraaaaaaab
@@ -49,7 +49,7 @@ temptest)
     cleos --wallet-url http://127.0.0.1:6666 push action gamemallards dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab
     cleos get table gamemallards gamemallards shuffleinfo -L $tableid -U $tableid
     cleos --wallet-url http://127.0.0.1:6666 push action gamemallards serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
-    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaac,"0.0000 TES","200.0000 TES","3.0000 TES","4.0000 TES","3.0000 TES", "useraaaaaaaj", "王帅"]' -p useraaaaaaac useraaaaaaah
+    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaac,"0.0000 TES","2.0000 TES","2.0000 TES","2.0000 TES","2.0000 TES", "wangls", "王帅"]' -p useraaaaaaac useraaaaaaah
     #cleos --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaad,"0.0000 TES","100.0000 TES","0.0000 TES","10.0000 TES","10.0000 TES", "useraaaaaaae", "王帅"]' -p useraaaaaaad useraaaaaaah
 
     sleep 36s
