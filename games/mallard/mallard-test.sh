@@ -31,6 +31,9 @@ temptest)
     cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '[useraaaaaaab,"23000.0000 TES", 1,"useraaaaaaaj","TES", "0.5000", "0.2000", "1001.0000 TES","100.0000 TES","100.0000 TES","1.0000 TES","50.0000 TES","1.0000 TES"]' -p useraaaaaaab
     tableid=`cleos get table gamemallards gamemallards tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
+    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards shuffle '['$tableid']' -p useraaaaaaab
+    cleos get table gamemallards gamemallards shuffleinfo -L $tableid -U $tableid
+    cleos get table gamemallards gamemallards tablesinfo -L $tableid -U $tableid
    # for((num=1;num<=1;num++));
    # do
    #     cleos get table gamemallards gamemallards tablesinfo -L $tableid -U $tableid
