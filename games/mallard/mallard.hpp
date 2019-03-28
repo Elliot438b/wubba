@@ -477,7 +477,6 @@ CONTRACT mallard : public contract
 
         auto sum_p = cardnumber % 10;
         auto count = 0;
-        sum_p = 40;
         while(count < sum_p)
         {
             string sub_seed = root_seed_64.substr(count + 1, 10);
