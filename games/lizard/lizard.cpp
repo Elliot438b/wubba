@@ -247,7 +247,7 @@ ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     }
 }
 
-ACTION lizard::playerbet(uint64_t tableId, name player, string bet, name agent, string nickname)
+ACTION lizard::playerbet(uint64_t tableId, name player, string bet, string agent, string nickname)
 {
     require_auth(player);
     require_auth(serveraccount);
@@ -380,8 +380,8 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, name agent, 
             {_self, platformaccount, platformtotransfer, std::string("platformcommission")});
     }
     // agent
-    auto existalias = tablealias.find(agent);
-    if (existalias != tablealias.end() && agent != existing->dealer)
+    auto existalias = tablealias.find(agent.value);
+    if (existalias != tablealias.end() && existalias != existing->dealer)
     {
         asset agentotransfer = asset(betAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
         eosio::print(" sum_bet_amount:", betAmount, " agentotransfer:", agentotransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
