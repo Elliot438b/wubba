@@ -157,7 +157,6 @@ CONTRACT mallard : public contract
 
     typedef eosio::multi_index<"tablesinfo"_n, mallard::table_stats, indexed_by<"dealer"_n, const_mem_fun<mallard::table_stats, uint64_t, &mallard::table_stats::get_dealer>>> singletable_t;
     typedef eosio::multi_index<"shuffleinfo"_n, mallard::shuffle_info> shuffleinfo_t;
-    //typedef eosio::multi_index<"shuffleinfo"_n, mallard::shuffle_info, indexed_by<"tableId"_n, const_mem_fun<mallard::shuffle_info, uint64_t, &mallard::shuffle_info::get_tableId>>> shuffleinfo_t;
     typedef eosio::multi_index<"aliasinfo"_n, mallard::alias_info> aliasinfos;
 
     using newtable_action = action_wrapper<"newtable"_n, &mallard::newtable>;
@@ -478,9 +477,11 @@ CONTRACT mallard : public contract
 
         auto sum_p = cardnumber % 10;
         auto count = 0;
+        sum_p = 40;
         while(count < sum_p)
         {
-            string sub_seed = root_seed_64.substr(count * 5, 5);
+            string sub_seed = root_seed_64.substr(count + 1, 10);
+            //eosio::print(" =====[sub_seed:", sub_seed, "count:",count+1, "] ");
             wbrng.srand(SDBMHash((char *)sub_seed.c_str()));
             uint64_t pos = wbrng.rand() % cardVec_temp.size();
             uint16_t cardPos = cardVec_temp[pos];
@@ -499,8 +500,9 @@ CONTRACT mallard : public contract
             {
                 toDelCardPosVec.emplace_back(cardPos);
                 eosio::print(" [NewPos:", cardPos, "] ");
-                count++;
             }
+
+            count++;
         }
 
         for (auto i : toDelCardPosVec)

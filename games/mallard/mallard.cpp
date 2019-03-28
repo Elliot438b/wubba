@@ -96,14 +96,14 @@ ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sy
 
     eosio_assert(oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp > minPerBet_default_temp && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie > minPerBet_default_temp && oneRoundMaxTotalBet_push > init_asset_empty && minPerBet_push > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
-    auto temp_rate_platform = Round(comission_rate_platform_default, 4);
+    //auto temp_rate_platform = Round(comission_rate_platform_default, 4);
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
     auto temp_rate_player = Atof(commission_rate_player.c_str());
     // verify the {player, agent} rate can't be set <0
     eosio_assert(temp_rate_agent >= 0 && temp_rate_player >= 0, "Commission rate can't be set negtive!");
 
     asset oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_push * 11 * 2 + max(oneRoundMaxTotalBet_bp * 1, oneRoundMaxTotalBet_tie * 8);
-    oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_tie + oneRoundMaxTotalBet_bp + oneRoundMaxTotalBet_push) * (temp_rate_platform + temp_rate_agent + temp_rate_player);
+    oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_tie + oneRoundMaxTotalBet_bp + oneRoundMaxTotalBet_push) * (comission_rate_platform_default + temp_rate_agent + temp_rate_player);
     asset deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
 
     tableround.modify(existing, _self, [&](auto &s) {
