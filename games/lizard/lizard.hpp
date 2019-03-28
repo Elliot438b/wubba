@@ -3,7 +3,7 @@
 #include <eosiolib/transaction.hpp>
 #include <eosiolib/permission.hpp>
 #include <eosiolib/crypto.hpp>
-#include "../../chain/eosio.token.hpp"
+#include "../../library/eosio.token/eosio.token.hpp"
 #include <cmath>
 
 using namespace eosio;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "eosio.token.hpp"
+#include "../library/eosio.token/eosio.token.hpp"
 #include <eosiolib/crypto.hpp>
 #include <cmath>
 
