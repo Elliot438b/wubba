@@ -17,7 +17,7 @@ CONTRACT mallard : public contract
     using contract::contract;
 
     mallard(name receiver, name code, datastream<const char *> ds)
-        : contract(receiver, code, ds), tableround(receiver, receiver.value), shuffleinfo(receiver, receiver.value), tablealias(receiver, receiver.value) {}
+        : contract(receiver, code, ds), tableround(receiver, receiver.value), tableshuffle(receiver, receiver.value), tablealias(receiver, receiver.value) {}
 
     ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
@@ -126,7 +126,7 @@ CONTRACT mallard : public contract
 
     struct shuffle_round_result
     {
-        uint64_t roundNum;
+        uint64_t roundNum; // {1,2,3}
         string roundResult;
         std::vector<card_info> playerHands;
         std::vector<card_info> bankerHands;
@@ -157,7 +157,7 @@ CONTRACT mallard : public contract
 
     typedef eosio::multi_index<"tablesinfo"_n, mallard::table_stats, indexed_by<"dealer"_n, const_mem_fun<mallard::table_stats, uint64_t, &mallard::table_stats::get_dealer>>> singletable_t;
     typedef eosio::multi_index<"shuffleinfo"_n, mallard::shuffle_info> shuffleinfo_t;
-    typedef eosio::multi_index<"aliasinfo"_n, mallard::alias_info> aliasinfos;
+    typedef eosio::multi_index<"aliasinfo"_n, mallard::alias_info> aliasinfo_t;
 
     using newtable_action = action_wrapper<"newtable"_n, &mallard::newtable>;
     using dealerseed_action = action_wrapper<"dealerseed"_n, &mallard::dealerseed>;
@@ -179,8 +179,6 @@ CONTRACT mallard : public contract
     using shuffle_action = action_wrapper<"shuffle"_n, &mallard::shuffle>;
     using edittable_action = action_wrapper<"edittable"_n, &mallard::edittable>;
     using pushaliasnam_action = action_wrapper<"pushaliasnam"_n, &mallard::pushaliasnam>;
-
-    shuffleinfo_t shuffleinfo;
 
     struct sym_info
     {
@@ -315,7 +313,7 @@ CONTRACT mallard : public contract
         return (num1 + num2) * (sign);
     }
 
-    void reveal(string root_seed, std::vector<uint16_t> validCardVec, std::vector<card_info> & playerHands, std::vector<card_info> & bankerHands, string & roundResult, std::vector<uint16_t> & validCardTemp)
+    void reveal(string root_seed, std::vector<uint16_t> & validCardVec, std::vector<card_info> & playerHands, std::vector<card_info> & bankerHands, string & roundResult)
     {
         // unify 64: root_seed_64.
         checksum256 hash = sha256(root_seed.c_str(), root_seed.size());
@@ -421,7 +419,7 @@ CONTRACT mallard : public contract
         {
             cardVec_temp.emplace_back(i);
         }
-
+        // use timestamp as seed
         string toDelPosSeed = to_string(now());
         checksum256 hash = sha256(toDelPosSeed.c_str(), toDelPosSeed.size());
         auto hash_data = hash.extract_as_byte_array();
@@ -429,12 +427,11 @@ CONTRACT mallard : public contract
         eosio::print(" toDelPosSeed : ", root_seed_64, " ");
 
         std::vector<uint16_t> toDelCardPosVec;
-        // string firstCardSeed = root_seed_64.substr(2, 9);
         wbrng.srand(SDBMHash((char *)root_seed_64.c_str()));
         uint64_t pos = wbrng.rand() % cardVec_temp.size();
-        uint16_t cardPos = cardVec_temp[pos];
-        eosio::print(" firstPos : ", cardPos, " pos:", pos, " ");
+        uint16_t cardPos = cardVec_temp[pos]; // first time, pos == cardPos.
         toDelCardPosVec.emplace_back(cardPos);
+        cardVec_temp.erase(pos);
         uint16_t cardnumber = (cardPos + 1) % 13;
         if (cardnumber == 0)
             cardnumber = 13;
@@ -453,126 +450,56 @@ CONTRACT mallard : public contract
         {
             string sub_seed = root_seed_64.substr(count * 6, 6);
             wbrng.srand(SDBMHash((char *)sub_seed.c_str()));
-            uint64_t pos = wbrng.rand() % cardVec_temp.size();
-            uint16_t cardPos = cardVec_temp[pos];
-            auto ii = 0;
-            while(std::find(toDelCardPosVec.begin(), toDelCardPosVec.end(), cardPos){
-                wbrng.srand(SDBMHash((char *)sub_seed.c_str()) + ii);
-                uint64_t pos = wbrng.rand() % cardVec_temp.size();
-                cardPos = cardVec_temp[pos];
-                ii++;
-            }
+            pos = wbrng.rand() % cardVec_temp.size();
+            cardPos = cardVec_temp[pos];
             toDelCardPosVec.emplace_back(cardPos);
             eosio::print(" [New cardPos to be deleted:", cardPos, "] ");
+            cardVec_temp.erase(pos);
             count++;
         }
 
-        for (auto i : toDelCardPosVec)
-        {
-            for (auto itr = cardVec_temp.begin(); itr != cardVec_temp.end(); itr++)
-            {
-                if (*itr == i)
-                {
-                    itr = cardVec_temp.erase(itr);
-                    eosio::print(" 【erase ", i);
-                }
-                if (itr == cardVec_temp.end())
-                {
-                    break;
-                }
-            }
-            eosio::print(" tem.size ", cardVec_temp.size(), "】");
-        }
-
-        bool tableid_exist_falg = false;
-        auto itr_shuffle = shuffleinfo.find(tableId);
-        if (itr_shuffle != shuffleinfo.end())
-        {
-            tableid_exist_falg = true;
-        }
-
-        count = 1;
+        // 3 times init result. (can't bet)
         std::vector<shuffle_round_result> threeResults_temp;
-        while (count <= 3)
+        for (auto k = 0; k < 3; k++)
         {
             string roundResult;
             std::vector<card_info> bankerHands;
             std::vector<card_info> playerHands;
-            std::vector<uint16_t> validCardTemp;
-
-            reveal(to_string(now()), cardVec_temp, playerHands, bankerHands, roundResult, validCardTemp);
-            cardVec_temp = validCardTemp;
-
+            reveal(to_string(now()), cardVec_temp, playerHands, bankerHands, roundResult);
             shuffle_round_result temp;
             temp.roundNum = count;
             temp.roundResult = roundResult;
             temp.playerHands = playerHands;
             temp.bankerHands = bankerHands;
             threeResults_temp.emplace_back(temp);
-
-            count++;
         }
-
-        if (!tableid_exist_falg)
+        auto itr_shuffle = tableshuffle.find(tableId);
+        if (itr_shuffle != tableshuffle.end())
+        {
+            eosio::print(" [ modify shuffle info (tableid=", tableId, ")] ");
+            tableshuffle.modify(itr_shuffle, _self, [&](auto &s) {
+                s.firstCard = firstCard_temp;
+                s.threeResults = threeResults_temp;
+            });
+        }
+        else
         {
             eosio::print(" [ add shuffle info (tableid=", tableId, ")] ");
-            shuffleinfo.emplace(_self, [&](auto &s) {
+            tableshuffle.emplace(_self, [&](auto &s) {
                 s.tableId = tableId;
                 s.firstCard = firstCard_temp;
                 s.threeResults = threeResults_temp;
             });
         }
-        else
-        {
-            eosio::print(" [ modify shuffle info (tableid=", tableId, ")] ");
-            shuffleinfo.modify(itr_shuffle, _self, [&](auto &s) {
-                s.firstCard = firstCard_temp;
-                s.threeResults = threeResults_temp;
-            });
-        }
-    }
-
-    double Round(double dSrc, int iBit)
-    {
-        double retVal = 0.0;
-        int intTmp = 0;
-
-        // 若保留小数位数不正确
-        if (0 > iBit)
-        {
-            return 0;
-        }
-
-        //  若 为负数
-        if (0 > dSrc)
-        {
-            // 首先转为正数
-            dSrc *= -1;
-
-            intTmp = (int)((dSrc + 0.5 / pow(10.0, iBit)) * pow(10.0, iBit));
-            retVal = (double)intTmp / pow(10.0, iBit);
-
-            // 再转为 负数
-            retVal *= -1;
-        }
-        // 若为非负数
-        else
-        {
-            intTmp = (int)((dSrc + 0.5 / pow(10.0, iBit)) * pow(10.0, iBit));
-            retVal = (double)intTmp / pow(10.0, iBit);
-        }
-
-        return retVal;
     }
 
     static const std::vector<sym_info> symOptions;
     singletable_t tableround;
-    aliasinfos tablealias;
-    //shuffleinfo_t shuffleinfo;
+    aliasinfo_t tablealias;
+    shuffleinfo_t tableshuffle;
     WBRNG wbrng;
 
     name serveraccount = "useraaaaaaah"_n;
-    name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
     name platformaccount = "useraaaaaaae"_n;
 
     const uint16_t CardsMinLimit = 100;

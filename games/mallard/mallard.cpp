@@ -5,7 +5,6 @@ ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, 
                          asset oneRoundMaxTotalBet_push, asset minPerBet_push)
 {
     require_auth(dealer);
-
     bool symbol_exist_flag = false; // flag if user symbol(code,sym) is including in sysconfig(symOptions).
     asset minPerBet_default_temp;
     for (auto p : mallard::symOptions)
@@ -23,14 +22,12 @@ ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, 
     }
 
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
-
     eosio_assert(oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp > minPerBet_default_temp && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie > minPerBet_default_temp && oneRoundMaxTotalBet_push > init_asset_empty && minPerBet_push > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
     //auto temp_rate_platform = Round(comission_rate_platform_default, 4);
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
     auto temp_rate_player = Atof(commission_rate_player.c_str());
     eosio_assert(temp_rate_agent >= 0 && temp_rate_player >= 0, "Commission rate can't be set negtive!");
-
     eosio::print(" temp_rate_platform:", comission_rate_platform_default, " temp_rate_agent:", temp_rate_agent, " temp_rate_player", temp_rate_player);
 
     asset oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_push * 11 * 2 + max(oneRoundMaxTotalBet_bp * 1, oneRoundMaxTotalBet_tie * 8);
@@ -46,10 +43,8 @@ ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, 
         {dealer, _self, deposit, std::string("new:tabledeposit")});
     // table init.
     std::vector<uint16_t> validCardVec_empty;
-    uint64_t tableId_temp;
     tableround.emplace(_self, [&](auto &s) {
         s.tableId = tableround.available_primary_key();
-        tableId_temp = s.tableId;
         s.cardBoot = 1;
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_SHUFFLE;
         s.dealer = dealer;
@@ -70,7 +65,7 @@ ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, 
     });
 }
 
-ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,asset oneRoundMaxTotalBet_push, asset minPerBet_push)
+ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_push, asset minPerBet_push)
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
@@ -294,8 +289,8 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
     {
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (
-             existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-             {_self, platformaccount, platformtotransfer, std::string("platformcommission")});
+            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+            {_self, platformaccount, platformtotransfer, std::string("platformcommission")});
     }
     // agent
     auto existalias = tablealias.find(SDBMHash((char *)agentalias.c_str()));
@@ -319,8 +314,8 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
     {
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (
-             existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-             {_self, player, playertotransfer, std::string("playercommission")});
+            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+            {_self, player, playertotransfer, std::string("playercommission")});
     }
 
     asset balance = existing->dealerBalance;
@@ -405,9 +400,9 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed)
     string roundResult;
     std::vector<card_info> bankerHands;
     std::vector<card_info> playerHands;
-    std::vector<uint16_t> validCardTemp;
-    reveal(root_seed, existing->validCardVec, playerHands, bankerHands, roundResult, validCardTemp);
-
+    std::vector<uint16_t> validCardTemp = existing->validCardVec;
+    reveal(root_seed, validCardTemp, playerHands, bankerHands, roundResult);
+    // odds
     std::vector<player_bet_info> tempPlayerVec;
     asset dealerBalance_temp = existing->dealerBalance;
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
@@ -456,7 +451,7 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed)
         playerBet.dBonus = dBonus;
         tempPlayerVec.emplace_back(playerBet);
     }
-
+    // shuffle trigger
     uint64_t tableStatus_temp = (uint64_t)table_stats::status_fields::ROUND_END;
     if (existing->validCardVec.size() <= CardsMinLimit)
         tableStatus_temp = (uint64_t)table_stats::status_fields::ROUND_SHUFFLE;
