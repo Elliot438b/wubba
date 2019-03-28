@@ -396,7 +396,6 @@ CONTRACT lizard : public contract
     WBRNG wbrng;
 
     name serveraccount = "useraaaaaaah"_n;
-    name platfrmacnt = "useraaaaaaah"_n; // platform commission account.
     name platformaccount = "useraaaaaaae"_n;
 
     const uint32_t betPeriod = 30;

@@ -26,10 +26,9 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
     eosio_assert(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe > minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri > minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum > minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum > minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx > minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom > minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
-    //temp_rate_agent = Round(temp_rate_agent, 4);
-
     auto temp_rate_player = Atof(commission_rate_player.c_str());
-    //temp_rate_player = Round(temp_rate_player, 4);
+    // verify the {player, agent} rate can't be set <0
+    eosio_assert(temp_rate_agent >= 0 && temp_rate_player >= 0, "Commission rate can't be set negtive!");
 
     auto diff_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_txx * 14 + oneRoundMaxTotalBet_twocom * 5 * 3 + oneRoundMaxTotalBet_single * 3;
     auto pair_nontri_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_pairnum * 8 + oneRoundMaxTotalBet_txx * 50 + oneRoundMaxTotalBet_twocom * 5 + oneRoundMaxTotalBet_single * 2;
@@ -39,7 +38,7 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
 
     oneRoundDealerMaxPay_temp = max(diff_max, pair_nontri_max);
     oneRoundDealerMaxPay_temp = max(oneRoundDealerMaxPay_temp, tri_max);
-    oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_bsoe + oneRoundMaxTotalBet_anytri + oneRoundMaxTotalBet_trinum + oneRoundMaxTotalBet_pairnum + oneRoundMaxTotalBet_txx + oneRoundMaxTotalBet_twocom + oneRoundMaxTotalBet_single)*(comission_rate_platform_default + temp_rate_agent + temp_rate_player);
+    oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_bsoe + oneRoundMaxTotalBet_anytri + oneRoundMaxTotalBet_trinum + oneRoundMaxTotalBet_pairnum + oneRoundMaxTotalBet_txx + oneRoundMaxTotalBet_twocom + oneRoundMaxTotalBet_single) * (comission_rate_platform_default + temp_rate_agent + temp_rate_player);
     deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
 
     eosio_assert(deposit >= deposit_tmp, "Table deposit is not enough!");
@@ -89,7 +88,7 @@ ACTION lizard::edittable(uint64_t tableId, bool isPrivate, name code, string sym
 {
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The table can only be edited at the ROUND_END stage!");
 
     bool symbol_exist_flag = false; // flag if user symbol(code,sym) is including in sysconfig(symOptions).
     asset minPerBet_default_temp;
@@ -111,10 +110,9 @@ ACTION lizard::edittable(uint64_t tableId, bool isPrivate, name code, string sym
     eosio_assert(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe > minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri > minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum > minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum > minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx > minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom > minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
-    //temp_rate_agent = Round(temp_rate_agent, 4);
-
     auto temp_rate_player = Atof(commission_rate_player.c_str());
-    //temp_rate_player = Round(temp_rate_player, 4);
+    // verify the {player, agent} rate can't be set <0
+    eosio_assert(temp_rate_agent >= 0 && temp_rate_player >= 0, "Commission rate can't be set negtive!");
 
     auto diff_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_txx * 14 + oneRoundMaxTotalBet_twocom * 5 * 3 + oneRoundMaxTotalBet_single * 3;
     auto pair_nontri_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_pairnum * 8 + oneRoundMaxTotalBet_txx * 50 + oneRoundMaxTotalBet_twocom * 5 + oneRoundMaxTotalBet_single * 2;
@@ -124,12 +122,11 @@ ACTION lizard::edittable(uint64_t tableId, bool isPrivate, name code, string sym
 
     auto oneRoundDealerMaxPay_temp = max(diff_max, pair_nontri_max);
     oneRoundDealerMaxPay_temp = max(oneRoundDealerMaxPay_temp, tri_max);
-    oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_bsoe + oneRoundMaxTotalBet_anytri + oneRoundMaxTotalBet_trinum + oneRoundMaxTotalBet_pairnum + oneRoundMaxTotalBet_txx + oneRoundMaxTotalBet_twocom + oneRoundMaxTotalBet_single)*(comission_rate_platform_default + temp_rate_agent + temp_rate_player);
+    oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_bsoe + oneRoundMaxTotalBet_anytri + oneRoundMaxTotalBet_trinum + oneRoundMaxTotalBet_pairnum + oneRoundMaxTotalBet_txx + oneRoundMaxTotalBet_twocom + oneRoundMaxTotalBet_single) * (comission_rate_platform_default + temp_rate_agent + temp_rate_player);
     auto deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
 
     // table modify.
     tableround.modify(existing, _self, [&](auto &s) {
-        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
         s.isPrivate = isPrivate;
         s.oneRoundMaxTotalBet_bsoe = oneRoundMaxTotalBet_bsoe;
         s.minPerBet_bsoe = minPerBet_bsoe;
@@ -269,44 +266,12 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, name agent, 
         }
     }
 
-    eosio_assert(!flag, "player have bet");
+    eosio_assert(!flag, "Player can't bet more than once in one round!");
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     asset betAmount = init_asset_empty;
     std::vector<bet_info> betAmountVec;
     bool ret = checkBetOptions(bet, existing->amountSymbol.get_symbol(), betAmount, betAmountVec);
-    eosio_assert(ret, "name not exist");
-
-    auto temp_rate_platform = comission_rate_platform_default;
-    asset platformtotransfer = asset(betAmount.amount*comission_rate_platform_default, existing->amountSymbol.get_symbol());
-
-    eosio::print(" sum_bet_amount:", betAmount.amount, " platformtotransfer:", platformtotransfer, " temp_rate_platform:", temp_rate_platform, " ");
-    if (platformtotransfer > init_asset_empty)
-    {
-        INLINE_ACTION_SENDER(eosio::token, transfer)
-        (
-             existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-             {_self, platformaccount, platformtotransfer, std::string("platform odds")});
-    }
-
-    asset agenttransfer = asset(betAmount.amount*existing->commission_rate_agent, existing->amountSymbol.get_symbol());
-
-    eosio::print(" sum_bet_amount:", betAmount, " agenttransfer:", agenttransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
-    if (agenttransfer > init_asset_empty)
-    {
-        INLINE_ACTION_SENDER(eosio::token, transfer)
-        (
-             existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-             {_self, agent, agenttransfer, std::string("platform odds")});
-    }
-    asset playertransfer = asset(betAmount.amount*existing->commission_rate_player, existing->amountSymbol.get_symbol());
-    eosio::print(" sum_bet_amount:", betAmount, " playertransfer:", playertransfer, " commission_rate_player:", existing->commission_rate_player, " ");
-    if (playertransfer > init_asset_empty)
-    {
-        INLINE_ACTION_SENDER(eosio::token, transfer)
-        (
-              existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-              {_self, player, playertransfer, std::string("platform odds")});
-    }
+    eosio_assert(ret, "Unknown bet option!");
 
     asset player_amount_sum_bsoe = existing->currRoundBetSum_bsoe;
     asset player_amount_sum_anytri = existing->currRoundBetSum_anytri;
@@ -402,6 +367,39 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, name agent, 
     temp.agent = agent;
     temp.nickname = nickname;
 
+    // -------------------------------- commission start -------------------------------- 
+    // platform
+    auto temp_rate_platform = comission_rate_platform_default;
+    asset platformtotransfer = asset(betAmount.amount * comission_rate_platform_default, existing->amountSymbol.get_symbol());
+    eosio::print(" sum_bet_amount:", betAmount.amount, " platformtotransfer:", platformtotransfer, " temp_rate_platform:", temp_rate_platform, " ");
+    if (platformtotransfer > init_asset_empty)
+    {
+        INLINE_ACTION_SENDER(eosio::token, transfer)
+        (
+            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+            {_self, platformaccount, platformtotransfer, std::string("platform odds")});
+    }
+    // agent
+    asset agenttransfer = asset(betAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
+    eosio::print(" sum_bet_amount:", betAmount, " agenttransfer:", agenttransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
+    if (agenttransfer > init_asset_empty)
+    {
+        INLINE_ACTION_SENDER(eosio::token, transfer)
+        (
+            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+            {_self, agent, agenttransfer, std::string("platform odds")});
+    }
+    // player
+    asset playertransfer = asset(betAmount.amount * existing->commission_rate_player, existing->amountSymbol.get_symbol());
+    eosio::print(" sum_bet_amount:", betAmount, " playertransfer:", playertransfer, " commission_rate_player:", existing->commission_rate_player, " ");
+    if (playertransfer > init_asset_empty)
+    {
+        INLINE_ACTION_SENDER(eosio::token, transfer)
+        (
+            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+            {_self, player, playertransfer, std::string("platform odds")});
+    }
+    // -------------------------------- commission end -------------------------------- 
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
@@ -694,32 +692,32 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
         }
         eosio::print(" [player:", playerBet.player, ", total bonus:", pBonus, "] ");
         eosio::print(" [dealer:", existing->dealer, ", total bonus:", dBonus, "] ");
-        asset platformtotransfer = (pBonus + dBonus)*2/1000;
+        asset platformtotransfer = (pBonus + dBonus) * 2 / 1000;
         if (platformtotransfer > init_asset_empty)
         {
             INLINE_ACTION_SENDER(eosio::token, transfer)
             (
-                 existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                 {_self, platformaccount, platformtotransfer, std::string("platform odds")});
+                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                {_self, platformaccount, platformtotransfer, std::string("platform odds")});
         }
-        pBonus = pBonus*998/1000;
-        dBonus = dBonus*998/1000;
+        pBonus = pBonus * 998 / 1000;
+        dBonus = dBonus * 998 / 1000;
 
         asset agenttransfer = init_asset_empty;
         auto existalias = tablealias.find(playerBet.agent.value);
-        if(existalias != tablealias.end() && playerBet.agent != existing->dealer)
+        if (existalias != tablealias.end() && playerBet.agent != existing->dealer)
         {
-            agenttransfer = dBonus*5/100;
+            agenttransfer = dBonus * 5 / 100;
             if (agenttransfer > init_asset_empty)
             {
                 INLINE_ACTION_SENDER(eosio::token, transfer)
                 (
-                        existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                        {_self, playerBet.agent, agenttransfer, std::string("agent odds")});
+                    existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                    {_self, playerBet.agent, agenttransfer, std::string("agent odds")});
             }
         }
 
-        if(agenttransfer > init_asset_empty)
+        if (agenttransfer > init_asset_empty)
             dBonus -= agenttransfer;
 
         eosio::print(" ===[player:", playerBet.player, ", total bonus:", pBonus, "] ");
