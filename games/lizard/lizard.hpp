@@ -22,7 +22,7 @@ CONTRACT lizard : public contract
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION endbet(uint64_t tableId);
-    ACTION playerbet(uint64_t tableId, name player, string bet, string agent, string nickname);
+    ACTION playerbet(uint64_t tableId, name player, string bet, string agentalias, string nickname);
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
     ACTION trusteeship(uint64_t tableId);
@@ -47,7 +47,7 @@ CONTRACT lizard : public contract
         string agent;
         string nickname;
 
-        EOSLIB_SERIALIZE(player_bet_info, (player)(bet)(pBonus)(dBonus)(string)(nickname))
+        EOSLIB_SERIALIZE(player_bet_info, (player)(bet)(pBonus)(dBonus)(agent)(nickname))
     };
 
     TABLE table_stats
@@ -118,11 +118,11 @@ CONTRACT lizard : public contract
 
     TABLE alias_info
     {
+        uint32_t aliasId;
         name account;
-        string alias;
 
-        uint64_t primary_key() const { return account.value; }
-        EOSLIB_SERIALIZE(alias_info, (account)(alias))
+        uint64_t primary_key() const { return aliasId; }
+        EOSLIB_SERIALIZE(alias_info, (aliasId)(account))
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, lizard::table_stats, indexed_by<"dealer"_n, const_mem_fun<lizard::table_stats, uint64_t, &lizard::table_stats::get_dealer>>> singletable_t;

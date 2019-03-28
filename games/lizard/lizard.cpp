@@ -247,7 +247,7 @@ ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     }
 }
 
-ACTION lizard::playerbet(uint64_t tableId, name player, string bet, string agent, string nickname)
+ACTION lizard::playerbet(uint64_t tableId, name player, string bet, string agentalias, string nickname)
 {
     require_auth(player);
     require_auth(serveraccount);
@@ -364,7 +364,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, string agent
     temp.bet = bet;
     temp.pBonus = init_asset_empty;
     temp.dBonus = init_asset_empty;
-    temp.agent = agent;
+    temp.agent = agentalias;
     temp.nickname = nickname;
 
     // -------------------------------- commission start --------------------------------
@@ -380,17 +380,18 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, string agent
             {_self, platformaccount, platformtotransfer, std::string("platformcommission")});
     }
     // agent
-    auto existalias = tablealias.find(agent.value);
-    if (existalias != tablealias.end() && existalias != existing->dealer)
+    auto existalias = tablealias.find(SDBMHash((char *)agentalias.c_str()));
+    asset agentotransfer = init_asset_empty;
+    if (existalias != tablealias.end() && existalias->account != existing->dealer)
     {
-        asset agentotransfer = asset(betAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
+        agentotransfer = asset(betAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
         eosio::print(" sum_bet_amount:", betAmount, " agentotransfer:", agentotransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
         if (agentotransfer > init_asset_empty)
         {
             INLINE_ACTION_SENDER(eosio::token, transfer)
             (
                 existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                {_self, existalias, agentotransfer, std::string("agentcommission")});
+                {_self, existalias->account, agentotransfer, std::string("agentcommission")});
         }
     }
     // player
@@ -409,7 +410,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, string agent
     balance -= agentotransfer;
     balance -= playertotransfer;
     // -------------------------------- commission end --------------------------------
-    
+
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
         s.dealerBalance = balance;
@@ -901,9 +902,10 @@ ACTION lizard::pushaliasnam(string alias, name account)
     auto existing = tablealias.find(account.value);
     eosio_assert(existing == tablealias.end(), "account exist...");
     require_auth(account);
+    uint32_t aliasId = SDBMHash((char *)alias.c_str());
 
     tablealias.emplace(_self, [&](auto &s) {
-        s.alias = alias;
+        s.aliasId = aliasId;
         s.account = account;
     });
 }
