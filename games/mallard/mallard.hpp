@@ -323,80 +323,79 @@ CONTRACT mallard : public contract
         string root_seed_64 = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
         eosio::print(" root_seed_64 : ", root_seed_64, " ");
         // Split 6 seeds, parse card info.
-        std::vector<card_info> cardInfo;
-        std::vector<uint16_t> sixPosVec;
-        auto counter = 0;
-        while (counter < 6)
+        auto sum_p, sum_b;
+        for (auto i = 1;; i++)
         {
             string sub_seed = root_seed_64.substr(counter * 9, 9);
             wbrng.srand(SDBMHash((char *)sub_seed.c_str()));
             uint64_t pos = wbrng.rand() % validCardVec.size();
             uint16_t cardPos = validCardVec[pos]; // value of validCardVec is cardPos(card index).
-            sixPosVec.emplace_back(cardPos);
             uint16_t deck = (cardPos) / 52 + 1;
             uint16_t suitcolor = (cardPos + 1) / 13 % 4;
             uint16_t cardnumber = (cardPos + 1) % 13;
             if (cardnumber == 0)
                 cardnumber = 13;
-            eosio::print("[pos:", pos, ", cardpos:", cardPos, ", deck:", deck, ", number:", cardnumber, ", suitcolor:", suitcolor, "]");
-            card_info tempCard;
-            tempCard.deck = deck;
-            tempCard.cardNum = cardnumber;
-            tempCard.cardColor = suitcolor;
-            cardInfo.emplace_back(tempCard);
-            counter++;
-        }
-        // init first 2 cards.
-        //std::vector<card_info> playerHands;
-        playerHands.emplace_back(cardInfo[0]);
-        playerHands.emplace_back(cardInfo[2]);
-        auto sum_p = (cardInfo[0].cardNum + cardInfo[2].cardNum) % 10;
-
-        //    std::vector<card_info> bankerHands;
-        bankerHands.emplace_back(cardInfo[1]);
-        bankerHands.emplace_back(cardInfo[3]);
-        auto sum_b = (cardInfo[1].cardNum + cardInfo[3].cardNum) % 10;
-        // 5th/6th card obtain rules.
-        bool fifthCard_flag = false;
-        bool sixthCard_flag = false;
-        // all non-obtain rules
-        if (sum_p == 8 || sum_p == 9 || sum_b == 8 || sum_b == 9)
-        {
-            eosio::print("4 cards end, don't need extra card obtain!");
-        }
-        else if ((sum_p == 6 || sum_p == 7) && (sum_b == 6 || sum_b == 7))
-        {
-            eosio::print("4 cards end, don't need extra card obtain!");
-        }
-        // all obtain rules.
-        else
-        {
-            if (sum_p < 6)
+            card_info card;
+            card.deck = deck;
+            card.cardNum = cardnumber;
+            card.cardColor = suitcolor;
+            if (i == 1 || i == 3)
             {
-                playerHands.emplace_back(cardInfo[4]);
-                sum_p = (sum_p + cardInfo[4].cardNum) % 10;
-                fifthCard_flag = true;
-                if (sum_b == 6 && (sum_p == 6 || sum_p == 7))
+                playerHands.emplace_back(card);
+                validCardVec.erase(pos);
+            }
+            else if (i == 2 || i == 4)
+            {
+                bankerHands.emplace_back(card);
+                validCardVec.erase(pos);
+            }
+            else if (i == 5)
+            {
+                sum_p = (playerHands[0].cardNum + playerHands[2].cardNum) % 10;
+                sum_b = (bankerHands[1].cardNum + bankerHands[3].cardNum) % 10;
+                // all non-obtain rules
+                if (sum_p == 8 || sum_p == 9 || sum_b == 8 || sum_b == 9)
                 {
-                    bankerHands.emplace_back(cardInfo[5]);
-                    sum_b = (sum_b + cardInfo[5].cardNum) % 10;
-                    sixthCard_flag = true;
+                    break;
+                }
+                else if ((sum_p == 6 || sum_p == 7) && (sum_b == 6 || sum_b == 7))
+                {
+                    break;
+                }
+                // all obtain rules.
+                else
+                {
+                    if (sum_p < 6)
+                    {
+                        playerHands.emplace_back(card);
+                        validCardVec.erase(pos);
+                        sum_p = (sum_p + card.cardNum) % 10;
+                    }
+                    else if (sum_b < 3)
+                    {
+                        bankerHands.emplace_back(card);
+                        validCardVec.erase(pos);
+                        sum_b = (sum_b + card.cardNum) % 10;
+                        break;
+                    }
+                    else
+                    {
+                        break; // example: sum_p=7, sum_b=4
+                    }
                 }
             }
-            if (!sixthCard_flag &&
-                (sum_b < 3 || (sum_b == 3 && !(sum_p == 8 && fifthCard_flag)) || (sum_b == 4 && !((sum_p == 1 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag)) || (sum_b == 5 && !((sum_p == 1 || sum_p == 2 || sum_p == 3 || sum_p == 8 || sum_p == 9 || sum_p == 0) && fifthCard_flag))))
+            else if (i == 6)
             {
-                if (fifthCard_flag)
+                if (sum_p < 3 || (sum_b == 3 && sum_p != 8) || (sum_b == 4 && sum_p != 0 && sum_p != 1 && sum_p != 8 && sum_p != 9) || (sum_b == 5 && sum_p != 0 && sum_p != 1 && sum_p != 2 && sum_p != 3 && sum_p != 8 && sum_p != 9) || sum_p == 6 || sum_p == 7)
                 {
-                    bankerHands.emplace_back(cardInfo[5]);
-                    sum_b = (sum_b + cardInfo[5].cardNum) % 10;
-                    sixthCard_flag = true;
+                    bankerHands.emplace_back(card);
+                    validCardVec.erase(pos);
+                    sum_b = (sum_b + card.cardNum) % 10;
+                    break;
                 }
                 else
                 {
-                    bankerHands.emplace_back(cardInfo[4]);
-                    sum_b = (sum_b + cardInfo[4].cardNum) % 10;
-                    fifthCard_flag = true;
+                    break;
                 }
             }
         }
@@ -413,35 +412,6 @@ CONTRACT mallard : public contract
         if (playerHands[0].cardNum == playerHands[1].cardNum) //PlayerPush
             roundResult[4] = '1';
         eosio::print(" round_result: ", roundResult, " ");
-
-        // delete cards used.
-        if (!fifthCard_flag && !sixthCard_flag)
-        {
-            sixPosVec.erase(sixPosVec.begin() + 4);
-            sixPosVec.erase(sixPosVec.begin() + 4);
-        }
-        else if (!sixthCard_flag)
-        {
-            sixPosVec.erase(sixPosVec.begin() + 5);
-        }
-
-        validCardTemp = validCardVec;
-        for (auto i : sixPosVec)
-        {
-            for (auto itr = validCardTemp.begin(); itr != validCardTemp.end(); itr++)
-            {
-                if (*itr == i)
-                {
-                    itr = validCardTemp.erase(itr);
-                    eosio::print(" 【erase ", i);
-                }
-                if (itr == validCardTemp.end())
-                {
-                    break;
-                }
-            }
-            eosio::print(" tem.size ", validCardTemp.size(), "】");
-        }
     }
 
     void shuffleFun(uint64_t tableId, std::vector<uint16_t> & cardVec_temp)
