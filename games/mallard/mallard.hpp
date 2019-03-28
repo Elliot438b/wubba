@@ -321,10 +321,11 @@ CONTRACT mallard : public contract
         string root_seed_64 = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
         eosio::print(" root_seed_64 : ", root_seed_64, " ");
         // Split 6 seeds, parse card info.
-        auto sum_p, sum_b;
+        auto sum_p = 0;
+        auto sum_b = 0;
         for (auto i = 1;; i++)
         {
-            string sub_seed = root_seed_64.substr(counter * 9, 9);
+            string sub_seed = root_seed_64.substr((i - 1) * 9, 9);
             wbrng.srand(SDBMHash((char *)sub_seed.c_str()));
             uint64_t pos = wbrng.rand() % validCardVec.size();
             uint16_t cardPos = validCardVec[pos]; // value of validCardVec is cardPos(card index).
@@ -340,12 +341,12 @@ CONTRACT mallard : public contract
             if (i == 1 || i == 3)
             {
                 playerHands.emplace_back(card);
-                validCardVec.erase(pos);
+                validCardVec.erase(validCardVec.begin() + pos);
             }
             else if (i == 2 || i == 4)
             {
                 bankerHands.emplace_back(card);
-                validCardVec.erase(pos);
+                validCardVec.erase(validCardVec.begin() + pos);
             }
             else if (i == 5)
             {
@@ -366,13 +367,13 @@ CONTRACT mallard : public contract
                     if (sum_p < 6)
                     {
                         playerHands.emplace_back(card);
-                        validCardVec.erase(pos);
+                        validCardVec.erase(validCardVec.begin() + pos);
                         sum_p = (sum_p + card.cardNum) % 10;
                     }
                     else if (sum_b < 3)
                     {
                         bankerHands.emplace_back(card);
-                        validCardVec.erase(pos);
+                        validCardVec.erase(validCardVec.begin() + pos);
                         sum_b = (sum_b + card.cardNum) % 10;
                         break;
                     }
@@ -387,7 +388,7 @@ CONTRACT mallard : public contract
                 if (sum_p < 3 || (sum_b == 3 && sum_p != 8) || (sum_b == 4 && sum_p != 0 && sum_p != 1 && sum_p != 8 && sum_p != 9) || (sum_b == 5 && sum_p != 0 && sum_p != 1 && sum_p != 2 && sum_p != 3 && sum_p != 8 && sum_p != 9) || sum_p == 6 || sum_p == 7)
                 {
                     bankerHands.emplace_back(card);
-                    validCardVec.erase(pos);
+                    validCardVec.erase(validCardVec.begin() + pos);
                     sum_b = (sum_b + card.cardNum) % 10;
                     break;
                 }
@@ -431,7 +432,7 @@ CONTRACT mallard : public contract
         uint64_t pos = wbrng.rand() % cardVec_temp.size();
         uint16_t cardPos = cardVec_temp[pos]; // first time, pos == cardPos.
         toDelCardPosVec.emplace_back(cardPos);
-        cardVec_temp.erase(pos);
+        cardVec_temp.erase(cardVec_temp.begin() + pos);
         uint16_t cardnumber = (cardPos + 1) % 13;
         if (cardnumber == 0)
             cardnumber = 13;
@@ -454,7 +455,7 @@ CONTRACT mallard : public contract
             cardPos = cardVec_temp[pos];
             toDelCardPosVec.emplace_back(cardPos);
             eosio::print(" [New cardPos to be deleted:", cardPos, "] ");
-            cardVec_temp.erase(pos);
+            cardVec_temp.erase(cardVec_temp.begin() + pos);
             count++;
         }
 
