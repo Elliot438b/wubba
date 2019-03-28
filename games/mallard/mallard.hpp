@@ -319,7 +319,6 @@ CONTRACT mallard : public contract
         checksum256 hash = sha256(root_seed.c_str(), root_seed.size());
         auto hash_data = hash.extract_as_byte_array();
         string root_seed_64 = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
-        eosio::print(" root_seed_64 : ", root_seed_64, " ");
         // Split 6 seeds, parse card info.
         auto sum_p = 0;
         auto sum_b = 0;
@@ -338,6 +337,7 @@ CONTRACT mallard : public contract
             card.deck = deck;
             card.cardNum = cardnumber;
             card.cardColor = suitcolor;
+            eosio::print(" [card : ", deck, " 【", cardnumber, "】 ", suitcolor, "] ");
             if (i == 1 || i == 3)
             {
                 playerHands.emplace_back(card);
@@ -352,6 +352,7 @@ CONTRACT mallard : public contract
             {
                 sum_p = (playerHands[0].cardNum + playerHands[2].cardNum) % 10;
                 sum_b = (bankerHands[1].cardNum + bankerHands[3].cardNum) % 10;
+                eosio::print(" [5sum_p: ", sum_p, " 5sum_b:", sum_b, "] ");
                 // all non-obtain rules
                 if (sum_p == 8 || sum_p == 9 || sum_b == 8 || sum_b == 9)
                 {
@@ -385,6 +386,7 @@ CONTRACT mallard : public contract
             }
             else if (i == 6)
             {
+                eosio::print(" [6sum_p: ", sum_p, " 6sum_b:", sum_b, "] ");
                 if (sum_p < 3 || (sum_b == 3 && sum_p != 8) || (sum_b == 4 && sum_p != 0 && sum_p != 1 && sum_p != 8 && sum_p != 9) || (sum_b == 5 && sum_p != 0 && sum_p != 1 && sum_p != 2 && sum_p != 3 && sum_p != 8 && sum_p != 9) || sum_p == 6 || sum_p == 7)
                 {
                     bankerHands.emplace_back(card);
@@ -410,7 +412,6 @@ CONTRACT mallard : public contract
             roundResult[3] = '1';
         if (playerHands[0].cardNum == playerHands[1].cardNum) //PlayerPush
             roundResult[4] = '1';
-        eosio::print(" round_result: ", roundResult, " ");
     }
 
     void shuffleFun(uint64_t tableId, std::vector<uint16_t> & cardVec_temp)
@@ -468,7 +469,7 @@ CONTRACT mallard : public contract
             std::vector<card_info> playerHands;
             reveal(to_string(now()), cardVec_temp, playerHands, bankerHands, roundResult);
             shuffle_round_result temp;
-            temp.roundNum = count;
+            temp.roundNum = k + 1;
             temp.roundResult = roundResult;
             temp.playerHands = playerHands;
             temp.bankerHands = bankerHands;
