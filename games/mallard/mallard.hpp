@@ -37,7 +37,7 @@ CONTRACT mallard : public contract
     ACTION depositable(name dealer, uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
     ACTION shuffle(uint64_t tableId);
-    ACTION edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,asset oneRoundMaxTotalBet_push, asset minPerBet_push);
+    ACTION edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_push, asset minPerBet_push);
     ACTION pushaliasnam(string alias, name account);
 
     struct card_info
@@ -71,10 +71,10 @@ CONTRACT mallard : public contract
         std::vector<uint16_t> validCardVec; // newtable init & new round check.
         uint64_t tableId;                   // table fix.
         uint64_t cardBoot;
-        name dealer;                        // table owner.
-        bool trusteeship;                   // table flag.
-        bool isPrivate;                     // table flag.
-        asset dealerBalance;                // table field.
+        name dealer;         // table owner.
+        bool trusteeship;    // table flag.
+        bool isPrivate;      // table flag.
+        asset dealerBalance; // table field.
         asset oneRoundMaxTotalBet_BP;
         asset minPerBet_BP;
         asset oneRoundMaxTotalBet_Tie;
@@ -315,7 +315,7 @@ CONTRACT mallard : public contract
         return (num1 + num2) * (sign);
     }
 
-    void reveal(string root_seed, std::vector<uint16_t> validCardVec, std::vector<card_info> &playerHands, std::vector<card_info> &bankerHands, string &roundResult, std::vector<uint16_t> &validCardTemp)
+    void reveal(string root_seed, std::vector<uint16_t> validCardVec, std::vector<card_info> & playerHands, std::vector<card_info> & bankerHands, string & roundResult, std::vector<uint16_t> & validCardTemp)
     {
         // unify 64: root_seed_64.
         checksum256 hash = sha256(root_seed.c_str(), root_seed.size());
@@ -352,7 +352,7 @@ CONTRACT mallard : public contract
         playerHands.emplace_back(cardInfo[2]);
         auto sum_p = (cardInfo[0].cardNum + cardInfo[2].cardNum) % 10;
 
-    //    std::vector<card_info> bankerHands;
+        //    std::vector<card_info> bankerHands;
         bankerHands.emplace_back(cardInfo[1]);
         bankerHands.emplace_back(cardInfo[3]);
         auto sum_b = (cardInfo[1].cardNum + cardInfo[3].cardNum) % 10;
@@ -368,7 +368,7 @@ CONTRACT mallard : public contract
         {
             eosio::print("4 cards end, don't need extra card obtain!");
         }
-            // all obtain rules.
+        // all obtain rules.
         else
         {
             if (sum_p < 6)
@@ -402,7 +402,7 @@ CONTRACT mallard : public contract
         }
         //round result
         roundResult = "00000"; //Banker,Player,Tie,BankerPush,PlayerPush
-        if (sum_p < sum_b)            //Banker
+        if (sum_p < sum_b)     //Banker
             roundResult[0] = '1';
         else if (sum_p > sum_b) //Player
             roundResult[1] = '1';
@@ -459,7 +459,7 @@ CONTRACT mallard : public contract
         eosio::print(" toDelPosSeed : ", root_seed_64, " ");
 
         std::vector<uint16_t> toDelCardPosVec;
-       // string firstCardSeed = root_seed_64.substr(2, 9);
+        // string firstCardSeed = root_seed_64.substr(2, 9);
         wbrng.srand(SDBMHash((char *)root_seed_64.c_str()));
         uint64_t pos = wbrng.rand() % cardVec_temp.size();
         uint16_t cardPos = cardVec_temp[pos];
@@ -475,32 +475,25 @@ CONTRACT mallard : public contract
         firstCard_temp.cardNum = cardnumber;
         eosio::print("firstCard.deck:", firstCard_temp.deck, " firstCard.cardNum : ", firstCard_temp.cardNum, " firstCard.cardColor:", firstCard_temp.cardColor, " ");
 
-        auto sum_p = cardnumber % 10;
+        auto delNum = firstCard_temp.cardNum;
+        if (delNum == 11 || delNum == 12 || delNum == 13)
+            delNum = 10;
         auto count = 0;
-        while(count < sum_p)
+        while (count < delNum)
         {
-            string sub_seed = root_seed_64.substr(count + 1, 10);
-            //eosio::print(" =====[sub_seed:", sub_seed, "count:",count+1, "] ");
+            string sub_seed = root_seed_64.substr(count * 6, 6);
             wbrng.srand(SDBMHash((char *)sub_seed.c_str()));
             uint64_t pos = wbrng.rand() % cardVec_temp.size();
             uint16_t cardPos = cardVec_temp[pos];
-            bool GotPosFlag = false;
-            for(auto a : toDelCardPosVec)
-            {
-                if(a == cardPos)
-                {
-                    eosio::print(" [GotPos:", cardPos, "] ");
-                    GotPosFlag = true;
-                    break;
-                }
+            auto ii = 0;
+            while(std::find(toDelCardPosVec.begin(), toDelCardPosVec.end(), cardPos){
+                wbrng.srand(SDBMHash((char *)sub_seed.c_str()) + ii);
+                uint64_t pos = wbrng.rand() % cardVec_temp.size();
+                cardPos = cardVec_temp[pos];
+                ii++;
             }
-
-            if(!GotPosFlag)
-            {
-                toDelCardPosVec.emplace_back(cardPos);
-                eosio::print(" [NewPos:", cardPos, "] ");
-            }
-
+            toDelCardPosVec.emplace_back(cardPos);
+            eosio::print(" [New cardPos to be deleted:", cardPos, "] ");
             count++;
         }
 
@@ -523,18 +516,19 @@ CONTRACT mallard : public contract
 
         bool tableid_exist_falg = false;
         auto itr_shuffle = shuffleinfo.find(tableId);
-        if(itr_shuffle != shuffleinfo.end())
+        if (itr_shuffle != shuffleinfo.end())
         {
             tableid_exist_falg = true;
         }
 
         count = 1;
         std::vector<shuffle_round_result> threeResults_temp;
-        while(count <= 3) {
+        while (count <= 3)
+        {
             string roundResult;
-            std::vector <card_info> bankerHands;
-            std::vector <card_info> playerHands;
-            std::vector <uint16_t> validCardTemp;
+            std::vector<card_info> bankerHands;
+            std::vector<card_info> playerHands;
+            std::vector<uint16_t> validCardTemp;
 
             reveal(to_string(now()), cardVec_temp, playerHands, bankerHands, roundResult, validCardTemp);
             cardVec_temp = validCardTemp;
@@ -546,10 +540,11 @@ CONTRACT mallard : public contract
             temp.bankerHands = bankerHands;
             threeResults_temp.emplace_back(temp);
 
-            count ++;
+            count++;
         }
 
-        if(!tableid_exist_falg) {
+        if (!tableid_exist_falg)
+        {
             eosio::print(" [ add shuffle info (tableid=", tableId, ")] ");
             shuffleinfo.emplace(_self, [&](auto &s) {
                 s.tableId = tableId;
@@ -573,7 +568,7 @@ CONTRACT mallard : public contract
         int intTmp = 0;
 
         // 若保留小数位数不正确
-        if( 0 > iBit )
+        if (0 > iBit)
         {
             return 0;
         }
@@ -584,8 +579,8 @@ CONTRACT mallard : public contract
             // 首先转为正数
             dSrc *= -1;
 
-            intTmp = (int) ((dSrc + 0.5 / pow(10.0, iBit)) * pow(10.0, iBit));
-            retVal = (double) intTmp / pow(10.0, iBit);
+            intTmp = (int)((dSrc + 0.5 / pow(10.0, iBit)) * pow(10.0, iBit));
+            retVal = (double)intTmp / pow(10.0, iBit);
 
             // 再转为 负数
             retVal *= -1;
@@ -593,8 +588,8 @@ CONTRACT mallard : public contract
         // 若为非负数
         else
         {
-            intTmp = (int) ((dSrc + 0.5 / pow(10.0, iBit)) * pow(10.0, iBit));
-            retVal = (double) intTmp / pow(10.0, iBit);
+            intTmp = (int)((dSrc + 0.5 / pow(10.0, iBit)) * pow(10.0, iBit));
+            retVal = (double)intTmp / pow(10.0, iBit);
         }
 
         return retVal;
@@ -612,12 +607,11 @@ CONTRACT mallard : public contract
 
     const uint16_t CardsMinLimit = 100;
     const uint32_t betPeriod = 30;
-    const uint16_t initDecks = 2;//todo default 8 ,2 is test use
+    const uint16_t initDecks = 2; //todo default 8 ,2 is test use
     const uint32_t minTableRounds = 10;
     const char *notableerr = "TableId isn't existing!";
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 
     float comission_rate_platform_default = 0.005;
-
 };
 const std::vector<mallard::sym_info> mallard::symOptions = mallard::createSymOptions();
