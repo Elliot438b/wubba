@@ -367,7 +367,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, name agent, 
     temp.agent = agent;
     temp.nickname = nickname;
 
-    // -------------------------------- commission start -------------------------------- 
+    // -------------------------------- commission start --------------------------------
     // platform
     auto temp_rate_platform = comission_rate_platform_default;
     asset platformtotransfer = asset(betAmount.amount * comission_rate_platform_default, existing->amountSymbol.get_symbol());
@@ -377,29 +377,33 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, name agent, 
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (
             existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-            {_self, platformaccount, platformtotransfer, std::string("platform odds")});
+            {_self, platformaccount, platformtotransfer, std::string("platformcommission")});
     }
     // agent
-    asset agenttransfer = asset(betAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
-    eosio::print(" sum_bet_amount:", betAmount, " agenttransfer:", agenttransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
-    if (agenttransfer > init_asset_empty)
+    auto existalias = tablealias.find(agent);
+    if (existalias != tablealias.end() && agent != existing->dealer)
     {
-        INLINE_ACTION_SENDER(eosio::token, transfer)
-        (
-            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-            {_self, agent, agenttransfer, std::string("platform odds")});
+        asset agentotransfer = asset(betAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
+        eosio::print(" sum_bet_amount:", betAmount, " agentotransfer:", agentotransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
+        if (agentotransfer > init_asset_empty)
+        {
+            INLINE_ACTION_SENDER(eosio::token, transfer)
+            (
+                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                {_self, existalias, agentotransfer, std::string("agentcommission")});
+        }
     }
     // player
-    asset playertransfer = asset(betAmount.amount * existing->commission_rate_player, existing->amountSymbol.get_symbol());
-    eosio::print(" sum_bet_amount:", betAmount, " playertransfer:", playertransfer, " commission_rate_player:", existing->commission_rate_player, " ");
-    if (playertransfer > init_asset_empty)
+    asset playertotransfer = asset(betAmount.amount * existing->commission_rate_player, existing->amountSymbol.get_symbol());
+    eosio::print(" sum_bet_amount:", betAmount, " playertotransfer:", playertotransfer, " commission_rate_player:", existing->commission_rate_player, " ");
+    if (playertotransfer > init_asset_empty)
     {
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (
             existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-            {_self, player, playertransfer, std::string("platform odds")});
+            {_self, player, playertotransfer, std::string("playercommission")});
     }
-    // -------------------------------- commission end -------------------------------- 
+    // -------------------------------- commission end --------------------------------
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
@@ -692,36 +696,6 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
         }
         eosio::print(" [player:", playerBet.player, ", total bonus:", pBonus, "] ");
         eosio::print(" [dealer:", existing->dealer, ", total bonus:", dBonus, "] ");
-        asset platformtotransfer = (pBonus + dBonus) * 2 / 1000;
-        if (platformtotransfer > init_asset_empty)
-        {
-            INLINE_ACTION_SENDER(eosio::token, transfer)
-            (
-                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                {_self, platformaccount, platformtotransfer, std::string("platform odds")});
-        }
-        pBonus = pBonus * 998 / 1000;
-        dBonus = dBonus * 998 / 1000;
-
-        asset agenttransfer = init_asset_empty;
-        auto existalias = tablealias.find(playerBet.agent.value);
-        if (existalias != tablealias.end() && playerBet.agent != existing->dealer)
-        {
-            agenttransfer = dBonus * 5 / 100;
-            if (agenttransfer > init_asset_empty)
-            {
-                INLINE_ACTION_SENDER(eosio::token, transfer)
-                (
-                    existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                    {_self, playerBet.agent, agenttransfer, std::string("agent odds")});
-            }
-        }
-
-        if (agenttransfer > init_asset_empty)
-            dBonus -= agenttransfer;
-
-        eosio::print(" ===[player:", playerBet.player, ", total bonus:", pBonus, "] ");
-        eosio::print(" ===[dealer:", existing->dealer, ", total bonus:", dBonus, "] ");
 
         if (pBonus > init_asset_empty)
         {
