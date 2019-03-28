@@ -403,10 +403,16 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, string agent
             existing->amountSymbol.get_contract(), {{_self, "active"_n}},
             {_self, player, playertotransfer, std::string("playercommission")});
     }
-    // -------------------------------- commission end --------------------------------
 
+    asset balance = existing->dealerBalance;
+    balance -= platformtotransfer;
+    balance -= agentotransfer;
+    balance -= playertotransfer;
+    // -------------------------------- commission end --------------------------------
+    
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
+        s.dealerBalance = balance;
         s.currRoundBetSum_bsoe = player_amount_sum_bsoe;
         s.currRoundBetSum_anytri = player_amount_sum_anytri;
         s.currRoundBetSum_trinum = player_amount_sum_trinum;
