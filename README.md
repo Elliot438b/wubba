@@ -62,7 +62,7 @@ flag | symbol | full name
     - banker_hands
 > Refer to the rules table:
 
-![image](https://github.com/evsward/wubba/blob/master/resouce/cardapplyrules.jpg?raw=true)
+![image](https://github.com/evsward/wubba/blob/master/resource/cardapplyrules.jpg?raw=true)
 
 - who win? dealer, player, tie, dealerPush or playerPush? or multy win. 
 ```math
