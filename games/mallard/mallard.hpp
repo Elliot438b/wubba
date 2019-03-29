@@ -388,7 +388,6 @@ CONTRACT mallard : public contract
             }
             else if (i == 6) // 第六次取牌，闲家拿到第五张牌，现在判断庄家是否要拿第六张牌：
             {
-                eosio::print(" [5-sum_p: ", sum_p, " 5-sum_b:", sum_b, "] ");
                 /** 
                  * ①庄两张总点数{0,1,2}，庄拿第六张牌
                  * ②庄两张总点数3，闲拿第五张且闲三张总点数不为8，庄拿第六张牌
@@ -396,10 +395,7 @@ CONTRACT mallard : public contract
                  * ④庄两张总点数5，闲拿第五张且闲三张总点数不为0,1,2,3,8,9，庄拿第六张牌
                  * ⑤庄两张总点数6，闲拿第五张且闲三张为6或7，庄拿第六张牌
                  **/
-                if (sum_b < 3 || (sum_b == 3 && sum_p != 8) 
-                || (sum_b == 4 && sum_p != 0 && sum_p != 1 && sum_p != 8 && sum_p != 9) 
-                || (sum_b == 5 && sum_p != 0 && sum_p != 1 && sum_p != 2 && sum_p != 3 && sum_p != 8 && sum_p != 9) 
-                || (sum_b == 6 && (sum_p == 6 || sum_p == 7)))
+                if (sum_b < 3 || (sum_b == 3 && sum_p != 8) || (sum_b == 4 && sum_p != 0 && sum_p != 1 && sum_p != 8 && sum_p != 9) || (sum_b == 5 && sum_p != 0 && sum_p != 1 && sum_p != 2 && sum_p != 3 && sum_p != 8 && sum_p != 9) || (sum_b == 6 && (sum_p == 6 || sum_p == 7)))
                 {
                     bankerHands.emplace_back(card);                 // 第六张牌插入到庄家手牌集合中
                     sum_b = (sum_b + card.cardNum) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
@@ -438,7 +434,7 @@ CONTRACT mallard : public contract
         // use timestamp as seed
         string toDelPosSeed = to_string(now());
         eosio::print(" [toDelPosSeed: ", toDelPosSeed, "] ");
-        
+
         checksum256 hash = sha256(toDelPosSeed.c_str(), toDelPosSeed.size());
         auto hash_data = hash.extract_as_byte_array();
         string root_seed_64 = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
