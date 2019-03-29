@@ -399,7 +399,7 @@ CONTRACT mallard : public contract
                 if (sum_b < 3 || (sum_b == 3 && sum_p != 8) 
                 || (sum_b == 4 && sum_p != 0 && sum_p != 1 && sum_p != 8 && sum_p != 9) 
                 || (sum_b == 5 && sum_p != 0 && sum_p != 1 && sum_p != 2 && sum_p != 3 && sum_p != 8 && sum_p != 9) 
-                || (sum_b == 6 && (sum_p == 6 || sum_p == 7))
+                || (sum_b == 6 && (sum_p == 6 || sum_p == 7)))
                 {
                     bankerHands.emplace_back(card);                 // 第六张牌插入到庄家手牌集合中
                     sum_b = (sum_b + card.cardNum) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
