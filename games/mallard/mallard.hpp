@@ -341,18 +341,17 @@ CONTRACT mallard : public contract
             if (i == 1 || i == 3)
             {
                 playerHands.emplace_back(card);
+                sum_p = (sum_p + card.cardNum) % 10;
                 validCardVec.erase(validCardVec.begin() + pos);
             }
             else if (i == 2 || i == 4)
             {
                 bankerHands.emplace_back(card);
+                sum_b = (sum_b + card.cardNum) % 10;
                 validCardVec.erase(validCardVec.begin() + pos);
             }
             else if (i == 5)
             {
-                sum_p = (playerHands[0].cardNum + playerHands[2].cardNum) % 10;
-                sum_b = (bankerHands[1].cardNum + bankerHands[3].cardNum) % 10;
-                eosio::print(" [5sum_p: ", sum_p, " 5sum_b:", sum_b, "] ");
                 // all non-obtain rules
                 if (sum_p == 8 || sum_p == 9 || sum_b == 8 || sum_b == 9)
                 {
@@ -383,10 +382,10 @@ CONTRACT mallard : public contract
                         break; // example: sum_p=7, sum_b=4
                     }
                 }
+                eosio::print(" [5-sum_p: ", sum_p, " 5-sum_b:", sum_b, "] ");
             }
             else if (i == 6)
             {
-                eosio::print(" [6sum_p: ", sum_p, " 6sum_b:", sum_b, "] ");
                 if (sum_p < 3 || (sum_b == 3 && sum_p != 8) || (sum_b == 4 && sum_p != 0 && sum_p != 1 && sum_p != 8 && sum_p != 9) || (sum_b == 5 && sum_p != 0 && sum_p != 1 && sum_p != 2 && sum_p != 3 && sum_p != 8 && sum_p != 9) || sum_p == 6 || sum_p == 7)
                 {
                     bankerHands.emplace_back(card);
@@ -398,6 +397,7 @@ CONTRACT mallard : public contract
                 {
                     break;
                 }
+                eosio::print(" [6-sum_p: ", sum_p, " 6-sum_b:", sum_b, "] ");
             }
         }
         //round result
