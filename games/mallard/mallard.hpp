@@ -426,8 +426,6 @@ CONTRACT mallard : public contract
         checksum256 hash = sha256(toDelPosSeed.c_str(), toDelPosSeed.size());
         auto hash_data = hash.extract_as_byte_array();
         string root_seed_64 = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
-        eosio::print(" toDelPosSeed : ", root_seed_64, " ");
-
         std::vector<uint16_t> toDelCardPosVec;
         wbrng.srand(SDBMHash((char *)root_seed_64.c_str()));
         uint64_t pos = wbrng.rand() % cardVec_temp.size();
@@ -442,7 +440,7 @@ CONTRACT mallard : public contract
         firstCard_temp.deck = (cardPos) / 52 + 1;
         firstCard_temp.cardColor = (cardPos + 1) / 13 % 4;
         firstCard_temp.cardNum = cardnumber;
-        eosio::print("firstCard.deck:", firstCard_temp.deck, " firstCard.cardNum : ", firstCard_temp.cardNum, " firstCard.cardColor:", firstCard_temp.cardColor, " ");
+        eosio::print(" [firstCard.deck:", firstCard_temp.deck, "【", firstCard_temp.cardNum, "】", firstCard_temp.cardColor, "] ");
 
         auto delNum = firstCard_temp.cardNum;
         if (delNum == 11 || delNum == 12 || delNum == 13)
@@ -455,7 +453,7 @@ CONTRACT mallard : public contract
             pos = wbrng.rand() % cardVec_temp.size();
             cardPos = cardVec_temp[pos];
             toDelCardPosVec.emplace_back(cardPos);
-            eosio::print(" [New cardPos to be deleted:", cardPos, "] ");
+            eosio::print(" PosValueToBeDeleted:【", cardPos, "】 ");
             cardVec_temp.erase(cardVec_temp.begin() + pos);
             count++;
         }
@@ -493,6 +491,7 @@ CONTRACT mallard : public contract
                 s.threeResults = threeResults_temp;
             });
         }
+        eosio::print(" 【cards left : ", cardVec_temp.size(), "】 ");
     }
 
     static const std::vector<sym_info> symOptions;
