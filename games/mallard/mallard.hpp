@@ -437,6 +437,8 @@ CONTRACT mallard : public contract
         }
         // use timestamp as seed
         string toDelPosSeed = to_string(now());
+        eosio::print(" [toDelPosSeed: ", toDelPosSeed, "] ");
+        
         checksum256 hash = sha256(toDelPosSeed.c_str(), toDelPosSeed.size());
         auto hash_data = hash.extract_as_byte_array();
         string root_seed_64 = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
