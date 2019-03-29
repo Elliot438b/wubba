@@ -396,7 +396,10 @@ CONTRACT mallard : public contract
                  * ④庄两张总点数5，闲拿第五张且闲三张总点数不为0,1,2,3,8,9，庄拿第六张牌
                  * ⑤庄两张总点数6，闲拿第五张且闲三张为6或7，庄拿第六张牌
                  **/
-                if (sum_b < 3 || (sum_b == 3 && sum_p != 8) || (sum_b == 4 && sum_p != 0 && sum_p != 1 && sum_p != 8 && sum_p != 9) || (sum_b == 5 && sum_p != 0 && sum_p != 1 && sum_p != 2 && sum_p != 3 && sum_p != 8 && sum_p != 9) || sum_p == 6 || sum_p == 7)
+                if (sum_b < 3 || (sum_b == 3 && sum_p != 8) 
+                || (sum_b == 4 && sum_p != 0 && sum_p != 1 && sum_p != 8 && sum_p != 9) 
+                || (sum_b == 5 && sum_p != 0 && sum_p != 1 && sum_p != 2 && sum_p != 3 && sum_p != 8 && sum_p != 9) 
+                || (sum_b == 6 && (sum_p == 6 || sum_p == 7))
                 {
                     bankerHands.emplace_back(card);                 // 第六张牌插入到庄家手牌集合中
                     sum_b = (sum_b + card.cardNum) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
@@ -404,7 +407,7 @@ CONTRACT mallard : public contract
                     break;                                          // 跳出循环，六张牌全部取出，取牌结束
                 }
                 else
-                { // 其他情况，庄均不博牌，共使用五张牌，跳出循环
+                { // sum_b = 7，庄不博牌，共使用五张牌，跳出循环
                     break;
                 }
             }
