@@ -338,68 +338,71 @@ CONTRACT mallard : public contract
             card.cardNum = cardnumber;
             card.cardColor = suitcolor;
             eosio::print(" [card : ", deck, " 【", cardnumber, "】 ", suitcolor, "] ");
-            if (i == 1 || i == 3)
+            // ------------------------------ 博牌 start ------------------------------
+            if (i == 1 || i == 3) // 第一次和第三次取牌
             {
-                playerHands.emplace_back(card);
-                sum_p = (sum_p + card.cardNum) % 10;
-                validCardVec.erase(validCardVec.begin() + pos);
+                playerHands.emplace_back(card);                 // 插入到闲家手牌集合中
+                sum_p = (sum_p + card.cardNum) % 10;            // 计算闲家手牌总点数，超过以及等于10，只算个位数
+                validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
             }
-            else if (i == 2 || i == 4)
+            else if (i == 2 || i == 4) // 第二次和第四次取牌
             {
-                bankerHands.emplace_back(card);
-                sum_b = (sum_b + card.cardNum) % 10;
-                validCardVec.erase(validCardVec.begin() + pos);
+                bankerHands.emplace_back(card);                 // 插入到庄家手牌集合中
+                sum_b = (sum_b + card.cardNum) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
+                validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
             }
-            else if (i == 5)
+            else if (i == 5) // 第五次取牌
             {
-                // all non-obtain rules
-                if (sum_p == 8 || sum_p == 9 || sum_b == 8 || sum_b == 9)
+                eosio::print(" [4-sum_p: ", sum_p, " 4-sum_b:", sum_b, "] ");
+                if (sum_p < 6) // 当闲家手牌（两张）总点数小于6{0,1,2,3,4,5}时，闲拿第五张牌
                 {
-                    break;
+                    playerHands.emplace_back(card);                 // 第五张牌插入到闲家手牌集合中
+                    sum_p = (sum_p + card.cardNum) % 10;            // 计算闲家手牌总点数，超过以及等于10，只算个位数
+                    validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
                 }
-                else if ((sum_p == 6 || sum_p == 7) && (sum_b == 6 || sum_b == 7))
+                else if (sum_b < 6) // 如果闲家未拿到第五张牌，这里讨论庄是否能拿第五张牌：
                 {
-                    break;
+                    /** 
+                     * ①庄两张总点数{0,1,2}，庄拿第五张牌
+                     * ②庄两张总点数3，庄拿第五张牌（庄不博牌的情况是基于闲拿第五张，闲未能拿第五张，庄一定可以拿）
+                     * ③庄两张总点数4，庄拿第五张牌（庄不博牌的情况是基于闲拿第五张，闲未能拿第五张，庄一定可以拿）
+                     * ④庄两张总点数5，庄拿第五张牌（庄不博牌的情况是基于闲拿第五张，闲未能拿第五张，庄一定可以拿）
+                     **/
+                    bankerHands.emplace_back(card);                 // 第五张牌插入到庄家手牌集合中
+                    sum_b = (sum_b + card.cardNum) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
+                    validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
+                    break;                                          // 庄拿到第五张牌，共使用五张牌，跳出循环，没有第六次取牌
                 }
-                // all obtain rules.
                 else
-                {
-                    if (sum_p < 6)
-                    {
-                        playerHands.emplace_back(card);
-                        validCardVec.erase(validCardVec.begin() + pos);
-                        sum_p = (sum_p + card.cardNum) % 10;
-                    }
-                    else if (sum_b < 3)
-                    {
-                        bankerHands.emplace_back(card);
-                        validCardVec.erase(validCardVec.begin() + pos);
-                        sum_b = (sum_b + card.cardNum) % 10;
-                        break;
-                    }
-                    else
-                    {
-                        break; // example: sum_p=7, sum_b=4
-                    }
+                { // 其他情况67以及例牌，均不博牌，共使用四张牌，跳出循环，没有第六次取牌。例如sum_p = 7, sum_b = 6
+                    break;
                 }
-                eosio::print(" [5-sum_p: ", sum_p, " 5-sum_b:", sum_b, "] ");
             }
-            else if (i == 6)
+            else if (i == 6) // 第六次取牌，闲家拿到第五张牌，现在判断庄家是否要拿第六张牌：
             {
+                eosio::print(" [5-sum_p: ", sum_p, " 5-sum_b:", sum_b, "] ");
+                /** 
+                 * ①庄两张总点数{0,1,2}，庄拿第六张牌
+                 * ②庄两张总点数3，闲拿第五张且闲三张总点数不为8，庄拿第六张牌
+                 * ③庄两张总点数4，闲拿第五张且闲三张总点数不为0,1,8,9，庄拿第六张牌
+                 * ④庄两张总点数5，闲拿第五张且闲三张总点数不为0,1,2,3,8,9，庄拿第六张牌
+                 * ⑤庄两张总点数6，闲拿第五张且闲三张为6或7，庄拿第六张牌
+                 **/
                 if (sum_p < 3 || (sum_b == 3 && sum_p != 8) || (sum_b == 4 && sum_p != 0 && sum_p != 1 && sum_p != 8 && sum_p != 9) || (sum_b == 5 && sum_p != 0 && sum_p != 1 && sum_p != 2 && sum_p != 3 && sum_p != 8 && sum_p != 9) || sum_p == 6 || sum_p == 7)
                 {
-                    bankerHands.emplace_back(card);
-                    validCardVec.erase(validCardVec.begin() + pos);
-                    sum_b = (sum_b + card.cardNum) % 10;
-                    break;
+                    bankerHands.emplace_back(card);                 // 第六张牌插入到庄家手牌集合中
+                    sum_b = (sum_b + card.cardNum) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
+                    validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
+                    break;                                          // 跳出循环，六张牌全部取出，取牌结束
                 }
                 else
-                {
+                { // 其他情况，庄均不博牌，共使用五张牌，跳出循环
                     break;
                 }
-                eosio::print(" [6-sum_p: ", sum_p, " 6-sum_b:", sum_b, "] ");
             }
+            // ------------------------------ 博牌 end ------------------------------
         }
+        eosio::print(" [final-sum_p: ", sum_p, " final-sum_b:", sum_b, "] ");
         //round result
         roundResult = "00000"; //Banker,Player,Tie,BankerPush,PlayerPush
         if (sum_p < sum_b)     //Banker
