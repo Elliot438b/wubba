@@ -404,8 +404,14 @@ Requirement change, workflow：
 Put the sym_info records into On-chain state table.
 - create a new state table obj: currencyinfo
 - adjust sym_info struct: {code[pk], symName, minPerBet_default}
+- add SC:init
+    - empty parameter
+    - permission: contract account.
+    - insert the init support currency token type.
 - test if successfull when find item from by code.
 - test get table.
+
+
 
 ---
 
