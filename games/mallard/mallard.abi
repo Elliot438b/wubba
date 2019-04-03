@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Apr  3 13:42:28 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Apr  3 13:42:09 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -13,6 +13,24 @@
                 {
                     "name": "account",
                     "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "card_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "deck",
+                    "type": "uint8"
+                },
+                {
+                    "name": "cardNum",
+                    "type": "uint8"
+                },
+                {
+                    "name": "cardColor",
+                    "type": "uint8"
                 }
             ]
         },
@@ -125,59 +143,27 @@
                     "type": "string"
                 },
                 {
-                    "name": "oneRoundMaxTotalBet_bsoe",
+                    "name": "oneRoundMaxTotalBet_bp",
                     "type": "asset"
                 },
                 {
-                    "name": "minPerBet_bsoe",
+                    "name": "minPerBet_bp",
                     "type": "asset"
                 },
                 {
-                    "name": "oneRoundMaxTotalBet_anytri",
+                    "name": "oneRoundMaxTotalBet_tie",
                     "type": "asset"
                 },
                 {
-                    "name": "minPerBet_anytri",
+                    "name": "minPerBet_tie",
                     "type": "asset"
                 },
                 {
-                    "name": "oneRoundMaxTotalBet_trinum",
+                    "name": "oneRoundMaxTotalBet_push",
                     "type": "asset"
                 },
                 {
-                    "name": "minPerBet_trinum",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_pairnum",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_pairnum",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_txx",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_txx",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_twocom",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_twocom",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_single",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_single",
+                    "name": "minPerBet_push",
                     "type": "asset"
                 }
             ]
@@ -259,59 +245,27 @@
                     "type": "string"
                 },
                 {
-                    "name": "oneRoundMaxTotalBet_bsoe",
+                    "name": "oneRoundMaxTotalBet_BP",
                     "type": "asset"
                 },
                 {
-                    "name": "minPerBet_bsoe",
+                    "name": "minPerBet_BP",
                     "type": "asset"
                 },
                 {
-                    "name": "oneRoundMaxTotalBet_anytri",
+                    "name": "oneRoundMaxTotalBet_Tie",
                     "type": "asset"
                 },
                 {
-                    "name": "minPerBet_anytri",
+                    "name": "minPerBet_Tie",
                     "type": "asset"
                 },
                 {
-                    "name": "oneRoundMaxTotalBet_trinum",
+                    "name": "oneRoundMaxTotalBet_Push",
                     "type": "asset"
                 },
                 {
-                    "name": "minPerBet_trinum",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_pairnum",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_pairnum",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_txx",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_txx",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_twocom",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_twocom",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_single",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_single",
+                    "name": "minPerBet_Push",
                     "type": "asset"
                 }
             ]
@@ -345,8 +299,24 @@
                     "type": "name"
                 },
                 {
-                    "name": "bet",
-                    "type": "string"
+                    "name": "betDealer",
+                    "type": "asset"
+                },
+                {
+                    "name": "betPlayer",
+                    "type": "asset"
+                },
+                {
+                    "name": "betTie",
+                    "type": "asset"
+                },
+                {
+                    "name": "betDealerPush",
+                    "type": "asset"
+                },
+                {
+                    "name": "betPlayerPush",
+                    "type": "asset"
                 },
                 {
                     "name": "pBonus",
@@ -379,8 +349,24 @@
                     "type": "name"
                 },
                 {
-                    "name": "bet",
-                    "type": "string"
+                    "name": "betDealer",
+                    "type": "asset"
+                },
+                {
+                    "name": "betPlayer",
+                    "type": "asset"
+                },
+                {
+                    "name": "betTie",
+                    "type": "asset"
+                },
+                {
+                    "name": "betDealerPush",
+                    "type": "asset"
+                },
+                {
+                    "name": "betPlayerPush",
+                    "type": "asset"
                 },
                 {
                     "name": "agentalias",
@@ -421,11 +407,69 @@
             ]
         },
         {
-            "name": "table_stats",
+            "name": "shuffle",
             "base": "",
             "fields": [
                 {
                     "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "shuffle_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "firstCard",
+                    "type": "card_info"
+                },
+                {
+                    "name": "threeResults",
+                    "type": "shuffle_round_result[]"
+                }
+            ]
+        },
+        {
+            "name": "shuffle_round_result",
+            "base": "",
+            "fields": [
+                {
+                    "name": "roundNum",
+                    "type": "uint64"
+                },
+                {
+                    "name": "roundResult",
+                    "type": "string"
+                },
+                {
+                    "name": "playerHands",
+                    "type": "card_info[]"
+                },
+                {
+                    "name": "bankerHands",
+                    "type": "card_info[]"
+                }
+            ]
+        },
+        {
+            "name": "table_stats",
+            "base": "",
+            "fields": [
+                {
+                    "name": "validCardVec",
+                    "type": "uint16[]"
+                },
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "cardBoot",
                     "type": "uint64"
                 },
                 {
@@ -445,59 +489,27 @@
                     "type": "asset"
                 },
                 {
-                    "name": "oneRoundMaxTotalBet_bsoe",
+                    "name": "oneRoundMaxTotalBet_BP",
                     "type": "asset"
                 },
                 {
-                    "name": "minPerBet_bsoe",
+                    "name": "minPerBet_BP",
                     "type": "asset"
                 },
                 {
-                    "name": "oneRoundMaxTotalBet_anytri",
+                    "name": "oneRoundMaxTotalBet_Tie",
                     "type": "asset"
                 },
                 {
-                    "name": "minPerBet_anytri",
+                    "name": "minPerBet_Tie",
                     "type": "asset"
                 },
                 {
-                    "name": "oneRoundMaxTotalBet_trinum",
+                    "name": "oneRoundMaxTotalBet_Push",
                     "type": "asset"
                 },
                 {
-                    "name": "minPerBet_trinum",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_pairnum",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_pairnum",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_txx",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_txx",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_twocom",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_twocom",
-                    "type": "asset"
-                },
-                {
-                    "name": "oneRoundMaxTotalBet_single",
-                    "type": "asset"
-                },
-                {
-                    "name": "minPerBet_single",
+                    "name": "minPerBet_Push",
                     "type": "asset"
                 },
                 {
@@ -514,11 +526,11 @@
                 },
                 {
                     "name": "commission_rate_agent",
-                    "type": "float64"
+                    "type": "float32"
                 },
                 {
                     "name": "commission_rate_player",
-                    "type": "float64"
+                    "type": "float32"
                 },
                 {
                     "name": "betStartTime",
@@ -529,31 +541,15 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "currRoundBetSum_bsoe",
+                    "name": "currRoundBetSum_BP",
                     "type": "asset"
                 },
                 {
-                    "name": "currRoundBetSum_anytri",
+                    "name": "currRoundBetSum_Tie",
                     "type": "asset"
                 },
                 {
-                    "name": "currRoundBetSum_trinum",
-                    "type": "asset"
-                },
-                {
-                    "name": "currRoundBetSum_pairnum",
-                    "type": "asset"
-                },
-                {
-                    "name": "currRoundBetSum_txx",
-                    "type": "asset"
-                },
-                {
-                    "name": "currRoundBetSum_twocom",
-                    "type": "asset"
-                },
-                {
-                    "name": "currRoundBetSum_single",
+                    "name": "currRoundBetSum_Push",
                     "type": "asset"
                 },
                 {
@@ -589,8 +585,12 @@
                     "type": "string"
                 },
                 {
-                    "name": "diceResult",
-                    "type": "string"
+                    "name": "playerHands",
+                    "type": "card_info[]"
+                },
+                {
+                    "name": "bankerHands",
+                    "type": "card_info[]"
                 }
             ]
         },
@@ -716,6 +716,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "shuffle",
+            "type": "shuffle",
+            "ricardian_contract": ""
+        },
+        {
             "name": "trusteeship",
             "type": "trusteeship",
             "ricardian_contract": ""
@@ -735,6 +740,13 @@
         {
             "name": "aliasinfo",
             "type": "alias_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "shuffleinfo",
+            "type": "shuffle_info",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
