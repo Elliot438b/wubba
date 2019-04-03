@@ -393,6 +393,20 @@ TABLE shuffle_info
 SC::playerbet add a commission settlement logic:
 - player/agent/platform, all paid by the banker(**dealerBalance**).
 
+## v0.8 target
+Requirement change, workflow：
+> ①new idea -> ②analyze -> ③add plan here(markdown) -> **④coding** -> **⑤testing** -> **⑥commit to github** -> ⑦verify **⑧modify interface file** -> **⑨commit** -> ⑩verify -> **⑪send to client colleague** -> **⑫explain**
+
+- ①②③⑦⑩：web
+- ④⑤⑥⑧⑨⑪⑫: liS
+
+### 1. sym_info
+Put the sym_info records into On-chain state table.
+- create a new state table obj: currencyinfo
+- adjust sym_info struct: {code[pk], symName, minPerBet_default}
+- test if successfull when find item from by code.
+- test get table.
+
 ---
 
 # NOTE
