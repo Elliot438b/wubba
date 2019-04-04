@@ -28,7 +28,7 @@ ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, 
                          asset oneRoundMaxTotalBet_push, asset minPerBet_push)
 {
     require_auth(dealer);
-    bool symbol_exist_flag = false; // flag if user symbol(code,sym) is including in sysconfig(symOptions).
+    extended_symbol cur_ex_sym = defaultSym;
     asset minPerBet_default_temp;
 
     auto existing = tablecurrency.find(code.value);
@@ -36,16 +36,10 @@ ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, 
     {
         if(0 == existing->symName.code().to_string().compare(sym))
         {
-            symbol_exist_flag = true;
+            cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
             minPerBet_default_temp = existing->minPerBet_default;
             eosio::print(" -----EXIST IN tablecuurrency");
         }
-    }
-
-    extended_symbol cur_ex_sym = defaultSym;
-    if (symbol_exist_flag)
-    {
-        cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
     }
 
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
@@ -99,20 +93,15 @@ ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sy
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The table can only be edited at the ROUND_END stage!");
 
     asset minPerBet_default_temp;
-    bool symbol_exist_flag = false; // flag if user symbol(code,sym) is including in sysconfig(symOptions).
+    extended_symbol cur_ex_sym = defaultSym;
     auto existing_cur = tablecurrency.find(code.value);
     if(existing_cur != tablecurrency.end())
     {
         if(0 == existing_cur->symName.code().to_string().compare(sym))
         {
-            symbol_exist_flag = true;
+            cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
             minPerBet_default_temp = existing_cur->minPerBet_default;
         }
-    }
-    extended_symbol cur_ex_sym = defaultSym;
-    if (symbol_exist_flag)
-    {
-        cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
     }
 
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
