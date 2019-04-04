@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Apr  3 13:42:09 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Apr  4 16:04:18 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -51,6 +51,24 @@
                 {
                     "name": "tableId",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "currency_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "name"
+                },
+                {
+                    "name": "symName",
+                    "type": "symbol"
+                },
+                {
+                    "name": "minPerBet_default",
+                    "type": "asset"
                 }
             ]
         },
@@ -209,6 +227,24 @@
                 {
                     "name": "contract",
                     "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "initsymbol",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "name"
+                },
+                {
+                    "name": "sym",
+                    "type": "string"
+                },
+                {
+                    "name": "minperbet",
+                    "type": "asset"
                 }
             ]
         },
@@ -686,6 +722,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "initsymbol",
+            "type": "initsymbol",
+            "ricardian_contract": ""
+        },
+        {
             "name": "newtable",
             "type": "newtable",
             "ricardian_contract": ""
@@ -740,6 +781,13 @@
         {
             "name": "aliasinfo",
             "type": "alias_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "currencyinfo",
+            "type": "currency_info",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

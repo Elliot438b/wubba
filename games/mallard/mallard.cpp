@@ -1,6 +1,6 @@
 #include "mallard.hpp"
 
-ACTION mallard::init(name code, string sym, asset minperbet)
+ACTION mallard::initsymbol(name code, string sym, asset minperbet)
 {
     require_auth(_self);
 
@@ -671,4 +671,4 @@ ACTION mallard::pushaliasnam(string alias, name account)
         s.account = account;
     });
 }
-EOSIO_DISPATCH(mallard, (init)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(pushaliasnam))
+EOSIO_DISPATCH(mallard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(pushaliasnam))

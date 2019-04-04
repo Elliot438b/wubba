@@ -16,8 +16,9 @@ CONTRACT lizard : public contract
     using contract::contract;
 
     lizard(name receiver, name code, datastream<const char *> ds)
-        : contract(receiver, code, ds), tableround(receiver, receiver.value), tablealias(receiver, receiver.value) {}
+        : contract(receiver, code, ds), tableround(receiver, receiver.value), tablealias(receiver, receiver.value), tablecurrency(receiver, receiver.value) {}
 
+    ACTION initsymbol(name code, string sym, asset minperbet);
     ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
@@ -125,9 +126,22 @@ CONTRACT lizard : public contract
         EOSLIB_SERIALIZE(alias_info, (aliasId)(account))
     };
 
+    TABLE currency_info
+    {
+        name code;
+        symbol symName;
+        asset minPerBet_default;
+
+        uint64_t primary_key() const { return code.value; }
+
+        EOSLIB_SERIALIZE(currency_info, (code)(symName)(minPerBet_default))
+    };
+
     typedef eosio::multi_index<"tablesinfo"_n, lizard::table_stats, indexed_by<"dealer"_n, const_mem_fun<lizard::table_stats, uint64_t, &lizard::table_stats::get_dealer>>> singletable_t;
     typedef eosio::multi_index<"aliasinfo"_n, lizard::alias_info> aliasinfos;
+    typedef eosio::multi_index<"currencyinfo"_n, lizard::currency_info> currencyinfo_t;
 
+    using initsymbol_action = action_wrapper<"initsymbol"_n, &lizard::initsymbol>;
     using newtable_action = action_wrapper<"newtable"_n, &lizard::newtable>;
     using dealerseed_action = action_wrapper<"dealerseed"_n, &lizard::dealerseed>;
     using serverseed_action = action_wrapper<"serverseed"_n, &lizard::serverseed>;
@@ -146,36 +160,6 @@ CONTRACT lizard : public contract
     using depositable_action = action_wrapper<"depositable"_n, &lizard::depositable>;
     using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &lizard::dealerwitdaw>;
     using pushaliasnam_action = action_wrapper<"pushaliasnam"_n, &lizard::pushaliasnam>;
-
-    struct sym_info
-    {
-        uint16_t id;
-        name code;
-        symbol symName;
-        asset minPerBet_default;
-
-        EOSLIB_SERIALIZE(sym_info, (id)(code)(symName)(minPerBet_default))
-    };
-
-    static std::vector<sym_info> createSymOptions()
-    {
-        std::vector<sym_info> tempSym;
-
-        sym_info sym_temp;
-        sym_temp.id = 0;
-        sym_temp.code = "eosio.token"_n;
-        sym_temp.symName = symbol(symbol_code("SYS"), 4);
-        sym_temp.minPerBet_default = asset(1000, sym_temp.symName);
-        tempSym.emplace_back(sym_temp);
-
-        sym_temp.id = 1;
-        sym_temp.code = "useraaaaaaaj"_n;
-        sym_temp.symName = symbol(symbol_code("TES"), 4);
-        sym_temp.minPerBet_default = asset(1000, sym_temp.symName);
-        tempSym.emplace_back(sym_temp);
-
-        return tempSym;
-    }
 
     struct bet_info
     {
@@ -387,9 +371,9 @@ CONTRACT lizard : public contract
     }
 
     static const std::vector<string> betOptions;
-    static const std::vector<sym_info> symOptions;
     singletable_t tableround;
     aliasinfos tablealias;
+    currencyinfo_t tablecurrency;
 
     WBRNG wbrng;
 
@@ -403,4 +387,3 @@ CONTRACT lizard : public contract
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 };
 const std::vector<string> lizard::betOptions = lizard::createBetOptions();
-const std::vector<lizard::sym_info> lizard::symOptions = lizard::createSymOptions();

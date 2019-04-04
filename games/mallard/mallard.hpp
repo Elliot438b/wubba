@@ -19,7 +19,7 @@ CONTRACT mallard : public contract
     mallard(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value), tableshuffle(receiver, receiver.value), tablealias(receiver, receiver.value), tablecurrency(receiver, receiver.value) {}
 
-    ACTION init(name code, string sym, asset minperbet);
+    ACTION initsymbol(name code, string sym, asset minperbet);
     ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
@@ -172,6 +172,7 @@ CONTRACT mallard : public contract
     typedef eosio::multi_index<"aliasinfo"_n, mallard::alias_info> aliasinfo_t;
     typedef eosio::multi_index<"currencyinfo"_n, mallard::currency_info> currencyinfo_t;
 
+    using initsymbol_action = action_wrapper<"initsymbol"_n, &mallard::initsymbol>;
     using newtable_action = action_wrapper<"newtable"_n, &mallard::newtable>;
     using dealerseed_action = action_wrapper<"dealerseed"_n, &mallard::dealerseed>;
     using serverseed_action = action_wrapper<"serverseed"_n, &mallard::serverseed>;
@@ -193,35 +194,6 @@ CONTRACT mallard : public contract
     using edittable_action = action_wrapper<"edittable"_n, &mallard::edittable>;
     using pushaliasnam_action = action_wrapper<"pushaliasnam"_n, &mallard::pushaliasnam>;
 
-//    struct sym_info
-//    {
-//        uint16_t id;
-//        name code;
-//        symbol symName;
-//        asset minPerBet_default;
-//
-//        EOSLIB_SERIALIZE(sym_info, (id)(code)(symName)(minPerBet_default))
-//    };
-
-//    static std::vector<sym_info> createSymOptions()
-//    {
-//        std::vector<sym_info> tempSym;
-//
-//        sym_info sym_temp;
-//        sym_temp.id = 0;
-//        sym_temp.code = "eosio.token"_n;
-//        sym_temp.symName = symbol(symbol_code("SYS"), 4);
-//        sym_temp.minPerBet_default = asset(1000, sym_temp.symName);
-//        tempSym.emplace_back(sym_temp);
-//
-//        sym_temp.id = 1;
-//        sym_temp.code = "useraaaaaaaj"_n;
-//        sym_temp.symName = symbol(symbol_code("TES"), 4);
-//        sym_temp.minPerBet_default = asset(1000, sym_temp.symName);
-//        tempSym.emplace_back(sym_temp);
-//
-//        return tempSym;
-//    }
 
     // std random
     struct WBRNG

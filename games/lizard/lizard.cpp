@@ -1,5 +1,29 @@
 #include "lizard.hpp"
 
+
+ACTION lizard::initsymbol(name code, string sym, asset minperbet)
+{
+    require_auth(_self);
+
+    auto existing = tablecurrency.find(code.value);
+    //eosio_assert(existing == tablealias.end(), "alias exist...");
+    if(existing == tablecurrency.end())
+    {
+        tablecurrency.emplace(_self, [&](auto &s) {
+            s.code = code;
+            s.symName = symbol(symbol_code(sym), 4);
+            s.minPerBet_default = minperbet;
+        });
+    }
+    else
+    {
+        tablecurrency.modify(existing, _self, [&](auto &s) {
+            s.symName = symbol(symbol_code(sym), 4);
+            s.minPerBet_default = minperbet;
+        });
+    }
+}
+
 ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
 {
     require_auth(dealer);
@@ -7,21 +31,19 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
     asset minPerBet_default_temp;
     asset oneRoundDealerMaxPay_temp;
     asset deposit_tmp;
+    extended_symbol cur_ex_sym = defaultSym;
 
-    bool symbol_exist_flag = false; // flag if user symbol(code,sym) is including in sysconfig(symOptions).
-    for (auto p : lizard::symOptions)
+    auto existing_cur = tablecurrency.find(code.value);
+    if(existing_cur != tablecurrency.end())
     {
-        if (p.code == code && 0 == p.symName.code().to_string().compare(sym))
-        { // found, exist
-            symbol_exist_flag = true;
-            minPerBet_default_temp = p.minPerBet_default;
+        if(0 == existing_cur->symName.code().to_string().compare(sym))
+        {
+            cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
+            minPerBet_default_temp = existing_cur->minPerBet_default;
+            eosio::print("----EXIST IN tablecuurrency");
         }
     }
-    extended_symbol cur_ex_sym = defaultSym;
-    if (symbol_exist_flag)
-    {
-        cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
-    }
+
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
     eosio_assert(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe > minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri > minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum > minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum > minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx > minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom > minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
@@ -90,22 +112,18 @@ ACTION lizard::edittable(uint64_t tableId, bool isPrivate, name code, string sym
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The table can only be edited at the ROUND_END stage!");
 
-    bool symbol_exist_flag = false; // flag if user symbol(code,sym) is including in sysconfig(symOptions).
+    extended_symbol cur_ex_sym = defaultSym;
     asset minPerBet_default_temp;
-    for (auto p : lizard::symOptions)
+    auto existing_cur = tablecurrency.find(code.value);
+    if(existing_cur != tablecurrency.end())
     {
-        if (p.code == code && 0 == p.symName.code().to_string().compare(sym))
-        { // found, exist
-            symbol_exist_flag = true;
-            minPerBet_default_temp = p.minPerBet_default;
+        if(0 == existing_cur->symName.code().to_string().compare(sym))
+        {
+            cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
+            minPerBet_default_temp = existing_cur->minPerBet_default;
         }
     }
 
-    extended_symbol cur_ex_sym = defaultSym;
-    if (symbol_exist_flag)
-    {
-        cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
-    }
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
     eosio_assert(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe > minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri > minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum > minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum > minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx > minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom > minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
@@ -900,7 +918,7 @@ ACTION lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
 ACTION lizard::pushaliasnam(string alias, name account)
 {
     auto existing = tablealias.find(account.value);
-    eosio_assert(existing == tablealias.end(), "account exist...");
+    eosio_assert(existing == tablealias.end(), "alias exist...");
     require_auth(account);
     uint32_t aliasId = SDBMHash((char *)alias.c_str());
 
@@ -909,4 +927,4 @@ ACTION lizard::pushaliasnam(string alias, name account)
         s.account = account;
     });
 }
-EOSIO_DISPATCH(lizard, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam)(edittable))
+EOSIO_DISPATCH(lizard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam)(edittable))
