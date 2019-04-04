@@ -1,5 +1,28 @@
 #include "mallard.hpp"
 
+ACTION mallard::init(name code, string sym, asset minperbet)
+{
+    require_auth(_self);
+
+    auto existing = tablecurrency.find(code.value);
+    //eosio_assert(existing == tablealias.end(), "alias exist...");
+    if(existing == tablecurrency.end())
+    {
+        tablecurrency.emplace(_self, [&](auto &s) {
+            s.code = code;
+            s.symName = symbol(symbol_code(sym), 4);
+            s.minPerBet_default = minperbet;
+        });
+    }
+    else
+    {
+        tablecurrency.modify(existing, _self, [&](auto &s) {
+            s.symName = symbol(symbol_code(sym), 4);
+            s.minPerBet_default = minperbet;
+        });
+    }
+}
+
 ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
                          asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
                          asset oneRoundMaxTotalBet_push, asset minPerBet_push)
@@ -7,14 +30,18 @@ ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, 
     require_auth(dealer);
     bool symbol_exist_flag = false; // flag if user symbol(code,sym) is including in sysconfig(symOptions).
     asset minPerBet_default_temp;
-    for (auto p : mallard::symOptions)
+
+    auto existing = tablecurrency.find(code.value);
+    if(existing != tablecurrency.end())
     {
-        if (p.code == code && 0 == p.symName.code().to_string().compare(sym))
-        { // found, exist
+        if(0 == existing->symName.code().to_string().compare(sym))
+        {
             symbol_exist_flag = true;
-            minPerBet_default_temp = p.minPerBet_default;
+            minPerBet_default_temp = existing->minPerBet_default;
+            eosio::print(" -----EXIST IN tablecuurrency");
         }
     }
+
     extended_symbol cur_ex_sym = defaultSym;
     if (symbol_exist_flag)
     {
@@ -71,14 +98,15 @@ ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sy
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The table can only be edited at the ROUND_END stage!");
 
-    bool symbol_exist_flag = false; // flag if user symbol(code,sym) is including in sysconfig(symOptions).
     asset minPerBet_default_temp;
-    for (auto p : mallard::symOptions)
+    bool symbol_exist_flag = false; // flag if user symbol(code,sym) is including in sysconfig(symOptions).
+    auto existing_cur = tablecurrency.find(code.value);
+    if(existing_cur != tablecurrency.end())
     {
-        if (p.code == code && 0 == p.symName.code().to_string().compare(sym))
-        { // found, exist
+        if(0 == existing_cur->symName.code().to_string().compare(sym))
+        {
             symbol_exist_flag = true;
-            minPerBet_default_temp = p.minPerBet_default;
+            minPerBet_default_temp = existing_cur->minPerBet_default;
         }
     }
     extended_symbol cur_ex_sym = defaultSym;
@@ -645,7 +673,7 @@ ACTION mallard::shuffle(uint64_t tableId)
 ACTION mallard::pushaliasnam(string alias, name account)
 {
     auto existing = tablealias.find(account.value);
-    eosio_assert(existing == tablealias.end(), "account exist...");
+    eosio_assert(existing == tablealias.end(), "alias exist...");
     require_auth(account);
     uint32_t aliasId = SDBMHash((char *)alias.c_str());
 
@@ -654,4 +682,4 @@ ACTION mallard::pushaliasnam(string alias, name account)
         s.account = account;
     });
 }
-EOSIO_DISPATCH(mallard, (newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(pushaliasnam))
+EOSIO_DISPATCH(mallard, (init)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(pushaliasnam))
