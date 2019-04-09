@@ -411,6 +411,11 @@ Put the sym_info records into On-chain state table.
 - test if successfull when find item from by code.
 - test get table.
 
+### 2. fix max tables per dealer
+- Add a limit of the maximum number of tables that can be created per person.
+- Set a global var named "maxinum_table_per_dealer", default as 100.
+- SC::newtable need to verify if the tables owned by current dealer is over the "maxinum_table_per_dealer".
+- Exclude closed tables.
 
 
 ---
