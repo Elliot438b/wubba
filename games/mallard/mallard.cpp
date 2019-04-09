@@ -41,7 +41,7 @@ ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, 
             continue;
         table_num += 1;
     }
-    eosio_assert(table_num <= maxinum_table_per_dealer, "Limit one dealer to 100 tables");
+    eosio_assert(table_num <= maxinum_table_per_dealer, "Exceeding the maxinum_table_per_dealer limit!");
 
     //check currency
     auto existing = tablecurrency.find(code.value);
@@ -55,7 +55,6 @@ ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, 
         }
     }
 
-    //
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
     eosio_assert(oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp > minPerBet_default_temp && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie > minPerBet_default_temp && oneRoundMaxTotalBet_push > init_asset_empty && minPerBet_push > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
