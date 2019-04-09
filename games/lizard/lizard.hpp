@@ -383,6 +383,7 @@ CONTRACT lizard : public contract
     const uint32_t betPeriod = 30;
     const uint32_t minTableRounds = 2;
     float comission_rate_platform_default = 0.005;
+    const uint16_t maxinum_table_per_dealer = 100;
     const char *notableerr = "TableId isn't existing!";
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 };

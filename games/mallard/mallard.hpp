@@ -505,6 +505,7 @@ CONTRACT mallard : public contract
     const uint32_t betPeriod = 30;
     const uint16_t initDecks = 2; //todo default 8 ,2 is test use
     const uint32_t minTableRounds = 10;
+    const uint16_t maxinum_table_per_dealer = 100;
     const char *notableerr = "TableId isn't existing!";
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 

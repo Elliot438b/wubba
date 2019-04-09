@@ -5,6 +5,18 @@ ACTION lizard::initsymbol(name code, string sym, asset minperbet)
 {
     require_auth(_self);
 
+    //dealer limit 100
+    auto dealer_index = tableround.get_index<"dealer"_n>();
+    auto exist_dealer_itr = dealer_index.lower_bound(dealer.value);
+    uint16_t table_num = 0;
+    for(;exist_dealer_itr != dealer_index.end(); exist_dealer_itr++)
+    {
+        if(exist_dealer_itr->tableStatus == (uint64_t)table_stats::status_fields::CLOSED)
+            continue;
+        table_num += 1;
+    }
+    eosio_assert(table_num <= maxinum_table_per_dealer, "Limit one dealer to 100 tables");
+
     auto existing = tablecurrency.find(code.value);
     //eosio_assert(existing == tablealias.end(), "alias exist...");
     if(existing == tablecurrency.end())
