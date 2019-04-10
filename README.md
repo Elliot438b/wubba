@@ -421,6 +421,9 @@ Put the sym_info records into On-chain state table.
 - Null or "" values are not accepted in SC::pushaliasnam. 
 - Account in aliasinfo must be unique.
 
+### 4. fix bug: deposit assert
+- dealerBalance + deposit >= minTableDeposit
+
 ---
 
 # NOTE
