@@ -400,7 +400,7 @@ Requirement change, workflow：
 - ①②③⑦⑩：web
 - ④⑤⑥⑧⑨⑪⑫: liS
 
-### 1. sym_info
+### 1. sym_info (both)
 Put the sym_info records into On-chain state table.
 - create a new state table obj: currencyinfo
 - adjust sym_info struct: {code[pk], symName, minPerBet_default}
@@ -411,12 +411,18 @@ Put the sym_info records into On-chain state table.
 - test if successfull when find item from by code.
 - test get table.
 
-### 2. fix max tables per dealer
+### 2. fix max tables per dealer (both)
 - Add a limit of the maximum number of tables that can be created per person.
 - Set a global var named "maxinum_table_per_dealer", default as 100.
 - SC::newtable need to verify if the tables owned by current dealer is over the "maxinum_table_per_dealer".
 - Exclude closed tables.
 
+### 3. aliasinfo account unique (both)
+- Null or "" values are not accepted in SC::pushaliasnam. 
+- Account in aliasinfo must be unique.
+
+### 4. fix bug: deposit assert
+- dealerBalance + deposit >= minTableDeposit
 
 ---
 

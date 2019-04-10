@@ -15,7 +15,7 @@ ACTION lizard::initsymbol(name code, string sym, asset minperbet)
             continue;
         table_num += 1;
     }
-    eosio_assert(table_num <= maxinum_table_per_dealer, "Limit one dealer to 100 tables");
+    eosio_assert(table_num <= maxinum_table_per_dealer, "Exceeding the maxinum_table_per_dealer limit!");
 
     auto existing = tablecurrency.find(code.value);
     //eosio_assert(existing == tablealias.end(), "alias exist...");
