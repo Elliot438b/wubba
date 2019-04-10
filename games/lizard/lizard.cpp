@@ -893,7 +893,7 @@ ACTION lizard::depositable(name dealer, uint64_t tableId, asset deposit)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(dealer);
-    eosio_assert(deposit >= existing->minTableDeposit, "Table deposit is not enough!");
+    eosio_assert(deposit + existing->dealerBalance >= existing->minTableDeposit, "Table deposit is not enough!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         existing->amountSymbol.get_contract(), {{dealer, "active"_n}},
