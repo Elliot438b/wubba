@@ -674,10 +674,17 @@ ACTION mallard::shuffle(uint64_t tableId)
 }
 ACTION mallard::pushaliasnam(string alias, name account)
 {
-    auto existing = tablealias.find(account.value);
-    eosio_assert(existing == tablealias.end(), "alias exist...");
     require_auth(account);
     uint32_t aliasId = SDBMHash((char *)alias.c_str());
+    auto existing = tablealias.find(aliasId);
+    eosio_assert(existing == tablealias.end(), "alias exist...");
+    eosio_assert(0 != alias.compare(""), "alias is empty");
+
+    auto account_index = tablealias.get_index<"account"_n>();
+    auto exist_account_itr_lower = account_index.lower_bound(account.value);
+    auto exist_account_itr_upper = account_index.upper_bound(account.value);
+
+    eosio_assert(exist_account_itr_lower == exist_account_itr_upper, "one account only have one alias");
 
     tablealias.emplace(_self, [&](auto &s) {
         s.aliasId = aliasId;
