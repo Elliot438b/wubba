@@ -22,7 +22,15 @@ temptest)
         cleos --wallet-url http://127.0.0.1:6666 push action game12lizard initsymbol '["eosio.token","SYS","0.1000 SYS"]' -p game12lizard
         cleos get table game12lizard game12lizard currencyinfo
 
-    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '[useraaaaaaab,"4000.0000 SYS", 1, "eosio.token", "SYS", "0.5000", "0.2000", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
+    for((num=1;num<=10;num++));
+    do
+        cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '[useraaaaaaab,"4000.0000 SYS", 1, "eosio.token", "SYS", "0.5000", "0.2000", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
+        tableid=`cleos get table game12lizard game12lizard tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
+        cleos --wallet-url http://127.0.0.1:6666 push action game12lizard shuffle '['$tableid']' -p useraaaaaaab
+        sleep 5s
+    done
+
+    #cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '[useraaaaaaab,"4000.0000 SYS", 1, "eosio.token", "SYS", "0.5000", "0.2000", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
 
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard pushaliasnam '["","useraaaaaaaa"]' -p useraaaaaaaa
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard pushaliasnam '["wls","useraaaaaaaa"]' -p useraaaaaaaa
