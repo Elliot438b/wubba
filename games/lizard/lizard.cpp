@@ -35,11 +35,13 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
 
     //dealer limit 100
     auto dealer_index = tableround.get_index<"dealer"_n>();
-    auto exist_dealer_itr = dealer_index.lower_bound(dealer.value);
+    auto exist_dealer_lower_itr = dealer_index.lower_bound(dealer.value);
+    auto exist_dealer_upper_itr = dealer_index.upper_bound(dealer.value);
+
     uint16_t table_num = 0;
-    for(;exist_dealer_itr != dealer_index.end(); exist_dealer_itr++)
+    for(;exist_dealer_lower_itr != exist_dealer_upper_itr; exist_dealer_lower_itr++)
     {
-        if(exist_dealer_itr->tableStatus == (uint64_t)table_stats::status_fields::CLOSED)
+        if(exist_dealer_lower_itr->tableStatus == (uint64_t)table_stats::status_fields::CLOSED)
             continue;
         table_num += 1;
     }
