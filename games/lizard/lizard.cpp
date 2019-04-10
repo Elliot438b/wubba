@@ -5,18 +5,6 @@ ACTION lizard::initsymbol(name code, string sym, asset minperbet)
 {
     require_auth(_self);
 
-    //dealer limit 100
-    auto dealer_index = tableround.get_index<"dealer"_n>();
-    auto exist_dealer_itr = dealer_index.lower_bound(dealer.value);
-    uint16_t table_num = 0;
-    for(;exist_dealer_itr != dealer_index.end(); exist_dealer_itr++)
-    {
-        if(exist_dealer_itr->tableStatus == (uint64_t)table_stats::status_fields::CLOSED)
-            continue;
-        table_num += 1;
-    }
-    eosio_assert(table_num <= maxinum_table_per_dealer, "Exceeding the maxinum_table_per_dealer limit!");
-
     auto existing = tablecurrency.find(code.value);
     //eosio_assert(existing == tablealias.end(), "alias exist...");
     if(existing == tablecurrency.end())
@@ -44,6 +32,18 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
     asset oneRoundDealerMaxPay_temp;
     asset deposit_tmp;
     extended_symbol cur_ex_sym = defaultSym;
+
+    //dealer limit 100
+    auto dealer_index = tableround.get_index<"dealer"_n>();
+    auto exist_dealer_itr = dealer_index.lower_bound(dealer.value);
+    uint16_t table_num = 0;
+    for(;exist_dealer_itr != dealer_index.end(); exist_dealer_itr++)
+    {
+        if(exist_dealer_itr->tableStatus == (uint64_t)table_stats::status_fields::CLOSED)
+            continue;
+        table_num += 1;
+    }
+    eosio_assert(table_num <= maxinum_table_per_dealer, "Exceeding the maxinum_table_per_dealer limit!");
 
     auto existing_cur = tablecurrency.find(code.value);
     if(existing_cur != tablecurrency.end())
@@ -929,10 +929,17 @@ ACTION lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
 
 ACTION lizard::pushaliasnam(string alias, name account)
 {
-    auto existing = tablealias.find(account.value);
-    eosio_assert(existing == tablealias.end(), "alias exist...");
     require_auth(account);
     uint32_t aliasId = SDBMHash((char *)alias.c_str());
+    auto existing = tablealias.find(aliasId);
+    eosio_assert(existing == tablealias.end(), "alias exist...");
+    eosio_assert(0 != alias.compare(""), "alias is empty");
+
+    auto account_index = tablealias.get_index<"account"_n>();
+    auto exist_account_itr_lower = account_index.lower_bound(account.value);
+    auto exist_account_itr_upper = account_index.upper_bound(account.value);
+
+    eosio_assert(exist_account_itr_lower == exist_account_itr_upper, "one account only have one alias");
 
     tablealias.emplace(_self, [&](auto &s) {
         s.aliasId = aliasId;

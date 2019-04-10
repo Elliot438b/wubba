@@ -170,7 +170,6 @@ CONTRACT mallard : public contract
 
     typedef eosio::multi_index<"tablesinfo"_n, mallard::table_stats, indexed_by<"dealer"_n, const_mem_fun<mallard::table_stats, uint64_t, &mallard::table_stats::get_dealer>>> singletable_t;
     typedef eosio::multi_index<"shuffleinfo"_n, mallard::shuffle_info> shuffleinfo_t;
-    //typedef eosio::multi_index<"aliasinfo"_n, mallard::alias_info> aliasinfo_t;
     typedef eosio::multi_index<"aliasinfo"_n, mallard::alias_info, indexed_by<"account"_n, const_mem_fun<mallard::alias_info, uint64_t, &mallard::alias_info::get_account>>> aliasinfo_t;
     typedef eosio::multi_index<"currencyinfo"_n, mallard::currency_info> currencyinfo_t;
 

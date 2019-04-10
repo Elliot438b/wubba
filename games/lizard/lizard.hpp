@@ -123,6 +123,8 @@ CONTRACT lizard : public contract
         name account;
 
         uint64_t primary_key() const { return aliasId; }
+        uint64_t get_account() const { return account.value; }
+
         EOSLIB_SERIALIZE(alias_info, (aliasId)(account))
     };
 
@@ -138,7 +140,7 @@ CONTRACT lizard : public contract
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, lizard::table_stats, indexed_by<"dealer"_n, const_mem_fun<lizard::table_stats, uint64_t, &lizard::table_stats::get_dealer>>> singletable_t;
-    typedef eosio::multi_index<"aliasinfo"_n, lizard::alias_info> aliasinfos;
+    typedef eosio::multi_index<"aliasinfo"_n, lizard::alias_info, indexed_by<"account"_n, const_mem_fun<lizard::alias_info, uint64_t, &lizard::alias_info::get_account>>> aliasinfo_t;
     typedef eosio::multi_index<"currencyinfo"_n, lizard::currency_info> currencyinfo_t;
 
     using initsymbol_action = action_wrapper<"initsymbol"_n, &lizard::initsymbol>;
@@ -372,7 +374,7 @@ CONTRACT lizard : public contract
 
     static const std::vector<string> betOptions;
     singletable_t tableround;
-    aliasinfos tablealias;
+    aliasinfo_t tablealias;
     currencyinfo_t tablecurrency;
 
     WBRNG wbrng;

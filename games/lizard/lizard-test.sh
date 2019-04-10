@@ -24,6 +24,10 @@ temptest)
 
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '[useraaaaaaab,"4000.0000 SYS", 1, "eosio.token", "SYS", "0.5000", "0.2000", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaab
 
+    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard pushaliasnam '["","useraaaaaaaa"]' -p useraaaaaaaa
+    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard pushaliasnam '["wls","useraaaaaaaa"]' -p useraaaaaaaa
+    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard pushaliasnam '["wls1","useraaaaaaaa"]' -p useraaaaaaaa
+    cleos get table game12lizard game12lizard aliasinfo
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard pushaliasnam '["wls", "useraaaaaaah"]' -p useraaaaaaah
     cleos get table game12lizard game12lizard aliasinfo
 
