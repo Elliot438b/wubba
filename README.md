@@ -400,7 +400,7 @@ Requirement change, workflow：
 - ①②③⑦⑩：web
 - ④⑤⑥⑧⑨⑪⑫: liS
 
-### 1. sym_info (both)
+### 1. sym_info
 Put the sym_info records into On-chain state table.
 - create a new state table obj: currencyinfo
 - adjust sym_info struct: {code[pk], symName, minPerBet_default}
@@ -411,13 +411,13 @@ Put the sym_info records into On-chain state table.
 - test if successfull when find item from by code.
 - test get table.
 
-### 2. fix max tables per dealer (both)
+### 2. fix max tables per dealer
 - Add a limit of the maximum number of tables that can be created per person.
 - Set a global var named "maxinum_table_per_dealer", default as 100.
 - SC::newtable need to verify if the tables owned by current dealer is over the "maxinum_table_per_dealer".
 - Exclude closed tables.
 
-### 3. aliasinfo account unique (both)
+### 3. aliasinfo account unique
 - Null or "" values are not accepted in SC::pushaliasnam. 
 - Account in aliasinfo must be unique.
 
@@ -433,6 +433,10 @@ Put the sym_info records into On-chain state table.
 - ***erasingdata***, change to **adminaccount**
 - ***initsymbol***, change to **adminaccount**
 - ***shuffle***, bac specific. Change to **serveraccount**
+
+### 7. modify erasingdata content
+- delete content: delete one item according to the key{tableId}.
+- modify the key which could delete all(used when update SC with data changed). From -1 to one gloabl var named: delall_key = 103718369455
 
 ---
 
