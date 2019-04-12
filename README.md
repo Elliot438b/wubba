@@ -424,9 +424,25 @@ Put the sym_info records into On-chain state table.
 ### 4. fix bug: deposit assert
 - dealerBalance + deposit >= minTableDeposit
 
+### 5. add new interface: ***import12data***
+- add a new global var named: adminaccount = "useraaaaaaak"
+- permission:**adminaccount**
+- function: import the current SC's state data struct with one item.
+
+### 6. modify the important interface's permission
+- ***erasingdata***, change to **adminaccount**
+- ***initsymbol***, change to **adminaccount**
+- ***shuffle***, bac specific. Change to **serveraccount**
+
 ---
 
 # NOTE
+## strategy:udpate SC with state data struct modification 
+- edit SC state data struct and modify ***import12data*** with new data strut.
+- localDB via getTableRows storage all exsit data items.
+- server account call ***erasingdata***
+- server account call ***import12data*** with all items storaged in localDB.
+
 ## spreadcode
 ### alias_info lifetime
 > rules: delete the item obj in "alias_info" when the item inactive for one month.
