@@ -424,6 +424,7 @@ Put the sym_info records into On-chain state table.
 ### 4. fix bug: deposit assert
 - dealerBalance + deposit >= minTableDeposit
 
+## TODO
 ### 5. add new interface: ***import12data***
 - add a new global var named: adminaccount = "useraaaaaaak"
 - permission:**adminaccount**
