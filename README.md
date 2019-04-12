@@ -438,6 +438,9 @@ Put the sym_info records into On-chain state table.
 - delete content: delete one item according to the key{tableId}.
 - modify the key which could delete all(used when update SC with data changed). From -1 to one gloabl var named: delall_key = 103718369455
 
+### 8. modify initsymbol
+- add verification: transfer *minperbet* new symbol added to verify. If success, insert symbol to **currencyinfo**, otherwise break off.
+
 ---
 
 # NOTE
