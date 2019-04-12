@@ -441,6 +441,9 @@ Put the sym_info records into On-chain state table.
 ### 8. modify initsymbol
 - add verification: transfer *minperbet* new symbol added to verify. If success, insert symbol to **currencyinfo**, otherwise break off.
 
+### 9. modify tablesinfo strut
+- add two new fields: *playercommission*, *agentcommission* into the **player_bet_info**
+- modify the SC:playerbet, record the *playercommission* and *agentcommission* into **tablesinfo** per bet.
 ---
 
 # NOTE
