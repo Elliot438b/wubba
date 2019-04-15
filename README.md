@@ -424,11 +424,8 @@ Put the sym_info records into On-chain state table.
 ### 4. fix bug: deposit assert
 - dealerBalance + deposit >= minTableDeposit
 
-## TODO
-### 5. add new interface: ***import12data***
+### 5. adminaccount
 - add a new global var named: adminaccount = "useraaaaaaak"
-- permission:**adminaccount**
-- function: import the current SC's state data struct with one item.
 
 ### 6. modify the important interface's permission
 - ***erasingdata***, change to **adminaccount**
@@ -446,6 +443,12 @@ Put the sym_info records into On-chain state table.
 ### 9. modify tablesinfo strut
 - add two new fields: *playercommission*, *agentcommission* into the **player_bet_info**
 - modify the SC:playerbet, record the *playercommission* and *agentcommission* into **tablesinfo** per bet.
+
+## TODO
+### 10.add new interface: ***import12data***
+- permission:**adminaccount**
+- function: import the current SC's state data struct with one item.
+
 ---
 
 # NOTE
