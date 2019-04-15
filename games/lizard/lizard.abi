@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Apr 10 17:15:21 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Mon Apr 15 17:03:24 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -13,6 +13,16 @@
                 {
                     "name": "account",
                     "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "clear12cache",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "int64"
                 }
             ]
         },
@@ -211,16 +221,6 @@
             ]
         },
         {
-            "name": "erasingdata",
-            "base": "",
-            "fields": [
-                {
-                    "name": "key",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "exitruteship",
             "base": "",
             "fields": [
@@ -399,6 +399,14 @@
                 {
                     "name": "nickname",
                     "type": "string"
+                },
+                {
+                    "name": "playercommission",
+                    "type": "asset"
+                },
+                {
+                    "name": "agentcommission",
+                    "type": "asset"
                 }
             ]
         },
@@ -672,6 +680,11 @@
     "types": [],
     "actions": [
         {
+            "name": "clear12cache",
+            "type": "clear12cache",
+            "ricardian_contract": ""
+        },
+        {
             "name": "closetable",
             "type": "closetable",
             "ricardian_contract": ""
@@ -709,11 +722,6 @@
         {
             "name": "endbet",
             "type": "endbet",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "erasingdata",
-            "type": "erasingdata",
             "ricardian_contract": ""
         },
         {

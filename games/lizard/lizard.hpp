@@ -29,7 +29,7 @@ CONTRACT lizard : public contract
     ACTION trusteeship(uint64_t tableId);
     ACTION exitruteship(uint64_t tableId);
     ACTION disconnecthi(name informed, uint64_t tableId);
-    ACTION erasingdata(uint64_t key);
+    ACTION clear12cache(int64_t key);
     ACTION pausetabledea(uint64_t tableId);
     ACTION pausetablesee(uint64_t tableId);
     ACTION continuetable(uint64_t tableId);
@@ -47,8 +47,10 @@ CONTRACT lizard : public contract
         asset dBonus;
         string agent;
         string nickname;
+        asset playercommission;
+        asset agentcommission;
 
-        EOSLIB_SERIALIZE(player_bet_info, (player)(bet)(pBonus)(dBonus)(agent)(nickname))
+        EOSLIB_SERIALIZE(player_bet_info, (player)(bet)(pBonus)(dBonus)(agent)(nickname)(playercommission)(agentcommission))
     };
 
     TABLE table_stats
@@ -154,7 +156,7 @@ CONTRACT lizard : public contract
     using trusteeship_action = action_wrapper<"trusteeship"_n, &lizard::trusteeship>;
     using exitruteship_action = action_wrapper<"exitruteship"_n, &lizard::exitruteship>;
     using disconnecthi_action = action_wrapper<"disconnecthi"_n, &lizard::disconnecthi>;
-    using erasingdata_action = action_wrapper<"erasingdata"_n, &lizard::erasingdata>;
+    using clear12cache_action = action_wrapper<"clear12cache"_n, &lizard::clear12cache>;
     using pausetabledea_action = action_wrapper<"pausetabledea"_n, &lizard::pausetabledea>;
     using pausetableser_action = action_wrapper<"pausetablesee"_n, &lizard::pausetablesee>;
     using continuetable_action = action_wrapper<"continuetable"_n, &lizard::continuetable>;
@@ -381,11 +383,13 @@ CONTRACT lizard : public contract
 
     name serveraccount = "useraaaaaaah"_n;
     name platformaccount = "useraaaaaaae"_n;
+    name adminaccount = "useraaaaaaak"_n;
 
     const uint32_t betPeriod = 30;
     const uint32_t minTableRounds = 2;
     float comission_rate_platform_default = 0.005;
     const uint16_t maxinum_table_per_dealer = 100;
+    const uint64_t delall_key = 103718369455;
     const char *notableerr = "TableId isn't existing!";
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 };

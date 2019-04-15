@@ -3,10 +3,14 @@
 
 ACTION lizard::initsymbol(name code, string sym, asset minperbet)
 {
-    require_auth(_self);
-
+    require_auth(adminaccount);
+    eosio_assert(0 == minperbet.symbol.code().to_string().compare(sym), "symbol not match");
     auto existing = tablecurrency.find(code.value);
-    //eosio_assert(existing == tablealias.end(), "alias exist...");
+    INLINE_ACTION_SENDER(eosio::token, transfer)
+    (
+        code, {{adminaccount, "active"_n}},
+        {adminaccount, _self, minperbet, std::string("test symbol")});
+
     if(existing == tablecurrency.end())
     {
         tablecurrency.emplace(_self, [&](auto &s) {
@@ -437,6 +441,9 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, string agent
             {_self, player, playertotransfer, std::string("playercommission")});
     }
 
+    temp.agentcommission = agentotransfer;
+    temp.playercommission = playertotransfer;
+
     asset balance = existing->dealerBalance;
     balance -= platformtotransfer;
     balance -= agentotransfer;
@@ -802,10 +809,10 @@ ACTION lizard::disconnecthi(name informed, uint64_t tableId)
     eosio::print("SC disconnecthi has already informed :", informed.to_string());
 }
 
-ACTION lizard::erasingdata(uint64_t key)
+ACTION lizard::clear12cache(int64_t key)
 {
-    require_auth(_self);
-    if (key == -1)
+    require_auth(adminaccount);
+    if (key == delall_key)
     {
         auto itr = tableround.begin();
         while (itr != tableround.end())
@@ -830,10 +837,7 @@ ACTION lizard::erasingdata(uint64_t key)
     }
     else
     {
-        auto itr = tableround.find(key);
-        eosio_assert(itr != tableround.end(), "the erase key is not existe");
-        eosio::print("Removing data ", _self, ", condition: ", key, ", itr: ", itr->tableId);
-        tableround.erase(itr);
+        eosio::print("not spport param...");
     }
 }
 
@@ -948,4 +952,4 @@ ACTION lizard::pushaliasnam(string alias, name account)
         s.account = account;
     });
 }
-EOSIO_DISPATCH(lizard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam)(edittable))
+EOSIO_DISPATCH(lizard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam)(edittable))
