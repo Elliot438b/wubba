@@ -30,7 +30,7 @@ CONTRACT mallard : public contract
     ACTION trusteeship(uint64_t tableId);
     ACTION exitruteship(uint64_t tableId);
     ACTION disconnecthi(name informed, uint64_t tableId);
-    ACTION erasingdata(uint64_t key);
+    ACTION clear12cache(int64_t key);
     ACTION pausetabledea(uint64_t tableId);
     ACTION pausetablesee(uint64_t tableId);
     ACTION continuetable(uint64_t tableId);
@@ -62,8 +62,10 @@ CONTRACT mallard : public contract
         asset dBonus;
         string agent;
         string nickname;
+        asset playercommission;
+        asset agentcommission;
 
-        EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPush)(betPlayerPush)(pBonus)(dBonus)(agent)(nickname))
+        EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPush)(betPlayerPush)(pBonus)(dBonus)(agent)(nickname)(playercommission)(agentcommission))
     };
 
     TABLE table_stats
@@ -184,7 +186,7 @@ CONTRACT mallard : public contract
     using trusteeship_action = action_wrapper<"trusteeship"_n, &mallard::trusteeship>;
     using exitruteship_action = action_wrapper<"exitruteship"_n, &mallard::exitruteship>;
     using disconnecthi_action = action_wrapper<"disconnecthi"_n, &mallard::disconnecthi>;
-    using erasingdata_action = action_wrapper<"erasingdata"_n, &mallard::erasingdata>;
+    using clear12cache_action = action_wrapper<"clear12cache"_n, &mallard::clear12cache>;
     using pausetabledea_action = action_wrapper<"pausetabledea"_n, &mallard::pausetabledea>;
     using pausetableser_action = action_wrapper<"pausetablesee"_n, &mallard::pausetablesee>;
     using continuetable_action = action_wrapper<"continuetable"_n, &mallard::continuetable>;
@@ -501,12 +503,14 @@ CONTRACT mallard : public contract
 
     name serveraccount = "useraaaaaaah"_n;
     name platformaccount = "useraaaaaaae"_n;
+    name adminaccount = "useraaaaaaak"_n;
 
     const uint16_t CardsMinLimit = 100;
     const uint32_t betPeriod = 30;
     const uint16_t initDecks = 2; //todo default 8 ,2 is test use
     const uint32_t minTableRounds = 10;
     const uint16_t maxinum_table_per_dealer = 100;
+    const uint64_t delall_key = 103718369455;
     const char *notableerr = "TableId isn't existing!";
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 

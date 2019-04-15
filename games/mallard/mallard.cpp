@@ -2,10 +2,14 @@
 
 ACTION mallard::initsymbol(name code, string sym, asset minperbet)
 {
-    require_auth(_self);
-
+    require_auth(adminaccount);
+    eosio_assert(0 == minperbet.symbol.code().to_string().compare(sym), "symbol not match");
     auto existing = tablecurrency.find(code.value);
-    //eosio_assert(existing == tablealias.end(), "alias exist...");
+    INLINE_ACTION_SENDER(eosio::token, transfer)
+    (
+        code, {{adminaccount, "active"_n}},
+        {adminaccount, _self, minperbet, std::string("test symbol")});
+
     if(existing == tablecurrency.end())
     {
         tablecurrency.emplace(_self, [&](auto &s) {
@@ -311,7 +315,6 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
     temp.dBonus = init_asset_empty;
     temp.agent = agentalias;
     temp.nickname = nickname;
-
     // -------------------------------- commission start --------------------------------
     // platform
     auto temp_rate_platform = comission_rate_platform_default;
@@ -349,6 +352,9 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
             existing->amountSymbol.get_contract(), {{_self, "active"_n}},
             {_self, player, playertotransfer, std::string("playercommission")});
     }
+
+    temp.playercommission = playertotransfer;
+    temp.agentcommission = agentotransfer;
 
     asset balance = existing->dealerBalance;
     balance -= platformtotransfer;
@@ -531,10 +537,10 @@ ACTION mallard::disconnecthi(name informed, uint64_t tableId)
     eosio::print("SC disconnecthi has already informed :", informed.to_string());
 }
 
-ACTION mallard::erasingdata(uint64_t key)
+ACTION mallard::clear12cache(int64_t key)
 {
-    require_auth(_self);
-    if (key == -1)
+    require_auth(adminaccount);
+    if (key == delall_key)
     {
         auto itr = tableround.begin();
         while (itr != tableround.end())
@@ -559,10 +565,7 @@ ACTION mallard::erasingdata(uint64_t key)
     }
     else
     {
-        auto itr = tableround.find(key);
-        eosio_assert(itr != tableround.end(), "the erase key is not existe");
-        eosio::print("Removing data ", _self, ", condition: ", key, ", itr: ", itr->tableId);
-        tableround.erase(itr);
+        eosio::print("not spport param...");
     }
 }
 
@@ -660,9 +663,9 @@ ACTION mallard::dealerwitdaw(uint64_t tableId, asset withdraw)
 }
 ACTION mallard::shuffle(uint64_t tableId)
 {
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_SHUFFLE, "The round isn't shuffle, can't shuffle!");
 
     std::vector<uint16_t> cardVec_temp = existing->validCardVec;
@@ -693,4 +696,6 @@ ACTION mallard::pushaliasnam(string alias, name account)
         s.account = account;
     });
 }
-EOSIO_DISPATCH(mallard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(erasingdata)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(pushaliasnam))
+
+
+EOSIO_DISPATCH(mallard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(pushaliasnam))

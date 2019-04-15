@@ -9,6 +9,7 @@ chainstart)
     cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaac active '{"threshold":1,"keys":[{"key":"EOS7WnhaKwHpbSidYuh2DF1qAExTRUtPEdZCaZqt75cKcixuQUtdA","weight":1}],"accounts":[{"permission":{"actor":"gamemallards","permission":"eosio.code"},"weight":1}]}' owner -p useraaaaaaac
     cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaad active '{"threshold":1,"keys":[{"key":"EOS7Bn1YDeZ18w2N9DU4KAJxZDt6hk3L7eUwFRAc1hb5bp6xJwxNV","weight":1}],"accounts":[{"permission":{"actor":"gamemallards","permission":"eosio.code"},"weight":1}]}' owner -p useraaaaaaad
     cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaae active '{"threshold":1,"keys":[{"key":"EOS7Bn1YDeZ18w2N9DU4KAJxZDt6hk3L7eUwFRAc1hb5bp6xJwxNV","weight":1}],"accounts":[{"permission":{"actor":"gamemallards","permission":"eosio.code"},"weight":1}]}' owner -p useraaaaaaae
+    cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaak active '{"threshold":1,"keys":[{"key":"EOS6iwndPo58Y2ihWshfhnFbEBJHGkZtujR1bn7bVLngnTWFA8Hm3","weight":1}],"accounts":[{"permission":{"actor":"gamemallards","permission":"eosio.code"},"weight":1}]}' owner -p useraaaaaaak
     cleos --wallet-url http://127.0.0.1:6666 set account permission gamemallards active '{"threshold":1,"keys":[{"key":"EOS69X3383RzBZj41k73CSjUNXM5MYGpnDxyPnWUKPEtYQmTBWz4D","weight":1}],"accounts":[{"permission":{"actor":"gamemallards","permission":"eosio.code"},"weight":1}]}' owner -p gamemallards
     
     # custom token issue.
@@ -29,21 +30,21 @@ temptest)
     eosio-cpp -abigen mallard.cpp -o mallard.wasm
     cleos --wallet-url http://127.0.0.1:6666 set contract gamemallards ./ mallard.wasm mallard.abi
 
-    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaaj","TES","0.1000 TES"]' -p gamemallards
-    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["eosio.token","SYS","0.1000 SYS"]' -p gamemallards
+    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaaj","TES","0.1000 TES"]' -p useraaaaaaak
+    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["eosio.token","SYS","0.1000 SYS"]' -p useraaaaaaak
     cleos get table gamemallards gamemallards currencyinfo
 
     for((num=1;num<=1;num++));
     do
         cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '[useraaaaaaab,"4000.0000 TES", 1,"useraaaaaaaj","TES", "0.5000", "0.2000", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaab
         tableid=`cleos get table gamemallards gamemallards tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
-        cleos --wallet-url http://127.0.0.1:6666 push action gamemallards shuffle '['$tableid']' -p useraaaaaaab
+        cleos --wallet-url http://127.0.0.1:6666 push action gamemallards shuffle '['$tableid']' -p useraaaaaaah
         sleep 5s
     done
 
-    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards pushaliasnam '["","useraaaaaaae"]' -p useraaaaaaae
-    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards pushaliasnam '["wls","useraaaaaaae"]' -p useraaaaaaae
-    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards pushaliasnam '["wls1","useraaaaaaae"]' -p useraaaaaaae
+    #cleos --wallet-url http://127.0.0.1:6666 push action gamemallards pushaliasnam '["","useraaaaaaae"]' -p useraaaaaaae
+    #cleos --wallet-url http://127.0.0.1:6666 push action gamemallards pushaliasnam '["wls","useraaaaaaae"]' -p useraaaaaaae
+    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards pushaliasnam '["wangls","useraaaaaaah"]' -p useraaaaaaah
     cleos get table gamemallards gamemallards aliasinfo
 
     #cleos --wallet-url http://127.0.0.1:6666 push action gamemallards depositable '[useraaaaaaab, '$tableid', "10.0000 TES"]' -p useraaaaaaab
@@ -155,7 +156,7 @@ pausetable)
 erasedata)
     #the second parameter is (-1 = erase all|| -2 = erase close||num)
     echo "erase old data(the second parameter is (-1 = erase all|| -2 = erase close||num))"
-    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards erasingdata '['$2']' -p gamemallards
+    cleos --wallet-url http://127.0.0.1:6666 push action gamemallards clear12cache '['$2']' -p useraaaaaaak
     ;;
 normalflow)
     echo "normalflow test"

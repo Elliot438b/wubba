@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Apr 10 17:07:38 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Mon Apr 15 16:36:15 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -31,6 +31,16 @@
                 {
                     "name": "cardColor",
                     "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "clear12cache",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "int64"
                 }
             ]
         },
@@ -192,16 +202,6 @@
             "fields": [
                 {
                     "name": "tableId",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "erasingdata",
-            "base": "",
-            "fields": [
-                {
-                    "name": "key",
                     "type": "uint64"
                 }
             ]
@@ -369,6 +369,14 @@
                 {
                     "name": "nickname",
                     "type": "string"
+                },
+                {
+                    "name": "playercommission",
+                    "type": "asset"
+                },
+                {
+                    "name": "agentcommission",
+                    "type": "asset"
                 }
             ]
         },
@@ -672,6 +680,11 @@
     "types": [],
     "actions": [
         {
+            "name": "clear12cache",
+            "type": "clear12cache",
+            "ricardian_contract": ""
+        },
+        {
             "name": "closetable",
             "type": "closetable",
             "ricardian_contract": ""
@@ -709,11 +722,6 @@
         {
             "name": "endbet",
             "type": "endbet",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "erasingdata",
-            "type": "erasingdata",
             "ricardian_contract": ""
         },
         {
