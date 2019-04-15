@@ -441,7 +441,7 @@ Put the sym_info records into On-chain state table.
 - modify the key which could delete all(used when update SC with data changed). From -1 to one gloabl var named: delall_key = 103718369455
 
 ### 8. modify initsymbol
-- add verification: transfer *minperbet* new symbol added to verify. If success, insert symbol to **currencyinfo**, otherwise break off.
+- add verification: transfer *minperbet* new symbol added to verify from ***adminaccount*** to ***contractaccount***. If success, insert symbol to **currencyinfo**, otherwise break off.
 
 ### 9. modify tablesinfo strut
 - add two new fields: *playercommission*, *agentcommission* into the **player_bet_info**
