@@ -13,7 +13,7 @@ using std::string;
 
 CONTRACT mallard : public contract
 {
-  public:
+public:
     using contract::contract;
 
     mallard(name receiver, name code, datastream<const char *> ds)
@@ -70,9 +70,10 @@ CONTRACT mallard : public contract
 
     TABLE table_stats
     {
-        // ------------------------------ table field ------------------------------
+        // ------------------------------ table fields ------------------------------
         std::vector<uint16_t> validCardVec; // newtable init & new round check.
         uint64_t tableId;                   // table fix.
+        uint64_t tableStatus;               // round stage.
         uint64_t cardBoot;
         name dealer;         // table owner.
         bool trusteeship;    // table flag.
@@ -93,7 +94,6 @@ CONTRACT mallard : public contract
 
         // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
-        uint64_t tableStatus;  // round stage.
         asset currRoundBetSum_BP;
         asset currRoundBetSum_Tie;
         asset currRoundBetSum_Push;
@@ -196,7 +196,6 @@ CONTRACT mallard : public contract
     using shuffle_action = action_wrapper<"shuffle"_n, &mallard::shuffle>;
     using edittable_action = action_wrapper<"edittable"_n, &mallard::edittable>;
     using pushaliasnam_action = action_wrapper<"pushaliasnam"_n, &mallard::pushaliasnam>;
-
 
     // std random
     struct WBRNG

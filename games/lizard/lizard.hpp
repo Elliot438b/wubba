@@ -12,7 +12,7 @@ using std::string;
 
 CONTRACT lizard : public contract
 {
-  public:
+public:
     using contract::contract;
 
     lizard(name receiver, name code, datastream<const char *> ds)
@@ -55,12 +55,13 @@ CONTRACT lizard : public contract
 
     TABLE table_stats
     {
-        // ------------------------------ table field ------------------------------
-        uint64_t tableId;    // table fix.
-        name dealer;         // table owner.
-        bool trusteeship;    // table flag.
-        bool isPrivate;      // table flag.
-        asset dealerBalance; // table field.
+        // ------------------------------ table fields ------------------------------
+        uint64_t tableId;     // table fix.
+        uint64_t tableStatus; // round stage.
+        name dealer;          // table owner.
+        bool trusteeship;     // table flag.
+        bool isPrivate;       // table flag.
+        asset dealerBalance;  // table field.
         asset oneRoundMaxTotalBet_bsoe;
         asset minPerBet_bsoe;
         asset oneRoundMaxTotalBet_anytri;
@@ -83,7 +84,6 @@ CONTRACT lizard : public contract
         double commission_rate_player;
         // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
-        uint64_t tableStatus;  // round stage.
         asset currRoundBetSum_bsoe;
         asset currRoundBetSum_anytri;
         asset currRoundBetSum_trinum;
