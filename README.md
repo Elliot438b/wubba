@@ -445,10 +445,16 @@ Put the sym_info records into On-chain state table.
 - modify the SC:playerbet, record the *playercommission* and *agentcommission* into **tablesinfo** per bet.
 
 ## TODO
-### 10.import12data
+### 10. import12data
 - add new interface:***upgrading***, permission:**adminaccount** with one param {bool flag}. 
     - If true, {!existing->trusteeship, dealerseed} and {existing->trusteeship, serverseed} can't start a new round. 
 - add new interface: ***import12data***, permission:**adminaccount**. Importing the current SC's state data struct with one item.
+
+### 11. exercise: update sc with data struct change
+1. Add one redundancy fields
+2. Do step in *sc_deploy_update.docx*
+
+**repeat 1,2 with 3 times at least.** 
 
 ---
 
