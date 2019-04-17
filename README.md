@@ -445,7 +445,7 @@ Put the sym_info records into On-chain state table.
 - modify the SC:playerbet, record the *playercommission* and *agentcommission* into **tablesinfo** per bet.
 
 ## v0.8.1 target
-- combine dealerseed serverseed
+- ~~combine dealerseed serverseed~~  ***RECOVER***
 - add salt in reveal root_seed before sha256.
 - permission adjust: all dealer action add server permission additional.
 - deposittable modify: delete the first param: name dealer.
