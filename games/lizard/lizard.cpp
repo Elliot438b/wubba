@@ -186,12 +186,14 @@ ACTION lizard::edittable(uint64_t tableId, bool isPrivate, name code, string sym
         s.commission_rate_player = temp_rate_player;
     });
 }
-ACTION lizard::hashseed(uint64_t tableId, checksum256 dealerHashSeed, checksum256 serverHashSeed)
+
+ACTION lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
+    eosio_assert(!existing->trusteeship, "Dealer is hosted.");
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END,
                  "tableStatus != end");
     if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
@@ -203,13 +205,14 @@ ACTION lizard::hashseed(uint64_t tableId, checksum256 dealerHashSeed, checksum25
         return;
     }
     // start a new round. table_round init.
+    checksum256 hash;
     std::vector<player_bet_info> emptyPlayers;
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     tableround.modify(existing, _self, [&](auto &s) {
-        s.betStartTime = now();
-        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
-        s.dealerSeedHash = dealerHashSeed;
-        s.serverSeedHash = serverHashSeed;
+        s.betStartTime = 0;
+        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
+        s.dealerSeedHash = encodeSeed;
+        s.serverSeedHash = hash;
         s.dealerSeed = "";
         s.serverSeed = "";
         s.dSeedVerity = 0;
@@ -225,6 +228,59 @@ ACTION lizard::hashseed(uint64_t tableId, checksum256 dealerHashSeed, checksum25
         s.currRoundBetSum_twocom = init_asset_empty;
         s.currRoundBetSum_single = init_asset_empty;
     });
+}
+
+ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
+{
+    require_auth(serveraccount);
+    auto existing = tableround.find(tableId);
+    eosio_assert(existing != tableround.end(), notableerr);
+
+    if (existing->trusteeship)
+    {
+        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
+        if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
+        {
+            INLINE_ACTION_SENDER(lizard, pausetablesee)
+            (
+                _self, {{serveraccount, "active"_n}},
+                {existing->tableId});
+            return;
+        }
+        // start a new round. table_round init.
+        checksum256 hash;
+        std::vector<player_bet_info> emptyPlayers;
+        asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.betStartTime = now();
+            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
+            s.dealerSeedHash = hash;
+            s.serverSeedHash = encodeSeed;
+            s.dealerSeed = "";
+            s.serverSeed = "";
+            s.dSeedVerity = 0;
+            s.sSeedVerity = 0;
+            s.playerInfo = emptyPlayers;
+            s.roundResult = "";
+            s.diceResult = "";
+            s.currRoundBetSum_bsoe = init_asset_empty;
+            s.currRoundBetSum_anytri = init_asset_empty;
+            s.currRoundBetSum_trinum = init_asset_empty;
+            s.currRoundBetSum_pairnum = init_asset_empty;
+            s.currRoundBetSum_txx = init_asset_empty;
+            s.currRoundBetSum_twocom = init_asset_empty;
+            s.currRoundBetSum_single = init_asset_empty;
+        });
+    }
+    else
+    {
+        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_START, "Dealer should send hash seed first!");
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.serverSeedHash = encodeSeed;
+            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
+            s.betStartTime = now();
+        });
+    }
 }
 
 ACTION lizard::playerbet(uint64_t tableId, name player, string bet, string agentalias, string nickname)
@@ -910,4 +966,4 @@ ACTION lizard::pushaliasnam(string alias, name account)
         s.account = account;
     });
 }
-EOSIO_DISPATCH(lizard, (initsymbol)(newtable)(hashseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam)(edittable))
+EOSIO_DISPATCH(lizard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam)(edittable))

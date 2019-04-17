@@ -156,12 +156,13 @@ ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sy
     });
 }
 
-ACTION mallard::hashseed(uint64_t tableId, checksum256 dealerHashSeed, checksum256 serverHashSeed)
+ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
+    eosio_assert(!existing->trusteeship, "Dealer is hosted.");
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END,
                  "tableStatus != end");
     if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
@@ -174,17 +175,18 @@ ACTION mallard::hashseed(uint64_t tableId, checksum256 dealerHashSeed, checksum2
     }
     // start a new round. table_round init.
     eosio::print(" before===validCardVec.size:", existing->validCardVec.size());
+    checksum256 hash;
     std::vector<player_bet_info> emptyPlayers;
     std::vector<card_info> emptyCards;
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     tableround.modify(existing, _self, [&](auto &s) {
-        s.betStartTime = now();
-        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
+        s.betStartTime = 0;
+        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
         s.currRoundBetSum_BP = init_asset_empty;
         s.currRoundBetSum_Tie = init_asset_empty;
         s.currRoundBetSum_Push = init_asset_empty;
-        s.dealerSeedHash = dealerHashSeed;
-        s.serverSeedHash = serverHashSeed;
+        s.dealerSeedHash = encodeSeed;
+        s.serverSeedHash = hash;
         s.dealerSeed = "";
         s.serverSeed = "";
         s.dSeedVerity = 0;
@@ -194,6 +196,59 @@ ACTION mallard::hashseed(uint64_t tableId, checksum256 dealerHashSeed, checksum2
         s.playerHands = emptyCards;
         s.bankerHands = emptyCards;
     });
+}
+
+ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
+{
+    require_auth(serveraccount);
+    auto existing = tableround.find(tableId);
+    eosio_assert(existing != tableround.end(), notableerr);
+
+    if (existing->trusteeship)
+    {
+        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
+        if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
+        {
+            INLINE_ACTION_SENDER(mallard, pausetablesee)
+            (
+                _self, {{serveraccount, "active"_n}},
+                {existing->tableId});
+            return;
+        }
+        // start a new round. table_round init.
+        eosio::print(" before===validCardVec.size:", existing->validCardVec.size());
+
+        checksum256 hash;
+        std::vector<player_bet_info> emptyPlayers;
+        std::vector<card_info> emptyCards;
+        asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.betStartTime = now();
+            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
+            s.currRoundBetSum_BP = init_asset_empty;
+            s.currRoundBetSum_Tie = init_asset_empty;
+            s.currRoundBetSum_Push = init_asset_empty;
+            s.dealerSeedHash = hash;
+            s.serverSeedHash = encodeSeed;
+            s.dealerSeed = "";
+            s.serverSeed = "";
+            s.dSeedVerity = 0;
+            s.sSeedVerity = 0;
+            s.playerInfo = emptyPlayers;
+            s.roundResult = "";
+            s.playerHands = emptyCards;
+            s.bankerHands = emptyCards;
+        });
+    }
+    else
+    {
+        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_START, "Dealer should send hash seed first!");
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.serverSeedHash = encodeSeed;
+            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
+            s.betStartTime = now();
+        });
+    }
 }
 
 ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, string agentalias, string nickname)
@@ -657,4 +712,4 @@ ACTION mallard::pushaliasnam(string alias, name account)
     });
 }
 
-EOSIO_DISPATCH(mallard, (initsymbol)(newtable)(hashseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(pushaliasnam))
+EOSIO_DISPATCH(mallard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(pushaliasnam))

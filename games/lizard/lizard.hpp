@@ -20,7 +20,8 @@ public:
 
     ACTION initsymbol(name code, string sym, asset minperbet);
     ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single);
-    ACTION hashseed(uint64_t tableId, checksum256 dealerHashSeed, checksum256 serverHashSeed);
+    ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
+    ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION endbet(uint64_t tableId);
     ACTION playerbet(uint64_t tableId, name player, string bet, string agentalias, string nickname);
     ACTION verdealeseed(uint64_t tableId, string seed);
@@ -108,6 +109,7 @@ public:
 
         enum class status_fields : uint64_t
         {
+            ROUND_START = 1,
             ROUND_BET = 2,
             ROUND_REVEAL = 4,
             ROUND_END = 0,
@@ -145,7 +147,8 @@ public:
 
     using initsymbol_action = action_wrapper<"initsymbol"_n, &lizard::initsymbol>;
     using newtable_action = action_wrapper<"newtable"_n, &lizard::newtable>;
-    using hashseed_action = action_wrapper<"hashseed"_n, &lizard::hashseed>;
+    using dealerseed_action = action_wrapper<"dealerseed"_n, &lizard::dealerseed>;
+    using serverseed_action = action_wrapper<"serverseed"_n, &lizard::serverseed>;
     using playerbet_action = action_wrapper<"playerbet"_n, &lizard::playerbet>;
     using endbet_action = action_wrapper<"endbet"_n, &lizard::endbet>;
     using verdealeseed_action = action_wrapper<"verdealeseed"_n, &lizard::verdealeseed>;

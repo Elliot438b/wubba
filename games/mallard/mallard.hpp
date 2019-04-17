@@ -21,7 +21,8 @@ public:
 
     ACTION initsymbol(name code, string sym, asset minperbet);
     ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
-    ACTION hashseed(uint64_t tableId, checksum256 dealerHashSeed, checksum256 serverHashSeed);
+    ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
+    ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, string agentalias, string nickname);
     ACTION endbet(uint64_t tableId);
     ACTION verdealeseed(uint64_t tableId, string seed);
@@ -115,6 +116,7 @@ public:
 
         enum class status_fields : uint64_t
         {
+            ROUND_START = 1,
             ROUND_BET = 2,
             ROUND_REVEAL = 4,
             ROUND_END = 0,
@@ -175,7 +177,8 @@ public:
 
     using initsymbol_action = action_wrapper<"initsymbol"_n, &mallard::initsymbol>;
     using newtable_action = action_wrapper<"newtable"_n, &mallard::newtable>;
-    using hashseed_action = action_wrapper<"hashseed"_n, &mallard::hashseed>;
+    using dealerseed_action = action_wrapper<"dealerseed"_n, &mallard::dealerseed>;
+    using serverseed_action = action_wrapper<"serverseed"_n, &mallard::serverseed>;
     using playerbet_action = action_wrapper<"playerbet"_n, &mallard::playerbet>;
     using endbet_action = action_wrapper<"endbet"_n, &mallard::endbet>;
     using verdealeseed_action = action_wrapper<"verdealeseed"_n, &mallard::verdealeseed>;
