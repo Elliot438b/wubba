@@ -452,12 +452,12 @@ Put the sym_info records into On-chain state table.
 - clear12cache: can only delete tables whose status are ROUND_END or PAUSE 
 
 ## TODO
-### 10. import12data
+### import12data
 - add new interface:***upgrading***, permission:**adminaccount** with one param {bool flag}. 
     - If true, {!existing->trusteeship, dealerseed} and {existing->trusteeship, serverseed} can't start a new round. 
 - add new interface: ***import12data***, permission:**adminaccount**. Importing the current SC's state data struct with one item.
 
-### 11. exercise: update sc with data struct change
+### exercise: update sc with data struct change
 1. Add one redundancy fields
 2. Do step in *sc_deploy_update.docx*
 
