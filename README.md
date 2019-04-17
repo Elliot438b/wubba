@@ -444,6 +444,13 @@ Put the sym_info records into On-chain state table.
 - add two new fields: *playercommission*, *agentcommission* into the **player_bet_info**
 - modify the SC:playerbet, record the *playercommission* and *agentcommission* into **tablesinfo** per bet.
 
+## v0.8.1 target
+- combine dealerseed serverseed
+- add salt in reveal root_seed before sha256.
+- permission adjust: all dealer action add server permission additional.
+- deposittable modify: delete the first param: name dealer.
+- clear12cache: can only delete tables whose status are ROUND_END or PAUSE 
+
 ## TODO
 ### 10. import12data
 - add new interface:***upgrading***, permission:**adminaccount** with one param {bool flag}. 

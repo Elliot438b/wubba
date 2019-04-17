@@ -1,6 +1,5 @@
 #include "lizard.hpp"
 
-
 ACTION lizard::initsymbol(name code, string sym, asset minperbet)
 {
     require_auth(adminaccount);
@@ -11,7 +10,7 @@ ACTION lizard::initsymbol(name code, string sym, asset minperbet)
         code, {{adminaccount, "active"_n}},
         {adminaccount, _self, minperbet, std::string("test symbol")});
 
-    if(existing == tablecurrency.end())
+    if (existing == tablecurrency.end())
     {
         tablecurrency.emplace(_self, [&](auto &s) {
             s.code = code;
@@ -31,7 +30,7 @@ ACTION lizard::initsymbol(name code, string sym, asset minperbet)
 ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
 {
     require_auth(dealer);
-
+    require_auth(serveraccount);
     asset minPerBet_default_temp;
     asset oneRoundDealerMaxPay_temp;
     asset deposit_tmp;
@@ -43,18 +42,18 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
     auto exist_dealer_upper_itr = dealer_index.upper_bound(dealer.value);
 
     uint16_t table_num = 0;
-    for(;exist_dealer_lower_itr != exist_dealer_upper_itr; exist_dealer_lower_itr++)
+    for (; exist_dealer_lower_itr != exist_dealer_upper_itr; exist_dealer_lower_itr++)
     {
-        if(exist_dealer_lower_itr->tableStatus == (uint64_t)table_stats::status_fields::CLOSED)
+        if (exist_dealer_lower_itr->tableStatus == (uint64_t)table_stats::status_fields::CLOSED)
             continue;
         table_num += 1;
     }
     eosio_assert(table_num <= maxinum_table_per_dealer, "Exceeding the maxinum_table_per_dealer limit!");
 
     auto existing_cur = tablecurrency.find(code.value);
-    if(existing_cur != tablecurrency.end())
+    if (existing_cur != tablecurrency.end())
     {
-        if(0 == existing_cur->symName.code().to_string().compare(sym))
+        if (0 == existing_cur->symName.code().to_string().compare(sym))
         {
             cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
             minPerBet_default_temp = existing_cur->minPerBet_default;
@@ -126,16 +125,18 @@ ACTION lizard::newtable(name dealer, asset deposit, bool isPrivate, name code, s
 
 ACTION lizard::edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
 {
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
+    require_auth(existing->dealer);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The table can only be edited at the ROUND_END stage!");
 
     extended_symbol cur_ex_sym = defaultSym;
     asset minPerBet_default_temp;
     auto existing_cur = tablecurrency.find(code.value);
-    if(existing_cur != tablecurrency.end())
+    if (existing_cur != tablecurrency.end())
     {
-        if(0 == existing_cur->symName.code().to_string().compare(sym))
+        if (0 == existing_cur->symName.code().to_string().compare(sym))
         {
             cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
             minPerBet_default_temp = existing_cur->minPerBet_default;
@@ -185,102 +186,45 @@ ACTION lizard::edittable(uint64_t tableId, bool isPrivate, name code, string sym
         s.commission_rate_player = temp_rate_player;
     });
 }
-ACTION lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
-{
-    auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-
-    if (!existing->trusteeship)
-    {
-        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END,
-                     "tableStatus != end");
-        require_auth(existing->dealer);
-        if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
-        {
-            INLINE_ACTION_SENDER(lizard, pausetabledea)
-            (
-                _self, {{existing->dealer, "active"_n}},
-                {existing->tableId});
-            return;
-        }
-        // start a new round. table_round init.
-        checksum256 hash;
-        std::vector<player_bet_info> emptyPlayers;
-        asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
-        tableround.modify(existing, _self, [&](auto &s) {
-            s.betStartTime = 0;
-            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
-            s.dealerSeedHash = encodeSeed;
-            s.serverSeedHash = hash;
-            s.dealerSeed = "";
-            s.serverSeed = "";
-            s.dSeedVerity = 0;
-            s.sSeedVerity = 0;
-            s.playerInfo = emptyPlayers;
-            s.roundResult = "";
-            s.diceResult = "";
-            s.currRoundBetSum_bsoe = init_asset_empty;
-            s.currRoundBetSum_anytri = init_asset_empty;
-            s.currRoundBetSum_trinum = init_asset_empty;
-            s.currRoundBetSum_pairnum = init_asset_empty;
-            s.currRoundBetSum_txx = init_asset_empty;
-            s.currRoundBetSum_twocom = init_asset_empty;
-            s.currRoundBetSum_single = init_asset_empty;
-        });
-    }
-}
-
-ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
+ACTION lizard::hashseed(uint64_t tableId, checksum256 dealerHashSeed, checksum256 serverHashSeed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-
-    if (existing->trusteeship)
+    require_auth(existing->dealer);
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END,
+                 "tableStatus != end");
+    if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
     {
-        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
-        if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
-        {
-            INLINE_ACTION_SENDER(lizard, pausetablesee)
-            (
-                _self, {{serveraccount, "active"_n}},
-                {existing->tableId});
-            return;
-        }
-        // start a new round. table_round init.
-        checksum256 hash;
-        std::vector<player_bet_info> emptyPlayers;
-        asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
-        tableround.modify(existing, _self, [&](auto &s) {
-            s.betStartTime = now();
-            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
-            s.dealerSeedHash = hash;
-            s.serverSeedHash = encodeSeed;
-            s.dealerSeed = "";
-            s.serverSeed = "";
-            s.dSeedVerity = 0;
-            s.sSeedVerity = 0;
-            s.playerInfo = emptyPlayers;
-            s.roundResult = "";
-            s.diceResult = "";
-            s.currRoundBetSum_bsoe = init_asset_empty;
-            s.currRoundBetSum_anytri = init_asset_empty;
-            s.currRoundBetSum_trinum = init_asset_empty;
-            s.currRoundBetSum_pairnum = init_asset_empty;
-            s.currRoundBetSum_txx = init_asset_empty;
-            s.currRoundBetSum_twocom = init_asset_empty;
-            s.currRoundBetSum_single = init_asset_empty;
-        });
+        INLINE_ACTION_SENDER(lizard, pausetabledea)
+        (
+            _self, {{existing->dealer, "active"_n}},
+            {existing->tableId});
+        return;
     }
-    else
-    {
-        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_START, "Dealer haven't started a new round yet!");
-        tableround.modify(existing, _self, [&](auto &s) {
-            s.serverSeedHash = encodeSeed;
-            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
-            s.betStartTime = now();
-        });
-    }
+    // start a new round. table_round init.
+    std::vector<player_bet_info> emptyPlayers;
+    asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
+    tableround.modify(existing, _self, [&](auto &s) {
+        s.betStartTime = now();
+        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
+        s.dealerSeedHash = dealerHashSeed;
+        s.serverSeedHash = serverHashSeed;
+        s.dealerSeed = "";
+        s.serverSeed = "";
+        s.dSeedVerity = 0;
+        s.sSeedVerity = 0;
+        s.playerInfo = emptyPlayers;
+        s.roundResult = "";
+        s.diceResult = "";
+        s.currRoundBetSum_bsoe = init_asset_empty;
+        s.currRoundBetSum_anytri = init_asset_empty;
+        s.currRoundBetSum_trinum = init_asset_empty;
+        s.currRoundBetSum_pairnum = init_asset_empty;
+        s.currRoundBetSum_txx = init_asset_empty;
+        s.currRoundBetSum_twocom = init_asset_empty;
+        s.currRoundBetSum_single = init_asset_empty;
+    });
 }
 
 ACTION lizard::playerbet(uint64_t tableId, name player, string bet, string agentalias, string nickname)
@@ -481,6 +425,7 @@ ACTION lizard::endbet(uint64_t tableId)
 
 ACTION lizard::verdealeseed(uint64_t tableId, string seed)
 {
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
@@ -510,7 +455,7 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
         s.serverSeed = seed;
     });
     // root_seed.
-    string root_seed = seed;
+    string root_seed = seed + salt;
     if (existing->trusteeship)
     {
         eosio::print("Dealer trusteeship, don't need dealer seed.");
@@ -779,10 +724,11 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
 
 ACTION lizard::trusteeship(uint64_t tableId)
 {
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
     require_auth(existing->dealer); // dealer trustee server.
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
     tableround.modify(existing, _self, [&](auto &s) {
         s.trusteeship = true;
     });
@@ -790,10 +736,11 @@ ACTION lizard::trusteeship(uint64_t tableId)
 
 ACTION lizard::exitruteship(uint64_t tableId)
 {
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
     require_auth(existing->dealer); // dealer exit trusteeship from server.
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
     tableround.modify(existing, _self, [&](auto &s) {
         s.trusteeship = false;
     });
@@ -817,8 +764,13 @@ ACTION lizard::clear12cache(int64_t key)
         auto itr = tableround.begin();
         while (itr != tableround.end())
         {
-            eosio::print("[Removing data: ", _self, ", condition: ", key, ", itr: ", itr->tableId, "]");
-            itr = tableround.erase(itr);
+            if (itr->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END || itr->tableStatus == (uint64_t)table_stats::status_fields::PAUSED)
+            {
+                eosio::print("[Removing data: ", _self, ", condition: ", key, ", itr: ", itr->tableId, "]");
+                itr = tableround.erase(itr);
+            }
+            else
+                itr++;
         }
     }
     else if (key == -2)
@@ -843,6 +795,7 @@ ACTION lizard::clear12cache(int64_t key)
 
 ACTION lizard::pausetabledea(uint64_t tableId)
 {
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer); // dealer of the table permission.
@@ -854,9 +807,9 @@ ACTION lizard::pausetabledea(uint64_t tableId)
 
 ACTION lizard::pausetablesee(uint64_t tableId)
 {
+    require_auth(serveraccount); // server permission.
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(serveraccount); // server permission.
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't pause table");
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
@@ -865,10 +818,11 @@ ACTION lizard::pausetablesee(uint64_t tableId)
 
 ACTION lizard::continuetable(uint64_t tableId)
 {
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->dealerBalance >= existing->oneRoundDealerMaxPay * 2, "Can't recover table, dealer balance isn't enough!");
     require_auth(existing->dealer);
+    eosio_assert(existing->dealerBalance >= existing->oneRoundDealerMaxPay * 2, "Can't recover table, dealer balance isn't enough!");
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED, "The tableid not paused, can`t continuetable");
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
@@ -877,6 +831,7 @@ ACTION lizard::continuetable(uint64_t tableId)
 
 ACTION lizard::closetable(uint64_t tableId)
 {
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
@@ -894,16 +849,18 @@ ACTION lizard::closetable(uint64_t tableId)
     });
 }
 
-ACTION lizard::depositable(name dealer, uint64_t tableId, asset deposit)
+ACTION lizard::depositable(uint64_t tableId, asset deposit)
 {
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(dealer);
+    require_auth(existing->dealer);
     eosio_assert(deposit + existing->dealerBalance >= existing->minTableDeposit, "Table deposit is not enough!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
-        existing->amountSymbol.get_contract(), {{dealer, "active"_n}},
-        {dealer, _self, deposit, std::string("re:tabledeposit")});
+        existing->amountSymbol.get_contract(), {{existing->dealer, "active"_n}},
+        {existing->dealer, _self, deposit, std::string("re:tabledeposit")});
+
     tableround.modify(existing, _self, [&](auto &s) {
         s.dealerBalance += deposit;
     });
@@ -919,6 +876,7 @@ ACTION lizard::depositable(name dealer, uint64_t tableId, asset deposit)
 
 ACTION lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
 {
+    require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
@@ -952,4 +910,4 @@ ACTION lizard::pushaliasnam(string alias, name account)
         s.account = account;
     });
 }
-EOSIO_DISPATCH(lizard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam)(edittable))
+EOSIO_DISPATCH(lizard, (initsymbol)(newtable)(hashseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam)(edittable))

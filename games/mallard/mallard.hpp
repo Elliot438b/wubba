@@ -21,8 +21,7 @@ public:
 
     ACTION initsymbol(name code, string sym, asset minperbet);
     ACTION newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
-    ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
-    ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
+    ACTION hashseed(uint64_t tableId, checksum256 dealerHashSeed, checksum256 serverHashSeed);
     ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, string agentalias, string nickname);
     ACTION endbet(uint64_t tableId);
     ACTION verdealeseed(uint64_t tableId, string seed);
@@ -35,7 +34,7 @@ public:
     ACTION pausetablesee(uint64_t tableId);
     ACTION continuetable(uint64_t tableId);
     ACTION closetable(uint64_t tableId);
-    ACTION depositable(name dealer, uint64_t tableId, asset deposit);
+    ACTION depositable(uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
     ACTION shuffle(uint64_t tableId);
     ACTION edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_push, asset minPerBet_push);
@@ -116,7 +115,6 @@ public:
 
         enum class status_fields : uint64_t
         {
-            ROUND_START = 1,
             ROUND_BET = 2,
             ROUND_REVEAL = 4,
             ROUND_END = 0,
@@ -124,7 +122,7 @@ public:
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(cardBoot)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Push)(minPerBet_Push)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(commission_rate_agent)(commission_rate_player)(betStartTime)(tableStatus)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
+        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(tableStatus)(cardBoot)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Push)(minPerBet_Push)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(commission_rate_agent)(commission_rate_player)(betStartTime)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
     };
 
     struct shuffle_round_result
@@ -177,8 +175,7 @@ public:
 
     using initsymbol_action = action_wrapper<"initsymbol"_n, &mallard::initsymbol>;
     using newtable_action = action_wrapper<"newtable"_n, &mallard::newtable>;
-    using dealerseed_action = action_wrapper<"dealerseed"_n, &mallard::dealerseed>;
-    using serverseed_action = action_wrapper<"serverseed"_n, &mallard::serverseed>;
+    using hashseed_action = action_wrapper<"hashseed"_n, &mallard::hashseed>;
     using playerbet_action = action_wrapper<"playerbet"_n, &mallard::playerbet>;
     using endbet_action = action_wrapper<"endbet"_n, &mallard::endbet>;
     using verdealeseed_action = action_wrapper<"verdealeseed"_n, &mallard::verdealeseed>;
@@ -510,6 +507,7 @@ public:
     const uint32_t minTableRounds = 10;
     const uint16_t maxinum_table_per_dealer = 100;
     const uint64_t delall_key = 103718369455;
+    const string salt = "w3H5OthR6PVYQnKL";
     const char *notableerr = "TableId isn't existing!";
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 
