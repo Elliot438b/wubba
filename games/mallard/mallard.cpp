@@ -27,7 +27,7 @@ ACTION mallard::initsymbol(name code, string sym, asset minperbet)
     }
 }
 
-ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
+ACTION mallard::newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
                          asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
                          asset oneRoundMaxTotalBet_push, asset minPerBet_push)
 {
@@ -85,7 +85,7 @@ ACTION mallard::newtable(name dealer, asset deposit, bool isPrivate, name code, 
     // table init.
     std::vector<uint16_t> validCardVec_empty;
     tableround.emplace(_self, [&](auto &s) {
-        s.tableId = tableround.available_primary_key();
+        s.tableId = newtableId;
         s.cardBoot = 1;
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_SHUFFLE;
         s.dealer = dealer;
