@@ -196,6 +196,7 @@ ACTION lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     eosio_assert(!existing->trusteeship, "Dealer is hosted.");
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END,
                  "tableStatus != end");
+
     if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
     {
         INLINE_ACTION_SENDER(lizard, pausetabledea)
@@ -204,6 +205,9 @@ ACTION lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
             {existing->tableId});
         return;
     }
+
+    eosio_assert(!existing->upgradingFlag, "system upgrading...");
+
     // start a new round. table_round init.
     checksum256 hash;
     std::vector<player_bet_info> emptyPlayers;
@@ -247,6 +251,8 @@ ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
                 {existing->tableId});
             return;
         }
+
+        eosio_assert(!existing->upgradingFlag, "system upgrading...");
         // start a new round. table_round init.
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
@@ -966,4 +972,50 @@ ACTION lizard::pushaliasnam(string alias, name account)
         s.account = account;
     });
 }
-EOSIO_DISPATCH(lizard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam)(edittable))
+
+ACTION lizard::upgrading(bool isupgrading)
+{
+    require_auth(serveraccount);
+    auto existing = tableround.begin();
+    for(; existing != tableround.end(); existing++)
+    {
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.upgradingFlag = isupgrading;
+        });
+    }
+}
+
+ACTION lizard::import12data(uint64_t tableId, uint64_t tableStatus, name dealer, bool trusteeship, bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single, asset oneRoundDealerMaxPay, asset minTableDeposit, float commission_rate_agent,float commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol)
+{
+    require_auth(adminaccount);
+
+    tableround.emplace(_self, [&](auto &s) {
+        s.tableId = tableId;
+        s.tableStatus = tableStatus;
+        s.dealer = dealer;
+        s.dealerBalance = dealerBalance;
+        s.isPrivate = isPrivate;
+        s.trusteeship = trusteeship;
+        s.oneRoundMaxTotalBet_bsoe = oneRoundMaxTotalBet_bsoe;
+        s.minPerBet_bsoe = minPerBet_bsoe;
+        s.oneRoundMaxTotalBet_anytri = oneRoundMaxTotalBet_anytri;
+        s.minPerBet_anytri = minPerBet_anytri;
+        s.oneRoundMaxTotalBet_trinum = oneRoundMaxTotalBet_trinum;
+        s.minPerBet_trinum = minPerBet_trinum;
+        s.oneRoundMaxTotalBet_pairnum = oneRoundMaxTotalBet_pairnum;
+        s.minPerBet_pairnum = minPerBet_pairnum;
+        s.oneRoundMaxTotalBet_txx = oneRoundMaxTotalBet_txx;
+        s.minPerBet_txx = minPerBet_txx;
+        s.oneRoundMaxTotalBet_twocom = oneRoundMaxTotalBet_twocom;
+        s.minPerBet_twocom = minPerBet_twocom;
+        s.oneRoundMaxTotalBet_single = oneRoundMaxTotalBet_single;
+        s.minPerBet_single = minPerBet_single;
+        s.oneRoundDealerMaxPay = oneRoundDealerMaxPay;
+        s.minTableDeposit = minTableDeposit;
+        s.amountSymbol = amountSymbol;
+        s.commission_rate_agent = commission_rate_agent;
+        s.commission_rate_player = commission_rate_player;
+        s.upgradingFlag = upgradingFlag;
+    });
+}
+EOSIO_DISPATCH(lizard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(pushaliasnam)(edittable)(upgrading)(import12data))

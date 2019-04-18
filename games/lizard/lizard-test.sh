@@ -44,6 +44,7 @@ temptest)
     cleos get table game12lizard game12lizard tablesinfo -L $tableid -U $tableid
 
     sleep 3s
+    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard upgrading '["1"]' -p useraaaaaaah
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab useraaaaaaah
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard playerbet '['$tableid',useraaaaaaac,"{\"small\": \"2.6000 SYS\",\"total6\": \"3.5000 SYS\",\"tri2\": \"2.0000 SYS\"}", "wangls", "王丽"]' -p useraaaaaaac useraaaaaaah
@@ -71,7 +72,17 @@ temptest)
    # cleos get table game12lizard game12lizard tablesinfo -L $tableid -U $tableid
 
     ;;
-
+erasedata)
+    #the second parameter is (103718369455 = erase end&&pause|| -2 = erase close)
+    echo "erase old data(second parameter is (103718369455 = erase end&&pause|| -2 = erase close)"
+    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard clear12cache '['$2']' -p useraaaaaaak
+    ;;
+importdata)
+    echo "importdata test"
+    nums=(29 100 13 8 91 44);
+    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard import12data '[155,0,"useraaaaaaab","0","0","100.0000 SYS","2.0000 SYS","3.0000 SYS","4.0000 SYS","5.0000 SYS","6.0000 SYS","7.0000 SYS","8.0000 SYS","9.0000 SYS","10.0000 SYS","11.0000 SYS","12.0000 SYS","13.0000 SYS","14.0000 SYS","15.0000 SYS","16.0000 SYS","17.0000 SYS",0.003,0.002,"0",{"symbol":"4,TES","contract":"useraaaaaaaj"}]' -p useraaaaaaak
+    #cleos --wallet-url http://127.0.0.1:6666 push action game12lizard import12data '[13,${nums[@]}]' -p useraaaaaaak
+    ;;
 shuffle)
     #test shuffle for baccarat
     echo "test shuffle"
@@ -128,11 +139,6 @@ pausetable)
     cleos --wallet-url http://127.0.0.1:6666 push action game12lizard continuetable '['$tableid']' -p useraaaaaaab
     cleos get table game12lizard game12lizard tablesinfo -L $tableid -U $tableid
 
-    ;;
-erasedata)
-    #the second parameter is (-1 = erase all|| -2 = erase close||num)
-    echo "erase old data(the second parameter is (-1 = erase all|| -2 = erase close||num))"
-    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard clear12cache '['$2']' -p useraaaaaaak
     ;;
 normalflow)
     echo "normalflow test"

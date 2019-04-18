@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Apr 17 18:15:45 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Apr 18 17:23:44 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -237,6 +237,116 @@
                 {
                     "name": "contract",
                     "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "import12data",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "tableStatus",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dealer",
+                    "type": "name"
+                },
+                {
+                    "name": "trusteeship",
+                    "type": "bool"
+                },
+                {
+                    "name": "isPrivate",
+                    "type": "bool"
+                },
+                {
+                    "name": "dealerBalance",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundDealerMaxPay",
+                    "type": "asset"
+                },
+                {
+                    "name": "minTableDeposit",
+                    "type": "asset"
+                },
+                {
+                    "name": "commission_rate_agent",
+                    "type": "float32"
+                },
+                {
+                    "name": "commission_rate_player",
+                    "type": "float32"
+                },
+                {
+                    "name": "upgradingFlag",
+                    "type": "bool"
+                },
+                {
+                    "name": "amountSymbol",
+                    "type": "extended_symbol"
                 }
             ]
         },
@@ -569,6 +679,14 @@
                     "type": "float64"
                 },
                 {
+                    "name": "upgradingFlag",
+                    "type": "bool"
+                },
+                {
+                    "name": "redundancy",
+                    "type": "string"
+                },
+                {
                     "name": "betStartTime",
                     "type": "uint64"
                 },
@@ -645,6 +763,16 @@
                 {
                     "name": "tableId",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "upgrading",
+            "base": "",
+            "fields": [
+                {
+                    "name": "isupgrading",
+                    "type": "bool"
                 }
             ]
         },
@@ -730,6 +858,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "import12data",
+            "type": "import12data",
+            "ricardian_contract": ""
+        },
+        {
             "name": "initsymbol",
             "type": "initsymbol",
             "ricardian_contract": ""
@@ -767,6 +900,11 @@
         {
             "name": "trusteeship",
             "type": "trusteeship",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "upgrading",
+            "type": "upgrading",
             "ricardian_contract": ""
         },
         {
