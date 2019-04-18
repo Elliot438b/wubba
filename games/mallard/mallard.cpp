@@ -173,6 +173,10 @@ ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
             {existing->tableId});
         return;
     }
+
+    //system upgrading
+    eosio::print(" upgradingFlag: ", existing->upgradingFlag, " ");
+    eosio_assert(!existing->upgradingFlag, "system upgrading...");
     // start a new round. table_round init.
     eosio::print(" before===validCardVec.size:", existing->validCardVec.size());
     checksum256 hash;
@@ -215,6 +219,11 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
                 {existing->tableId});
             return;
         }
+
+        //system upgrading
+        eosio::print(" upgradingFlag: ", existing->upgradingFlag, " ");
+        eosio_assert(!existing->upgradingFlag, "system upgrading...");
+
         // start a new round. table_round init.
         eosio::print(" before===validCardVec.size:", existing->validCardVec.size());
 
@@ -711,5 +720,45 @@ ACTION mallard::pushaliasnam(string alias, name account)
         s.account = account;
     });
 }
+ACTION mallard::upgrading(bool isupgrading)
+{
+    require_auth(adminaccount);
+    auto existing = tableround.begin();
+    for(; existing != tableround.end(); existing++)
+    {
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.upgradingFlag = isupgrading;
+        });
+    }
+}
 
-EOSIO_DISPATCH(mallard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(pushaliasnam))
+ACTION mallard::import12data(uint64_t tableId, uint64_t tableStatus, uint64_t cardBoot, name dealer, bool trusteeship,
+                             bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie,
+                             asset oneRoundMaxTotalBet_Push, asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit,float commission_rate_agent,float commission_rate_player, bool upgradingFlag,extended_symbol amountSymbol, std::vector<uint16_t> validCardVec)
+{
+    require_auth(adminaccount);
+
+    tableround.emplace(_self, [&](auto &s) {
+        s.tableId = tableId;
+        s.tableStatus = tableStatus;
+        s.validCardVec = validCardVec;
+        s.cardBoot = cardBoot;
+        s.dealer = dealer;
+        s.dealerBalance = dealerBalance;
+        s.isPrivate = isPrivate;
+        s.trusteeship = trusteeship;
+        s.oneRoundMaxTotalBet_BP = oneRoundMaxTotalBet_BP;
+        s.minPerBet_BP = minPerBet_BP;
+        s.oneRoundMaxTotalBet_Tie = oneRoundMaxTotalBet_Tie;
+        s.minPerBet_Tie = minPerBet_Tie;
+        s.oneRoundMaxTotalBet_Push = oneRoundMaxTotalBet_Push;
+        s.minPerBet_Push = minPerBet_Push;
+        s.oneRoundDealerMaxPay = oneRoundDealerMaxPay;
+        s.minTableDeposit = minTableDeposit;
+        s.amountSymbol = amountSymbol;
+        s.commission_rate_agent = commission_rate_agent;
+        s.commission_rate_player = commission_rate_player;
+        s.upgradingFlag = upgradingFlag;
+    });
+}
+EOSIO_DISPATCH(mallard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(pushaliasnam)(upgrading)(import12data))

@@ -31,6 +31,9 @@ ACTION lizard::newtable(uint64_t newtableId, name dealer, asset deposit, bool is
 {
     require_auth(dealer);
     require_auth(serveraccount);
+    auto existing = tableround.find(newtableId);
+    eosio_assert(existing == tableround.end(), "tableId exist...");
+
     asset minPerBet_default_temp;
     asset oneRoundDealerMaxPay_temp;
     asset deposit_tmp;
@@ -975,7 +978,7 @@ ACTION lizard::pushaliasnam(string alias, name account)
 
 ACTION lizard::upgrading(bool isupgrading)
 {
-    require_auth(serveraccount);
+    require_auth(adminaccount);
     auto existing = tableround.begin();
     for(; existing != tableround.end(); existing++)
     {

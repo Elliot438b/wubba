@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Wed Apr 17 18:06:52 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Apr 18 18:45:19 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -223,6 +223,92 @@
                 {
                     "name": "contract",
                     "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "import12data",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "tableStatus",
+                    "type": "uint64"
+                },
+                {
+                    "name": "cardBoot",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dealer",
+                    "type": "name"
+                },
+                {
+                    "name": "trusteeship",
+                    "type": "bool"
+                },
+                {
+                    "name": "isPrivate",
+                    "type": "bool"
+                },
+                {
+                    "name": "dealerBalance",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_BP",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_BP",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_Tie",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_Tie",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_Push",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_Push",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundDealerMaxPay",
+                    "type": "asset"
+                },
+                {
+                    "name": "minTableDeposit",
+                    "type": "asset"
+                },
+                {
+                    "name": "commission_rate_agent",
+                    "type": "float32"
+                },
+                {
+                    "name": "commission_rate_player",
+                    "type": "float32"
+                },
+                {
+                    "name": "upgradingFlag",
+                    "type": "bool"
+                },
+                {
+                    "name": "amountSymbol",
+                    "type": "extended_symbol"
+                },
+                {
+                    "name": "validCardVec",
+                    "type": "uint16[]"
                 }
             ]
         },
@@ -581,6 +667,14 @@
                     "type": "float32"
                 },
                 {
+                    "name": "upgradingFlag",
+                    "type": "bool"
+                },
+                {
+                    "name": "redundancy",
+                    "type": "string"
+                },
+                {
                     "name": "betStartTime",
                     "type": "uint64"
                 },
@@ -645,6 +739,16 @@
                 {
                     "name": "tableId",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "upgrading",
+            "base": "",
+            "fields": [
+                {
+                    "name": "isupgrading",
+                    "type": "bool"
                 }
             ]
         },
@@ -730,6 +834,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "import12data",
+            "type": "import12data",
+            "ricardian_contract": ""
+        },
+        {
             "name": "initsymbol",
             "type": "initsymbol",
             "ricardian_contract": ""
@@ -772,6 +881,11 @@
         {
             "name": "trusteeship",
             "type": "trusteeship",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "upgrading",
+            "type": "upgrading",
             "ricardian_contract": ""
         },
         {

@@ -40,8 +40,13 @@ public:
     ACTION shuffle(uint64_t tableId);
     ACTION edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_push, asset minPerBet_push);
     ACTION pushaliasnam(string alias, name account);
+    ACTION upgrading(bool isupgrading);
+    ACTION import12data(uint64_t tableId, uint64_t tableStatus, uint64_t cardBoot, name dealer, bool trusteeship,
+                    bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie,
+                    asset oneRoundMaxTotalBet_Push, asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit, float commission_rate_agent,float commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec);
 
-    struct card_info
+
+struct card_info
     {
         uint8_t deck;
         uint8_t cardNum;
@@ -91,7 +96,8 @@ public:
         extended_symbol amountSymbol;
         float commission_rate_agent;
         float commission_rate_player;
-
+        bool upgradingFlag;
+        string redundancy;
         // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
         asset currRoundBetSum_BP;
@@ -124,7 +130,7 @@ public:
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(tableStatus)(cardBoot)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Push)(minPerBet_Push)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(commission_rate_agent)(commission_rate_player)(betStartTime)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
+        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(tableStatus)(cardBoot)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Push)(minPerBet_Push)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(commission_rate_agent)(commission_rate_player)(upgradingFlag)(redundancy)(betStartTime)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
     };
 
     struct shuffle_round_result
@@ -196,6 +202,8 @@ public:
     using shuffle_action = action_wrapper<"shuffle"_n, &mallard::shuffle>;
     using edittable_action = action_wrapper<"edittable"_n, &mallard::edittable>;
     using pushaliasnam_action = action_wrapper<"pushaliasnam"_n, &mallard::pushaliasnam>;
+    using upgrading_action = action_wrapper<"upgrading"_n, &mallard::upgrading>;
+    using import12data_action = action_wrapper<"import12data"_n, &mallard::import12data>;
 
     // std random
     struct WBRNG

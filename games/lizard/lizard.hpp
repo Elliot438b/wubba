@@ -169,6 +169,7 @@ struct player_bet_info
     using depositable_action = action_wrapper<"depositable"_n, &lizard::depositable>;
     using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &lizard::dealerwitdaw>;
     using pushaliasnam_action = action_wrapper<"pushaliasnam"_n, &lizard::pushaliasnam>;
+    using edittable_action = action_wrapper<"edittable"_n, &lizard::edittable>;
     using upgrading_action = action_wrapper<"upgrading"_n, &lizard::upgrading>;
     using import12data_action = action_wrapper<"import12data"_n, &lizard::import12data>;
 
