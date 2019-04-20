@@ -451,7 +451,7 @@ Put the sym_info records into On-chain state table.
 - deposittable modify: delete the first param: name dealer.
 - clear12cache: can only delete tables whose status are ROUND_END or PAUSE 
 
-### v0.8.2 import12data
+## v0.8.2 import12data
 - add new interface:***upgrading***, permission:**adminaccount** with one param {bool flag}. 
     - If true, {!existing->trusteeship, dealerseed} and {existing->trusteeship, serverseed} can't start a new round. 
 - add new interface: ***import12data***, permission:**adminaccount**. Importing the current SC's state data struct with one item.
