@@ -456,6 +456,14 @@ Put the sym_info records into On-chain state table.
     - If true, {!existing->trusteeship, dealerseed} and {existing->trusteeship, serverseed} can't start a new round. 
 - add new interface: ***import12data***, permission:**adminaccount**. Importing the current SC's state data struct with one item.
 
+## v0.8.3 target
+- fix bug: initsymbol verify token that not exsit should be failed.
+- remove all alias code including: 
+    - bet param{agent} change to name type
+    - aliasinfo state table
+    - delete SC::pushaliasnam
+    - **NOTE:**code clean and testing.
+
 ## TODO
 ### exercise: update sc with data struct change
 1. Add one redundancy fields
