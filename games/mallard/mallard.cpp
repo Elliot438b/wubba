@@ -260,7 +260,7 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     }
 }
 
-ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, string agentalias, string nickname)
+ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, name agent)
 {
     require_auth(player);
     require_auth(serveraccount);
@@ -323,8 +323,8 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
     temp.betPlayerPush = betPlayerPush;
     temp.pBonus = init_asset_empty;
     temp.dBonus = init_asset_empty;
-    temp.agent = agentalias;
-    temp.nickname = nickname;
+    temp.agent = agent;
+
     // -------------------------------- commission start --------------------------------
     // platform
     auto temp_rate_platform = comission_rate_platform_default;
@@ -338,20 +338,18 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
             {_self, platformaccount, platformtotransfer, std::string("platformcommission")});
     }
     // agent
-    auto existalias = tablealias.find(SDBMHash((char *)agentalias.c_str()));
+    //auto existalias = tablealias.find(SDBMHash((char *)agentalias.c_str()));
     asset agentotransfer = init_asset_empty;
-    if (existalias != tablealias.end() && existalias->account != existing->dealer)
+    agentotransfer = asset(depositAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
+    eosio::print(" sum_bet_amount:", depositAmount, " agentotransfer:", agentotransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
+    if (agentotransfer > init_asset_empty)
     {
-        agentotransfer = asset(depositAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
-        eosio::print(" sum_bet_amount:", depositAmount, " agentotransfer:", agentotransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
-        if (agentotransfer > init_asset_empty)
-        {
-            INLINE_ACTION_SENDER(eosio::token, transfer)
-            (
+        INLINE_ACTION_SENDER(eosio::token, transfer)
+        (
                 existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                {_self, existalias->account, agentotransfer, std::string("agentcommission")});
-        }
+                {_self, agent, agentotransfer, std::string("agentcommission")});
     }
+
     // player
     asset playertotransfer = asset(depositAmount.amount * existing->commission_rate_player, existing->amountSymbol.get_symbol());
     eosio::print(" sum_bet_amount:", depositAmount, " playertotransfer:", playertotransfer, " commission_rate_player:", existing->commission_rate_player, " ");
@@ -701,25 +699,7 @@ ACTION mallard::shuffle(uint64_t tableId)
         s.cardBoot += 1;
     });
 }
-ACTION mallard::pushaliasnam(string alias, name account)
-{
-    require_auth(account);
-    uint32_t aliasId = SDBMHash((char *)alias.c_str());
-    auto existing = tablealias.find(aliasId);
-    eosio_assert(existing == tablealias.end(), "alias exist...");
-    eosio_assert(0 != alias.compare(""), "alias is empty");
 
-    auto account_index = tablealias.get_index<"account"_n>();
-    auto exist_account_itr_lower = account_index.lower_bound(account.value);
-    auto exist_account_itr_upper = account_index.upper_bound(account.value);
-
-    eosio_assert(exist_account_itr_lower == exist_account_itr_upper, "one account only have one alias");
-
-    tablealias.emplace(_self, [&](auto &s) {
-        s.aliasId = aliasId;
-        s.account = account;
-    });
-}
 ACTION mallard::upgrading(bool isupgrading)
 {
     require_auth(adminaccount);
@@ -761,4 +741,4 @@ ACTION mallard::import12data(uint64_t tableId, uint64_t tableStatus, uint64_t ca
         s.upgradingFlag = upgradingFlag;
     });
 }
-EOSIO_DISPATCH(mallard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(pushaliasnam)(upgrading)(import12data))
+EOSIO_DISPATCH(mallard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(upgrading)(import12data))

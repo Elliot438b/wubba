@@ -17,13 +17,13 @@ public:
     using contract::contract;
 
     mallard(name receiver, name code, datastream<const char *> ds)
-        : contract(receiver, code, ds), tableround(receiver, receiver.value), tableshuffle(receiver, receiver.value), tablealias(receiver, receiver.value), tablecurrency(receiver, receiver.value) {}
+        : contract(receiver, code, ds), tableround(receiver, receiver.value), tableshuffle(receiver, receiver.value), tablecurrency(receiver, receiver.value) {}
 
     ACTION initsymbol(name code, string sym, asset minperbet);
     ACTION newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
-    ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, string agentalias, string nickname);
+    ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, name agent);
     ACTION endbet(uint64_t tableId);
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
@@ -39,7 +39,6 @@ public:
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
     ACTION shuffle(uint64_t tableId);
     ACTION edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_push, asset minPerBet_push);
-    ACTION pushaliasnam(string alias, name account);
     ACTION upgrading(bool isupgrading);
     ACTION import12data(uint64_t tableId, uint64_t tableStatus, uint64_t cardBoot, name dealer, bool trusteeship,
                     bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie,
@@ -65,12 +64,11 @@ struct card_info
         asset betPlayerPush;
         asset pBonus;
         asset dBonus;
-        string agent;
-        string nickname;
+        name agent;
         asset playercommission;
         asset agentcommission;
 
-        EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPush)(betPlayerPush)(pBonus)(dBonus)(agent)(nickname)(playercommission)(agentcommission))
+        EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPush)(betPlayerPush)(pBonus)(dBonus)(agent)(playercommission)(agentcommission))
     };
 
     TABLE table_stats
@@ -154,17 +152,6 @@ struct card_info
         EOSLIB_SERIALIZE(shuffle_info, (tableId)(firstCard)(threeResults));
     };
 
-    TABLE alias_info
-    {
-        uint32_t aliasId;
-        name account;
-
-        uint64_t primary_key() const { return aliasId; }
-        uint64_t get_account() const { return account.value; }
-
-        EOSLIB_SERIALIZE(alias_info, (aliasId)(account))
-    };
-
     TABLE currency_info
     {
         name code;
@@ -178,7 +165,6 @@ struct card_info
 
     typedef eosio::multi_index<"tablesinfo"_n, mallard::table_stats, indexed_by<"dealer"_n, const_mem_fun<mallard::table_stats, uint64_t, &mallard::table_stats::get_dealer>>> singletable_t;
     typedef eosio::multi_index<"shuffleinfo"_n, mallard::shuffle_info> shuffleinfo_t;
-    typedef eosio::multi_index<"aliasinfo"_n, mallard::alias_info, indexed_by<"account"_n, const_mem_fun<mallard::alias_info, uint64_t, &mallard::alias_info::get_account>>> aliasinfo_t;
     typedef eosio::multi_index<"currencyinfo"_n, mallard::currency_info> currencyinfo_t;
 
     using initsymbol_action = action_wrapper<"initsymbol"_n, &mallard::initsymbol>;
@@ -201,7 +187,6 @@ struct card_info
     using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &mallard::dealerwitdaw>;
     using shuffle_action = action_wrapper<"shuffle"_n, &mallard::shuffle>;
     using edittable_action = action_wrapper<"edittable"_n, &mallard::edittable>;
-    using pushaliasnam_action = action_wrapper<"pushaliasnam"_n, &mallard::pushaliasnam>;
     using upgrading_action = action_wrapper<"upgrading"_n, &mallard::upgrading>;
     using import12data_action = action_wrapper<"import12data"_n, &mallard::import12data>;
 
@@ -503,7 +488,6 @@ struct card_info
 
     //static const std::vector<sym_info> symOptions;
     singletable_t tableround;
-    aliasinfo_t tablealias;
     shuffleinfo_t tableshuffle;
     currencyinfo_t tablecurrency;
     WBRNG wbrng;
