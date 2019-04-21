@@ -457,12 +457,14 @@ Put the sym_info records into On-chain state table.
 - add new interface: ***import12data***, permission:**adminaccount**. Importing the current SC's state data struct with one item.
 
 ## v0.8.3 target
-- fix bug: initsymbol verify token that not exsit should be failed.
 - remove all alias code including: 
     - bet param{agent} change to name type
     - aliasinfo state table
     - delete SC::pushaliasnam
     - **NOTE:**code clean and testing.
+- fix bug: initsymbol verify token that not exsit should be failed.
+- fix bug: get table has 10ms modification response.
+- fix bug: import12data verification.
 
 ## TODO
 ### exercise: update sc with data struct change
