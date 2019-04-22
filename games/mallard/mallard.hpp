@@ -498,7 +498,7 @@ public:
 
     const uint16_t CardsMinLimit = 100;
     const uint32_t betPeriod = 30;
-    const uint16_t initDecks = 2; //todo default 8 ,2 is test use
+    const uint16_t initDecks = 8; //todo default 8 ,2 is test use
     const uint32_t minTableRounds = 10;
     const uint16_t maxinum_table_per_dealer = 100;
     const uint64_t delall_key = 103718369455;

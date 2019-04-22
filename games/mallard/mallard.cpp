@@ -393,7 +393,6 @@ ACTION mallard::endbet(uint64_t tableId)
     uint64_t useTime = now() - existing->betStartTime;
     eosio::print("spend time : ", useTime, "s, need ", betPeriod, "s!");
     eosio_assert(useTime > betPeriod, "Bet time is not end now, wait... ");
-
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_REVEAL;
     });
@@ -405,16 +404,14 @@ ACTION mallard::verdealeseed(uint64_t tableId, string seed)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
-    if (!existing->trusteeship)
-    {
-        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
-        eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time to verify dealer seed yet.");
-        assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerSeedHash));
-        tableround.modify(existing, _self, [&](auto &s) {
-            s.dSeedVerity = true;
-            s.dealerSeed = seed;
-        });
-    }
+    eosio_assert(!existing->trusteeship, "Dealer is hosted.");
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
+    eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time to verify dealer seed yet.");
+    assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerSeedHash));
+    tableround.modify(existing, _self, [&](auto &s) {
+        s.dSeedVerity = true;
+        s.dealerSeed = seed;
+    });
 }
 // Server push defer 3' action, once got ROUND_REVEAL.
 ACTION mallard::verserveseed(uint64_t tableId, string seed)
@@ -422,7 +419,7 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "table status != reveal");
     eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time to verify server seed yet.");
     assert_sha256(seed.c_str(), seed.size(), ((*existing).serverSeedHash));
     tableround.modify(existing, _self, [&](auto &s) {
