@@ -23,7 +23,7 @@ public:
     ACTION newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
-    ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, name agent);
+    ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, name agent, string nickname);
     ACTION endbet(uint64_t tableId);
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
@@ -64,10 +64,11 @@ public:
         asset pBonus;
         asset dBonus;
         name agent;
+        string nickname;
         asset playercommission;
         asset agentcommission;
 
-        EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPush)(betPlayerPush)(pBonus)(dBonus)(agent)(playercommission)(agentcommission))
+        EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPush)(betPlayerPush)(pBonus)(dBonus)(agent)(nickname)(playercommission)(agentcommission))
     };
 
     TABLE table_stats

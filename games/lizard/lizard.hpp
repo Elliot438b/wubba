@@ -16,14 +16,14 @@ public:
     using contract::contract;
 
     lizard(name receiver, name code, datastream<const char *> ds)
-        : contract(receiver, code, ds), tableround(receiver, receiver.value), tablealias(receiver, receiver.value), tablecurrency(receiver, receiver.value) {}
+        : contract(receiver, code, ds), tableround(receiver, receiver.value), tablecurrency(receiver, receiver.value) {}
 
     ACTION initsymbol(name code, string sym, asset minperbet);
     ACTION newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION endbet(uint64_t tableId);
-    ACTION playerbet(uint64_t tableId, name player, string bet, string agentalias, string nickname);
+    ACTION playerbet(uint64_t tableId, name player, string bet, name agent, string nickname);
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed);
     ACTION trusteeship(uint64_t tableId);
@@ -36,7 +36,6 @@ public:
     ACTION closetable(uint64_t tableId);
     ACTION depositable(uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
-    ACTION pushaliasnam(string alias, name account);
     ACTION edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single);
     ACTION upgrading(bool isupgrading);
     ACTION import12data(uint64_t tableId, uint64_t tableStatus, name dealer, bool trusteeship,
@@ -48,7 +47,7 @@ public:
         string bet;
         asset pBonus;
         asset dBonus;
-        string agent;
+        name agent;
         string nickname;
         asset playercommission;
         asset agentcommission;
@@ -124,17 +123,6 @@ public:
         EOSLIB_SERIALIZE(table_stats, (tableId)(tableStatus)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_bsoe)(minPerBet_bsoe)(oneRoundMaxTotalBet_anytri)(minPerBet_anytri)(oneRoundMaxTotalBet_trinum)(minPerBet_trinum)(oneRoundMaxTotalBet_pairnum)(minPerBet_pairnum)(oneRoundMaxTotalBet_txx)(minPerBet_txx)(oneRoundMaxTotalBet_twocom)(minPerBet_twocom)(oneRoundMaxTotalBet_single)(minPerBet_single)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(commission_rate_agent)(commission_rate_player)(upgradingFlag)(redundancy)(betStartTime)(currRoundBetSum_bsoe)(currRoundBetSum_anytri)(currRoundBetSum_trinum)(currRoundBetSum_pairnum)(currRoundBetSum_txx)(currRoundBetSum_twocom)(currRoundBetSum_single)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(diceResult))
     };
 
-    TABLE alias_info
-    {
-        uint32_t aliasId;
-        name account;
-
-        uint64_t primary_key() const { return aliasId; }
-        uint64_t get_account() const { return account.value; }
-
-        EOSLIB_SERIALIZE(alias_info, (aliasId)(account))
-    };
-
     TABLE currency_info
     {
         name code;
@@ -147,7 +135,6 @@ public:
     };
 
     typedef eosio::multi_index<"tablesinfo"_n, lizard::table_stats, indexed_by<"dealer"_n, const_mem_fun<lizard::table_stats, uint64_t, &lizard::table_stats::get_dealer>>> singletable_t;
-    typedef eosio::multi_index<"aliasinfo"_n, lizard::alias_info, indexed_by<"account"_n, const_mem_fun<lizard::alias_info, uint64_t, &lizard::alias_info::get_account>>> aliasinfo_t;
     typedef eosio::multi_index<"currencyinfo"_n, lizard::currency_info> currencyinfo_t;
 
     using initsymbol_action = action_wrapper<"initsymbol"_n, &lizard::initsymbol>;
@@ -168,7 +155,6 @@ public:
     using closetable_action = action_wrapper<"closetable"_n, &lizard::closetable>;
     using depositable_action = action_wrapper<"depositable"_n, &lizard::depositable>;
     using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &lizard::dealerwitdaw>;
-    using pushaliasnam_action = action_wrapper<"pushaliasnam"_n, &lizard::pushaliasnam>;
     using edittable_action = action_wrapper<"edittable"_n, &lizard::edittable>;
     using upgrading_action = action_wrapper<"upgrading"_n, &lizard::upgrading>;
     using import12data_action = action_wrapper<"import12data"_n, &lizard::import12data>;
@@ -384,7 +370,6 @@ public:
 
     static const std::vector<string> betOptions;
     singletable_t tableround;
-    aliasinfo_t tablealias;
     currencyinfo_t tablecurrency;
 
     WBRNG wbrng;

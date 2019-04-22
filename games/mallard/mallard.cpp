@@ -265,7 +265,7 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     }
 }
 
-ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, name agent)
+ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, name agent, string nickname)
 {
     require_auth(player);
     require_auth(serveraccount);
@@ -329,6 +329,7 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
     temp.pBonus = init_asset_empty;
     temp.dBonus = init_asset_empty;
     temp.agent = agent;
+    temp.nickname = nickname;
 
     // -------------------------------- commission start --------------------------------
     // platform
@@ -343,7 +344,6 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
             {_self, platformaccount, platformtotransfer, std::string("platformcommission")});
     }
     // agent
-    //auto existalias = tablealias.find(SDBMHash((char *)agentalias.c_str()));
     asset agentotransfer = init_asset_empty;
     agentotransfer = asset(depositAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
     eosio::print(" sum_bet_amount:", depositAmount, " agentotransfer:", agentotransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
@@ -354,7 +354,6 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
             existing->amountSymbol.get_contract(), {{_self, "active"_n}},
             {_self, agent, agentotransfer, std::string("agentcommission")});
     }
-
     // player
     asset playertotransfer = asset(depositAmount.amount * existing->commission_rate_player, existing->amountSymbol.get_symbol());
     eosio::print(" sum_bet_amount:", depositAmount, " playertotransfer:", playertotransfer, " commission_rate_player:", existing->commission_rate_player, " ");

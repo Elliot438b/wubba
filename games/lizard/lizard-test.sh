@@ -50,7 +50,9 @@ case $1 in
         #cleos --wallet-url http://127.0.0.1:6666 push action game12lizard upgrading '["1"]' -p useraaaaaaak
         cleos --wallet-url http://127.0.0.1:6666 push action game12lizard dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab useraaaaaaah
         cleos --wallet-url http://127.0.0.1:6666 push action game12lizard serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
-        cleos --wallet-url http://127.0.0.1:6666 push action game12lizard playerbet '['$tableid',useraaaaaaac,"{\"small\": \"2.6000 SYS\",\"total6\": \"3.5000 SYS\",\"tri2\": \"2.0000 SYS\"}", "wangls", "王丽"]' -p useraaaaaaac useraaaaaaah
+        cleos --wallet-url http://127.0.0.1:6666 push action game12lizard playerbet '['$tableid',useraaaaaaac,"{\"small\": \"1.6000 SYS\",\"total6\": \"1.5000 SYS\",\"tri2\": \"1.0000 SYS\"}", useraaaaaaac, "小马"]' -p useraaaaaaac useraaaaaaah
+        cleos --wallet-url http://127.0.0.1:6666 push action game12lizard playerbet '['$tableid',useraaaaaaab,"{\"small\": \"1.6000 SYS\",\"total6\": \"1.5000 SYS\",\"tri2\": \"1.0000 SYS\"}", useraaaaaaac, "Jack"]' -p useraaaaaaab useraaaaaaah
+        cleos --wallet-url http://127.0.0.1:6666 push action game12lizard playerbet '['$tableid',useraaaaaaad,"{\"small\": \"1.6000 SYS\",\"total6\": \"1.5000 SYS\",\"tri2\": \"1.0000 SYS\"}", useraaaaaaac, "风"]' -p useraaaaaaad useraaaaaaah
         #cleos --wallet-url http://127.0.0.1:6666 push action game12lizard playerbet '['$tableid',useraaaaaaac,"{\"small\": \"2.6000 SYS\",\"total6\": \"3.5000 SYS\",\"tri2\": \"2.0000 SYS\"}", "wls", "wls"]' -p useraaaaaaac useraaaaaaah
         #cleos --wallet-url http://127.0.0.1:6666 push action game12lizard playerbet '['$tableid',useraaaaaaad,"{\"big\": \"2.6001 SYS\",\"total9\": \"3.5001 SYS\",\"tri2\": \"2.0000 SYS\"}"]' -p useraaaaaaad useraaaaaaah
         cleos get table game12lizard game12lizard tablesinfo -L $tableid -U $tableid
@@ -60,7 +62,7 @@ case $1 in
         sleep 36s
         cleos --wallet-url http://127.0.0.1:6666 push action game12lizard endbet '['$tableid']' -p useraaaaaaah
         cleos --wallet-url http://127.0.0.1:6666 push action game12lizard verdealeseed '['$tableid',10]' -p useraaaaaaab useraaaaaaah
-        sleep 3s
+        #sleep 3s
         cleos --wallet-url http://127.0.0.1:6666 push action game12lizard verserveseed '['$tableid',704]' -p useraaaaaaah
         cleos get table game12lizard game12lizard tablesinfo -L $tableid -U $tableid
         

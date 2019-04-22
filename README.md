@@ -461,9 +461,16 @@ Put the sym_info records into On-chain state table.
     - bet param{agent} change to name type
     - aliasinfo state table
     - delete SC::pushaliasnam
-    - **NOTE:**code clean and testing.
+
+**NOTE:** code clean and testing, fixed, tested.
+
 - fix bug: initsymbol verify token that not exsit should be failed.
+    - fixed: wrong account or wrong symbol can't pass the verification now.
 - fix bug: get table has 10ms modification response.
+    - fixed: can't get all table data once the data collection is too big, get 100 rows per time.
+
+> get_table_rows_ex::walk_table_row_range::auto end_time = cur_time + fc::microseconds(1000 * 10); /// 10ms max time
+
 - fix bug: import12data verification.
 
 ## TODO
