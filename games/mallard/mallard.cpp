@@ -92,6 +92,7 @@ ACTION mallard::newtable(uint64_t newtableId, name dealer, asset deposit, bool i
     tableround.emplace(_self, [&](auto &s) {
         s.tableId = newtableId;
         s.cardBoot = 1;
+        s.trusteeship = false;
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_SHUFFLE;
         s.dealer = dealer;
         s.dealerBalance = deposit;
@@ -108,6 +109,7 @@ ACTION mallard::newtable(uint64_t newtableId, name dealer, asset deposit, bool i
         s.amountSymbol = cur_ex_sym;
         s.commission_rate_agent = temp_rate_agent;
         s.commission_rate_player = temp_rate_player;
+        s.upgradingFlag = false;
     });
 }
 
@@ -180,7 +182,6 @@ ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     }
 
     //system upgrading
-    eosio::print(" upgradingFlag: ", existing->upgradingFlag, " ");
     eosio_assert(!existing->upgradingFlag, "system upgrading...");
     // start a new round. table_round init.
     eosio::print(" before===validCardVec.size:", existing->validCardVec.size());
@@ -226,7 +227,6 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
         }
 
         //system upgrading
-        eosio::print(" upgradingFlag: ", existing->upgradingFlag, " ");
         eosio_assert(!existing->upgradingFlag, "system upgrading...");
 
         // start a new round. table_round init.
@@ -742,7 +742,7 @@ ACTION mallard::import12data(uint64_t tableId, uint64_t tableStatus, uint64_t ca
         s.amountSymbol = amountSymbol;
         s.commission_rate_agent = commission_rate_agent;
         s.commission_rate_player = commission_rate_player;
-        s.upgradingFlag = upgradingFlag;
+        s.upgradingFlag = true;
     });
 }
 EOSIO_DISPATCH(mallard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(upgrading)(import12data))

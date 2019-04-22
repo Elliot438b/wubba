@@ -100,6 +100,7 @@ ACTION lizard::newtable(uint64_t newtableId, name dealer, asset deposit, bool is
         s.tableId = newtableId;
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
         s.dealer = dealer;
+        s.trusteeship = false;
         s.dealerBalance = deposit;
         s.isPrivate = isPrivate;
         s.oneRoundMaxTotalBet_bsoe = oneRoundMaxTotalBet_bsoe;
@@ -128,6 +129,7 @@ ACTION lizard::newtable(uint64_t newtableId, name dealer, asset deposit, bool is
         s.amountSymbol = cur_ex_sym;
         s.commission_rate_agent = temp_rate_agent;
         s.commission_rate_player = temp_rate_player;
+        s.upgradingFlag = false;
     });
 }
 
@@ -999,7 +1001,7 @@ ACTION lizard::import12data(uint64_t tableId, uint64_t tableStatus, name dealer,
         s.amountSymbol = amountSymbol;
         s.commission_rate_agent = commission_rate_agent;
         s.commission_rate_player = commission_rate_player;
-        s.upgradingFlag = upgradingFlag;
+        s.upgradingFlag = true;
     });
 }
 EOSIO_DISPATCH(lizard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(edittable)(upgrading)(import12data))
