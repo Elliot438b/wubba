@@ -462,7 +462,7 @@ Put the sym_info records into On-chain state table.
     - aliasinfo state table
     - delete SC::pushaliasnam
 
-**NOTE:** code clean and testing, fixed, tested.
+**NOTE:** **keep nickname!** code clean and testing, fixed, tested.
 
 - fix bug: initsymbol verify token that not exsit should be failed.
     - fixed: wrong account or wrong symbol can't pass the verification now.
@@ -472,6 +472,11 @@ Put the sym_info records into On-chain state table.
 > get_table_rows_ex::walk_table_row_range::auto end_time = cur_time + fc::microseconds(1000 * 10); /// 10ms max time
 
 - fix bug: import12data verification.
+    - fixed, import12data don't need verification, controlled by the admin.
+- fix bug: depositable can't automate recover the table round.
+    - fixed, remove the automate.
+- fix bug: exitruteship=>dealerseed,permission error. 
+    - fixed, init table field{trusteeship=false} in newtable.
 
 ## TODO
 ### exercise: update sc with data struct change
