@@ -662,13 +662,13 @@ ACTION mallard::depositable(uint64_t tableId, asset deposit)
         s.dealerBalance += deposit;
     });
     // automate recover the table round.
-    if (existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED)
-    {
-        INLINE_ACTION_SENDER(mallard, continuetable)
-        (
-            _self, {{existing->dealer, "active"_n}},
-            {existing->tableId});
-    }
+    // if (existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED)
+    // {
+    //     INLINE_ACTION_SENDER(mallard, continuetable)
+    //     (
+    //         _self, {{existing->dealer, "active"_n}},
+    //         {existing->tableId});
+    // }
 }
 
 ACTION mallard::dealerwitdaw(uint64_t tableId, asset withdraw)
