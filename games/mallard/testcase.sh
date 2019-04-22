@@ -627,10 +627,11 @@ case $1 in
         tableid=$(($tableid + 1))
         cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '['$tableid',useraaaaaaab,"4000.0000 TES", wls,"useraaaaaaaj","TES", "0.005", "0.002", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaab useraaaaaaah
 !
-        for((num=16000;num<=18000;num++));
+        for((num=2101;num<=2150;num++));
         do
-            cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '['$num',useraaaaaaab,"4000.0000 TES", 1,"useraaaaaaaj","TES", "0.005", "0.002", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaab useraaaaaaah
-            cleos --wallet-url http://127.0.0.1:6666 push action gamemallards shuffle '['$tableid']' -p useraaaaaaah
+            cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '['$num',useraaaaaaai,"4000.0000 TES", 1,"useraaaaaaaj","TES", "0.005", "0.002", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaai useraaaaaaah
+            cleos --wallet-url http://127.0.0.1:6666 push action gamemallards shuffle '['$num']' -p useraaaaaaah
+            sleep 0.5s
         done
         ;;
 
