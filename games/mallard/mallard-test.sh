@@ -3,7 +3,7 @@
 case $1 in
     chainstart)
         echo "chain restart, set permission"
-        cleos --wallet-url http://127.0.0.1:6666 system newaccount useraaaaaaak gamemallards EOS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr --buy-ram "100 SYS" --stake-net "100 SYS" --stake-cpu "100 SYS" --transfer
+        cleos --wallet-url http://127.0.0.1:6666 system newaccount useraaaaaaaa gamemallards EOS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr --buy-ram "1000 SYS" --stake-net "1000 SYS" --stake-cpu "1000 SYS" --transfer
         cleos --wallet-url http://127.0.0.1:6666 transfer useraaaaaaam gamemallards "100000 SYS"
         cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaab active '{"threshold":1,"keys":[{"key":"EOS7yBtksm8Kkg85r4in4uCbfN77uRwe82apM8jjbhFVDgEgz3w8S","weight":1}],"accounts":[{"permission":{"actor":"gamemallards","permission":"eosio.code"},"weight":1}]}' owner -p useraaaaaaab
         cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaac active '{"threshold":1,"keys":[{"key":"EOS7WnhaKwHpbSidYuh2DF1qAExTRUtPEdZCaZqt75cKcixuQUtdA","weight":1}],"accounts":[{"permission":{"actor":"gamemallards","permission":"eosio.code"},"weight":1}]}' owner -p useraaaaaaac
@@ -12,7 +12,7 @@ case $1 in
         cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaak active '{"threshold":1,"keys":[{"key":"EOS6iwndPo58Y2ihWshfhnFbEBJHGkZtujR1bn7bVLngnTWFA8Hm3","weight":1}],"accounts":[{"permission":{"actor":"gamemallards","permission":"eosio.code"},"weight":1}]}' owner -p useraaaaaaak
         cleos --wallet-url http://127.0.0.1:6666 set account permission gamemallards active '{"threshold":1,"keys":[{"key":"EOS69X3383RzBZj41k73CSjUNXM5MYGpnDxyPnWUKPEtYQmTBWz4D","weight":1}],"accounts":[{"permission":{"actor":"gamemallards","permission":"eosio.code"},"weight":1}]}' owner -p gamemallards
         
-        # custom token issue.
+        # custom token issue 1.
         cleos --wallet-url http://127.0.0.1:6666 system buyram useraaaaaaag useraaaaaaaj "10 SYS"
         cleos --wallet-url http://127.0.0.1:6666 set contract useraaaaaaaj ../../library/eosio.token eosio.token.wasm eosio.token.abi
         cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj create '["useraaaaaaai","100000000.0000 TES"]' -p useraaaaaaaj
@@ -20,10 +20,26 @@ case $1 in
         cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj issue '["useraaaaaaac","10000.0000 TES","xxx"]' -p useraaaaaaai
         cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj issue '["useraaaaaaad","10000.0000 TES","xxx"]' -p useraaaaaaai
         cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj issue '["useraaaaaaak","10000.0000 TES","xxx"]' -p useraaaaaaai
+        cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaaj issue '["useraaaaaaaj","10000.0000 TES","xxx"]' -p useraaaaaaai
         cleos --wallet-url http://127.0.0.1:6666 get currency balance useraaaaaaaj useraaaaaaab "TES"
         cleos --wallet-url http://127.0.0.1:6666 get currency balance useraaaaaaaj useraaaaaaac "TES"
         cleos --wallet-url http://127.0.0.1:6666 get currency balance useraaaaaaaj useraaaaaaad "TES"
         cleos --wallet-url http://127.0.0.1:6666 get currency balance useraaaaaaaj useraaaaaaak "TES"
+        cleos --wallet-url http://127.0.0.1:6666 get currency balance useraaaaaaaj useraaaaaaaj "TES"
+         # custom token issue 2.
+        cleos --wallet-url http://127.0.0.1:6666 system buyram useraaaaaaag useraaaaaaal "10 SYS"
+        cleos --wallet-url http://127.0.0.1:6666 set contract useraaaaaaal ../../library/eosio.token eosio.token.wasm eosio.token.abi
+        cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaal create '["useraaaaaaal","100000000.0000 GDP"]' -p useraaaaaaal
+        cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaal issue '["useraaaaaaab","10000000.0000 GDP","xxx"]' -p useraaaaaaal
+        cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaal issue '["useraaaaaaac","10000.0000 GDP","xxx"]' -p useraaaaaaal
+        cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaal issue '["useraaaaaaad","10000.0000 GDP","xxx"]' -p useraaaaaaal
+        cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaal issue '["useraaaaaaak","10000.0000 GDP","xxx"]' -p useraaaaaaal
+        cleos --wallet-url http://127.0.0.1:6666 push action useraaaaaaal issue '["useraaaaaaal","10000.0000 GDP","xxx"]' -p useraaaaaaal
+        cleos --wallet-url http://127.0.0.1:6666 get currency balance useraaaaaaal useraaaaaaab "GDP"
+        cleos --wallet-url http://127.0.0.1:6666 get currency balance useraaaaaaal useraaaaaaac "GDP"
+        cleos --wallet-url http://127.0.0.1:6666 get currency balance useraaaaaaal useraaaaaaad "GDP"
+        cleos --wallet-url http://127.0.0.1:6666 get currency balance useraaaaaaal useraaaaaaad "GDP"
+        cleos --wallet-url http://127.0.0.1:6666 get currency balance useraaaaaaal useraaaaaaal "GDP"
     ;;
     
     temptest)
@@ -33,7 +49,13 @@ case $1 in
         cleos --wallet-url http://127.0.0.1:6666 set contract gamemallards ./ mallard.wasm mallard.abi
         # init currencyinfo
         cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaaj","TES","0.1000 TES"]' -p useraaaaaaak
+        cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaal","GDP","0.1000 GDP"]' -p useraaaaaaak
         cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["eosio.token","SYS","0.1000 SYS"]' -p useraaaaaaak
+        # error test
+        cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaaa","GDP","0.1000 GDP"]' -p useraaaaaaak
+        cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaal","GDA","0.1000 GDA"]' -p useraaaaaaak
+        cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaal","GDP","0.1000 GDA"]' -p useraaaaaaak
+        
         cleos get table gamemallards gamemallards currencyinfo
         for((num=1;num<=1;num++));
         do

@@ -3,28 +3,33 @@
 ACTION mallard::initsymbol(name code, string sym, asset minperbet)
 {
     require_auth(adminaccount);
-    eosio_assert(0 == minperbet.symbol.code().to_string().compare(sym), "symbol not match");
+    eosio_assert(0 == minperbet.symbol.code().to_string().compare(sym), "The minperbet's symbol not match!");
     auto existing = tablecurrency.find(code.value);
+    eosio_assert(existing == tablecurrency.end(), "Symbol already exsits!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         code, {{adminaccount, "active"_n}},
         {adminaccount, _self, minperbet, std::string("test symbol")});
 
-    if (existing == tablecurrency.end())
+    symbol symB = symbol(symbol_code(sym), 4);
+    asset init_asset_empty = asset(0, symB);
+    if (code == "eosio.token"_n)
     {
-        tablecurrency.emplace(_self, [&](auto &s) {
-            s.code = code;
-            s.symName = symbol(symbol_code(sym), 4);
-            s.minPerBet_default = minperbet;
-        });
+        eosio::print("------ insert the core symbol ------");
+        asset selfSymBalance = eosio::token::get_balance(code, _self, symB.code());
+        eosio_assert(selfSymBalance > init_asset_empty, "_self must own the core symbol itself!");
     }
     else
     {
-        tablecurrency.modify(existing, _self, [&](auto &s) {
-            s.symName = symbol(symbol_code(sym), 4);
-            s.minPerBet_default = minperbet;
-        });
+        eosio::print("------ insert the custom symbol ------");
+        asset selfSymBalance = eosio::token::get_balance(code, code, symB.code());
+        eosio_assert(selfSymBalance > init_asset_empty, "Symbol creator must own the asset itself!");
     }
+    tablecurrency.emplace(_self, [&](auto &s) {
+        s.code = code;
+        s.sym = symB;
+        s.minPerBet_default = minperbet;
+    });
 }
 
 ACTION mallard::newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
@@ -54,7 +59,7 @@ ACTION mallard::newtable(uint64_t newtableId, name dealer, asset deposit, bool i
     auto existing = tablecurrency.find(code.value);
     if (existing != tablecurrency.end())
     {
-        if (0 == existing->symName.code().to_string().compare(sym))
+        if (0 == existing->sym.code().to_string().compare(sym))
         {
             cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
             minPerBet_default_temp = existing->minPerBet_default;
@@ -119,7 +124,7 @@ ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sy
     auto existing_cur = tablecurrency.find(code.value);
     if (existing_cur != tablecurrency.end())
     {
-        if (0 == existing_cur->symName.code().to_string().compare(sym))
+        if (0 == existing_cur->sym.code().to_string().compare(sym))
         {
             cur_ex_sym = extended_symbol(symbol(symbol_code(sym), 4), code);
             minPerBet_default_temp = existing_cur->minPerBet_default;
@@ -346,8 +351,8 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
     {
         INLINE_ACTION_SENDER(eosio::token, transfer)
         (
-                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                {_self, agent, agentotransfer, std::string("agentcommission")});
+            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+            {_self, agent, agentotransfer, std::string("agentcommission")});
     }
 
     // player
@@ -704,7 +709,7 @@ ACTION mallard::upgrading(bool isupgrading)
 {
     require_auth(adminaccount);
     auto existing = tableround.begin();
-    for(; existing != tableround.end(); existing++)
+    for (; existing != tableround.end(); existing++)
     {
         tableround.modify(existing, _self, [&](auto &s) {
             s.upgradingFlag = isupgrading;
@@ -714,7 +719,7 @@ ACTION mallard::upgrading(bool isupgrading)
 
 ACTION mallard::import12data(uint64_t tableId, uint64_t tableStatus, uint64_t cardBoot, name dealer, bool trusteeship,
                              bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie,
-                             asset oneRoundMaxTotalBet_Push, asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit,float commission_rate_agent,float commission_rate_player, bool upgradingFlag,extended_symbol amountSymbol, std::vector<uint16_t> validCardVec)
+                             asset oneRoundMaxTotalBet_Push, asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit, float commission_rate_agent, float commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec)
 {
     require_auth(adminaccount);
 
