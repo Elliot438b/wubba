@@ -433,14 +433,17 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, name agent, 
     }
     // agent
     asset agentotransfer = init_asset_empty;
-    agentotransfer = asset(betAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
-    eosio::print(" sum_bet_amount:", betAmount, " agentotransfer:", agentotransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
-    if (agentotransfer > init_asset_empty)
+    if (is_account(agent))
     {
-        INLINE_ACTION_SENDER(eosio::token, transfer)
-        (
-            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-            {_self, agent, agentotransfer, std::string("agentcommission")});
+        agentotransfer = asset(betAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
+        eosio::print(" sum_bet_amount:", betAmount, " agentotransfer:", agentotransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
+        if (agentotransfer > init_asset_empty)
+        {
+            INLINE_ACTION_SENDER(eosio::token, transfer)
+            (
+                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                {_self, agent, agentotransfer, std::string("agentcommission")});
+        }
     }
     // player
     asset playertotransfer = asset(betAmount.amount * existing->commission_rate_player, existing->amountSymbol.get_symbol());
