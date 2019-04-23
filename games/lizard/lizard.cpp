@@ -819,9 +819,8 @@ ACTION lizard::disconnecthi(name informed, uint64_t tableId)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
     eosio_assert(existing->dealer == informed, "People informed is not the dealer of table!");
-    eosio::print("SC disconnecthi has already informed :", informed.to_string());
+    require_recipient(informed); // inform dealer who is disconnect.
 }
 
 ACTION lizard::clear12cache(int64_t key)
@@ -879,6 +878,7 @@ ACTION lizard::pausetablesee(uint64_t tableId)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't pause table");
+    require_recipient(existing->dealer); // inform dealer whose table is paused.
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
     });
