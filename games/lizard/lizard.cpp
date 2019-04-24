@@ -209,9 +209,9 @@ ACTION lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 
     if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
     {
-        INLINE_ACTION_SENDER(lizard, pausetabledea)
+        INLINE_ACTION_SENDER(lizard, pausetablesee)
         (
-            _self, {{existing->dealer, "active"_n}},
+            _self, {{serveraccount, "active"_n}},
             {existing->tableId});
         return;
     }

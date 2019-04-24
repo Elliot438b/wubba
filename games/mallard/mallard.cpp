@@ -174,9 +174,9 @@ ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
                  "tableStatus != end");
     if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
     {
-        INLINE_ACTION_SENDER(mallard, pausetabledea)
+        INLINE_ACTION_SENDER(mallard, pausetablesee)
         (
-            _self, {{existing->dealer, "active"_n}},
+            _self, {{serveraccount, "active"_n}},
             {existing->tableId});
         return;
     }
