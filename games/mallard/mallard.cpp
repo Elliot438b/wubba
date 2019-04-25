@@ -2,15 +2,10 @@
 
 ACTION mallard::initsymbol(name code, string sym, asset minperbet)
 {
-    require_auth(adminaccount);
+    require_auth(_self);
     eosio_assert(0 == minperbet.symbol.code().to_string().compare(sym), "The minperbet's symbol not match!");
     auto existing = tablecurrency.find(code.value);
     eosio_assert(existing == tablecurrency.end(), "Symbol already exsits!");
-    INLINE_ACTION_SENDER(eosio::token, transfer)
-    (
-        code, {{adminaccount, "active"_n}},
-        {adminaccount, _self, minperbet, std::string("test symbol")});
-
     symbol symB = symbol(symbol_code(sym), 4);
     asset init_asset_empty = asset(0, symB);
     if (code == "eosio.token"_n)
@@ -553,7 +548,7 @@ ACTION mallard::disconnecthi(name informed, uint64_t tableId)
 
 ACTION mallard::clear12cache(int64_t key)
 {
-    require_auth(adminaccount);
+    require_auth(_self);
     if (key == delall_key)
     {
         auto itr = tableround.begin();
@@ -706,7 +701,7 @@ ACTION mallard::shuffle(uint64_t tableId)
 
 ACTION mallard::upgrading(bool isupgrading)
 {
-    require_auth(adminaccount);
+    require_auth(_self);
     auto existing = tableround.begin();
     for (; existing != tableround.end(); existing++)
     {
@@ -720,7 +715,7 @@ ACTION mallard::import12data(uint64_t tableId, uint64_t tableStatus, uint64_t ca
                              bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie,
                              asset oneRoundMaxTotalBet_Push, asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit, float commission_rate_agent, float commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec)
 {
-    require_auth(adminaccount);
+    require_auth(_self);
 
     tableround.emplace(_self, [&](auto &s) {
         s.tableId = tableId;

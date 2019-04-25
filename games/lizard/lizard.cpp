@@ -2,15 +2,10 @@
 
 ACTION lizard::initsymbol(name code, string sym, asset minperbet)
 {
-    require_auth(adminaccount);
+    require_auth(_self);
     eosio_assert(0 == minperbet.symbol.code().to_string().compare(sym), "The minperbet's symbol not match!");
     auto existing = tablecurrency.find(code.value);
     eosio_assert(existing == tablecurrency.end(), "Symbol already exsits!");
-    INLINE_ACTION_SENDER(eosio::token, transfer)
-    (
-        code, {{adminaccount, "active"_n}},
-        {adminaccount, _self, minperbet, std::string("test symbol")});
-
     symbol symB = symbol(symbol_code(sym), 4);
     asset init_asset_empty = asset(0, symB);
     if (code == "eosio.token"_n)
@@ -828,7 +823,7 @@ ACTION lizard::disconnecthi(name informed, uint64_t tableId)
 
 ACTION lizard::clear12cache(int64_t key)
 {
-    require_auth(adminaccount);
+    require_auth(_self);
     if (key == delall_key)
     {
         auto itr = tableround.begin();
@@ -964,7 +959,7 @@ ACTION lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
 
 ACTION lizard::upgrading(bool isupgrading)
 {
-    require_auth(adminaccount);
+    require_auth(_self);
     auto existing = tableround.begin();
     for (; existing != tableround.end(); existing++)
     {
@@ -976,7 +971,7 @@ ACTION lizard::upgrading(bool isupgrading)
 
 ACTION lizard::import12data(uint64_t tableId, uint64_t tableStatus, name dealer, bool trusteeship, bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single, asset oneRoundDealerMaxPay, asset minTableDeposit, float commission_rate_agent, float commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol)
 {
-    require_auth(adminaccount);
+    require_auth(_self);
 
     tableround.emplace(_self, [&](auto &s) {
         s.tableId = tableId;

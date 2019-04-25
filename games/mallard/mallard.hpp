@@ -494,7 +494,6 @@ public:
 
     name serveraccount = "useraaaaaaah"_n;
     name platformaccount = "useraaaaaaae"_n;
-    name adminaccount = "useraaaaaaak"_n;
 
     const uint16_t CardsMinLimit = 100;
     const uint32_t betPeriod = 30;

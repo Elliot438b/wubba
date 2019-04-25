@@ -376,7 +376,6 @@ public:
 
     name serveraccount = "useraaaaaaah"_n;
     name platformaccount = "useraaaaaaae"_n;
-    name adminaccount = "useraaaaaaak"_n;
 
     const uint32_t betPeriod = 30;
     const uint32_t minTableRounds = 2;
