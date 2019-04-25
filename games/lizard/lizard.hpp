@@ -41,6 +41,29 @@ public:
     ACTION import12data(uint64_t tableId, uint64_t tableStatus, name dealer, bool trusteeship,
                         bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single, asset oneRoundDealerMaxPay, asset minTableDeposit, float commission_rate_agent, float commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol);
 
+    using initsymbol_action = action_wrapper<"initsymbol"_n, &lizard::initsymbol>;
+    using newtable_action = action_wrapper<"newtable"_n, &lizard::newtable>;
+    using dealerseed_action = action_wrapper<"dealerseed"_n, &lizard::dealerseed>;
+    using serverseed_action = action_wrapper<"serverseed"_n, &lizard::serverseed>;
+    using playerbet_action = action_wrapper<"playerbet"_n, &lizard::playerbet>;
+    using endbet_action = action_wrapper<"endbet"_n, &lizard::endbet>;
+    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &lizard::verdealeseed>;
+    using verserveseed_action = action_wrapper<"verserveseed"_n, &lizard::verserveseed>;
+    using trusteeship_action = action_wrapper<"trusteeship"_n, &lizard::trusteeship>;
+    using exitruteship_action = action_wrapper<"exitruteship"_n, &lizard::exitruteship>;
+    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &lizard::disconnecthi>;
+    using clear12cache_action = action_wrapper<"clear12cache"_n, &lizard::clear12cache>;
+    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &lizard::pausetabledea>;
+    using pausetableser_action = action_wrapper<"pausetablesee"_n, &lizard::pausetablesee>;
+    using continuetable_action = action_wrapper<"continuetable"_n, &lizard::continuetable>;
+    using closetable_action = action_wrapper<"closetable"_n, &lizard::closetable>;
+    using depositable_action = action_wrapper<"depositable"_n, &lizard::depositable>;
+    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &lizard::dealerwitdaw>;
+    using edittable_action = action_wrapper<"edittable"_n, &lizard::edittable>;
+    using upgrading_action = action_wrapper<"upgrading"_n, &lizard::upgrading>;
+    using import12data_action = action_wrapper<"import12data"_n, &lizard::import12data>;
+
+private:
     struct player_bet_info
     {
         name player;
@@ -136,28 +159,6 @@ public:
 
     typedef eosio::multi_index<"tablesinfo"_n, lizard::table_stats, indexed_by<"dealer"_n, const_mem_fun<lizard::table_stats, uint64_t, &lizard::table_stats::get_dealer>>> singletable_t;
     typedef eosio::multi_index<"currencyinfo"_n, lizard::currency_info> currencyinfo_t;
-
-    using initsymbol_action = action_wrapper<"initsymbol"_n, &lizard::initsymbol>;
-    using newtable_action = action_wrapper<"newtable"_n, &lizard::newtable>;
-    using dealerseed_action = action_wrapper<"dealerseed"_n, &lizard::dealerseed>;
-    using serverseed_action = action_wrapper<"serverseed"_n, &lizard::serverseed>;
-    using playerbet_action = action_wrapper<"playerbet"_n, &lizard::playerbet>;
-    using endbet_action = action_wrapper<"endbet"_n, &lizard::endbet>;
-    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &lizard::verdealeseed>;
-    using verserveseed_action = action_wrapper<"verserveseed"_n, &lizard::verserveseed>;
-    using trusteeship_action = action_wrapper<"trusteeship"_n, &lizard::trusteeship>;
-    using exitruteship_action = action_wrapper<"exitruteship"_n, &lizard::exitruteship>;
-    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &lizard::disconnecthi>;
-    using clear12cache_action = action_wrapper<"clear12cache"_n, &lizard::clear12cache>;
-    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &lizard::pausetabledea>;
-    using pausetableser_action = action_wrapper<"pausetablesee"_n, &lizard::pausetablesee>;
-    using continuetable_action = action_wrapper<"continuetable"_n, &lizard::continuetable>;
-    using closetable_action = action_wrapper<"closetable"_n, &lizard::closetable>;
-    using depositable_action = action_wrapper<"depositable"_n, &lizard::depositable>;
-    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &lizard::dealerwitdaw>;
-    using edittable_action = action_wrapper<"edittable"_n, &lizard::edittable>;
-    using upgrading_action = action_wrapper<"upgrading"_n, &lizard::upgrading>;
-    using import12data_action = action_wrapper<"import12data"_n, &lizard::import12data>;
 
     struct bet_info
     {

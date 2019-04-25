@@ -44,6 +44,30 @@ public:
                         bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie,
                         asset oneRoundMaxTotalBet_Push, asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit, float commission_rate_agent, float commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec);
 
+    using initsymbol_action = action_wrapper<"initsymbol"_n, &mallard::initsymbol>;
+    using newtable_action = action_wrapper<"newtable"_n, &mallard::newtable>;
+    using dealerseed_action = action_wrapper<"dealerseed"_n, &mallard::dealerseed>;
+    using serverseed_action = action_wrapper<"serverseed"_n, &mallard::serverseed>;
+    using playerbet_action = action_wrapper<"playerbet"_n, &mallard::playerbet>;
+    using endbet_action = action_wrapper<"endbet"_n, &mallard::endbet>;
+    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &mallard::verdealeseed>;
+    using verserveseed_action = action_wrapper<"verserveseed"_n, &mallard::verserveseed>;
+    using trusteeship_action = action_wrapper<"trusteeship"_n, &mallard::trusteeship>;
+    using exitruteship_action = action_wrapper<"exitruteship"_n, &mallard::exitruteship>;
+    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &mallard::disconnecthi>;
+    using clear12cache_action = action_wrapper<"clear12cache"_n, &mallard::clear12cache>;
+    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &mallard::pausetabledea>;
+    using pausetableser_action = action_wrapper<"pausetablesee"_n, &mallard::pausetablesee>;
+    using continuetable_action = action_wrapper<"continuetable"_n, &mallard::continuetable>;
+    using closetable_action = action_wrapper<"closetable"_n, &mallard::closetable>;
+    using depositable_action = action_wrapper<"depositable"_n, &mallard::depositable>;
+    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &mallard::dealerwitdaw>;
+    using shuffle_action = action_wrapper<"shuffle"_n, &mallard::shuffle>;
+    using edittable_action = action_wrapper<"edittable"_n, &mallard::edittable>;
+    using upgrading_action = action_wrapper<"upgrading"_n, &mallard::upgrading>;
+    using import12data_action = action_wrapper<"import12data"_n, &mallard::import12data>;
+
+private:
     struct card_info
     {
         uint8_t deck;
@@ -166,29 +190,6 @@ public:
     typedef eosio::multi_index<"tablesinfo"_n, mallard::table_stats, indexed_by<"dealer"_n, const_mem_fun<mallard::table_stats, uint64_t, &mallard::table_stats::get_dealer>>> singletable_t;
     typedef eosio::multi_index<"shuffleinfo"_n, mallard::shuffle_info> shuffleinfo_t;
     typedef eosio::multi_index<"currencyinfo"_n, mallard::currency_info> currencyinfo_t;
-
-    using initsymbol_action = action_wrapper<"initsymbol"_n, &mallard::initsymbol>;
-    using newtable_action = action_wrapper<"newtable"_n, &mallard::newtable>;
-    using dealerseed_action = action_wrapper<"dealerseed"_n, &mallard::dealerseed>;
-    using serverseed_action = action_wrapper<"serverseed"_n, &mallard::serverseed>;
-    using playerbet_action = action_wrapper<"playerbet"_n, &mallard::playerbet>;
-    using endbet_action = action_wrapper<"endbet"_n, &mallard::endbet>;
-    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &mallard::verdealeseed>;
-    using verserveseed_action = action_wrapper<"verserveseed"_n, &mallard::verserveseed>;
-    using trusteeship_action = action_wrapper<"trusteeship"_n, &mallard::trusteeship>;
-    using exitruteship_action = action_wrapper<"exitruteship"_n, &mallard::exitruteship>;
-    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &mallard::disconnecthi>;
-    using clear12cache_action = action_wrapper<"clear12cache"_n, &mallard::clear12cache>;
-    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &mallard::pausetabledea>;
-    using pausetableser_action = action_wrapper<"pausetablesee"_n, &mallard::pausetablesee>;
-    using continuetable_action = action_wrapper<"continuetable"_n, &mallard::continuetable>;
-    using closetable_action = action_wrapper<"closetable"_n, &mallard::closetable>;
-    using depositable_action = action_wrapper<"depositable"_n, &mallard::depositable>;
-    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &mallard::dealerwitdaw>;
-    using shuffle_action = action_wrapper<"shuffle"_n, &mallard::shuffle>;
-    using edittable_action = action_wrapper<"edittable"_n, &mallard::edittable>;
-    using upgrading_action = action_wrapper<"upgrading"_n, &mallard::upgrading>;
-    using import12data_action = action_wrapper<"import12data"_n, &mallard::import12data>;
 
     // std random
     struct WBRNG
@@ -507,4 +508,3 @@ public:
 
     float comission_rate_platform_default = 0.005;
 };
-//const std::vector<mallard::sym_info> mallard::symOptions = mallard::createSymOptions();
