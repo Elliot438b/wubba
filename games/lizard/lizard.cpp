@@ -97,7 +97,6 @@ ACTION lizard::newtable(uint64_t newtableId, name dealer, asset deposit, bool is
         s.dealer = dealer;
         s.trusteeship = false;
         s.dealerBalance = deposit;
-        s.dealerBalance = asset(200, cur_ex_sym.get_symbol());
         s.isPrivate = isPrivate;
         s.oneRoundMaxTotalBet_bsoe = oneRoundMaxTotalBet_bsoe;
         s.minPerBet_bsoe = minPerBet_bsoe;
