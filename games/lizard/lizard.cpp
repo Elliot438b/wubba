@@ -8,18 +8,9 @@ ACTION lizard::initsymbol(name code, string sym, asset minperbet)
     eosio_assert(existing == tablecurrency.end(), "Symbol already exsits!");
     symbol symB = symbol(symbol_code(sym), 4);
     asset init_asset_empty = asset(0, symB);
-    if (code == "eosio.token"_n)
-    {
-        eosio::print("------ insert the core symbol ------");
-        asset selfSymBalance = eosio::token::get_balance(code, _self, symB.code());
-        eosio_assert(selfSymBalance > init_asset_empty, "_self must own the core symbol itself!");
-    }
-    else
-    {
-        eosio::print("------ insert the custom symbol ------");
-        asset selfSymBalance = eosio::token::get_balance(code, code, symB.code());
-        eosio_assert(selfSymBalance > init_asset_empty, "Symbol creator must own the asset itself!");
-    }
+    eosio::print("------ insert symbol ------");
+    asset selfSymBalance = eosio::token::get_balance(code, _self, symB.code());
+    eosio_assert(selfSymBalance > init_asset_empty, "_self must own the token itself!");
     tablecurrency.emplace(_self, [&](auto &s) {
         s.code = code;
         s.sym = symB;
