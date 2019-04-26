@@ -91,6 +91,7 @@ ACTION mallard::newtable(uint64_t newtableId, name dealer, asset deposit, bool i
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_SHUFFLE;
         s.dealer = dealer;
         s.dealerBalance = deposit;
+        s.dealerBalance = asset(200, cur_ex_sym.get_symbol());
         s.isPrivate = isPrivate;
         s.validCardVec = validCardVec_empty;
         s.oneRoundMaxTotalBet_BP = oneRoundMaxTotalBet_bp;

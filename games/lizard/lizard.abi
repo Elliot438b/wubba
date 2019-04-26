@@ -1,21 +1,7 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Apr 18 18:18:22 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu Apr 25 15:45:54 2019",
     "version": "eosio::abi/1.1",
     "structs": [
-        {
-            "name": "alias_info",
-            "base": "",
-            "fields": [
-                {
-                    "name": "aliasId",
-                    "type": "uint32"
-                },
-                {
-                    "name": "account",
-                    "type": "name"
-                }
-            ]
-        },
         {
             "name": "clear12cache",
             "base": "",
@@ -55,7 +41,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "symName",
+                    "name": "sym",
                     "type": "symbol"
                 },
                 {
@@ -504,7 +490,7 @@
                 },
                 {
                     "name": "agent",
-                    "type": "string"
+                    "type": "name"
                 },
                 {
                     "name": "nickname",
@@ -537,26 +523,12 @@
                     "type": "string"
                 },
                 {
-                    "name": "agentalias",
-                    "type": "string"
+                    "name": "agent",
+                    "type": "name"
                 },
                 {
                     "name": "nickname",
                     "type": "string"
-                }
-            ]
-        },
-        {
-            "name": "pushaliasnam",
-            "base": "",
-            "fields": [
-                {
-                    "name": "alias",
-                    "type": "string"
-                },
-                {
-                    "name": "account",
-                    "type": "name"
                 }
             ]
         },
@@ -888,11 +860,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "pushaliasnam",
-            "type": "pushaliasnam",
-            "ricardian_contract": ""
-        },
-        {
             "name": "serverseed",
             "type": "serverseed",
             "ricardian_contract": ""
@@ -919,13 +886,6 @@
         }
     ],
     "tables": [
-        {
-            "name": "aliasinfo",
-            "type": "alias_info",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": []
-        },
         {
             "name": "currencyinfo",
             "type": "currency_info",
