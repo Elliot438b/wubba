@@ -403,7 +403,7 @@ ACTION mallard::verdealeseed(uint64_t tableId, string seed)
     });
 }
 // Server push defer 3' action, once got ROUND_REVEAL.
-ACTION mallard::verserveseed(uint64_t tableId, string seed)
+ACTION mallard::verserveseed(uint64_t tableId, string seed, bool free)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -434,11 +434,12 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed)
     { // dealer online and not trusteeship
         root_seed += existing->dealerSeed;
     }
+    int32_t sum_b_R = 0;
     string roundResult;
     std::vector<card_info> bankerHands;
     std::vector<card_info> playerHands;
     std::vector<uint16_t> validCardTemp = existing->validCardVec;
-    reveal(root_seed, validCardTemp, playerHands, bankerHands, roundResult);
+    reveal(root_seed, validCardTemp, playerHands, bankerHands, roundResult, sum_b_R);
     // odds
     std::vector<player_bet_info> tempPlayerVec;
     asset dealerBalance_temp = existing->dealerBalance;
@@ -447,11 +448,33 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed)
     {
         auto pBonus = init_asset_empty;
         auto dBonus = init_asset_empty;
+        eosio::print("  【 playerBet.betDealer.amount=", playerBet.betDealer.amount, " 】 ");
         // Banker field
         if (roundResult[0] == '1')
-            pBonus = playerBet.betDealer * (1 + 0.95);
+        {
+            eosio::print("  【 free=", free, " 】 ");
+            if (!free)
+            {
+                pBonus.set_amount(playerBet.betDealer.amount * (1 + 0.95));
+                eosio::print("  【 1pBonus=", pBonus, " 】 ");
+            }
+            else
+            {
+                if (sum_b_R == 6)
+                {
+                    eosio::print("  【 sum_b_R=", sum_b_R, " 】 ");
+                    pBonus.set_amount(playerBet.betDealer.amount * (1 + 0.5));
+                }
+                else
+                {
+                    pBonus = playerBet.betDealer * (1 + 1);
+                }
+            }
+        }
         else
+        {
             dBonus = playerBet.betDealer;
+        }
         // Player field
         if (roundResult[1] == '1')
             pBonus += playerBet.betPlayer * (1 + 1);
@@ -704,7 +727,7 @@ ACTION mallard::upgrading(bool isupgrading)
 
 ACTION mallard::import12data(uint64_t tableId, uint64_t tableStatus, uint64_t cardBoot, name dealer, bool trusteeship,
                              bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie,
-                             asset oneRoundMaxTotalBet_Push, asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit, float commission_rate_agent, float commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec)
+                             asset oneRoundMaxTotalBet_Push, asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit, double commission_rate_agent, double commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec)
 {
     require_auth(_self);
 

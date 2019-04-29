@@ -26,7 +26,7 @@ public:
     ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, name agent, string nickname);
     ACTION endbet(uint64_t tableId);
     ACTION verdealeseed(uint64_t tableId, string seed);
-    ACTION verserveseed(uint64_t tableId, string seed);
+    ACTION verserveseed(uint64_t tableId, string seed, bool free);
     ACTION trusteeship(uint64_t tableId);
     ACTION exitruteship(uint64_t tableId);
     ACTION disconnecthi(name informed, uint64_t tableId);
@@ -42,7 +42,7 @@ public:
     ACTION upgrading(bool isupgrading);
     ACTION import12data(uint64_t tableId, uint64_t tableStatus, uint64_t cardBoot, name dealer, bool trusteeship,
                         bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie,
-                        asset oneRoundMaxTotalBet_Push, asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit, float commission_rate_agent, float commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec);
+                        asset oneRoundMaxTotalBet_Push, asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit, double commission_rate_agent, double commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec);
 
     using initsymbol_action = action_wrapper<"initsymbol"_n, &mallard::initsymbol>;
     using newtable_action = action_wrapper<"newtable"_n, &mallard::newtable>;
@@ -116,8 +116,8 @@ private:
         asset oneRoundDealerMaxPay;
         asset minTableDeposit;
         extended_symbol amountSymbol;
-        float commission_rate_agent;
-        float commission_rate_player;
+        double commission_rate_agent;
+        double commission_rate_player;
         bool upgradingFlag;
         string redundancy;
         // ------------------------------ round field ------------------------------
@@ -294,7 +294,7 @@ private:
         return (num1 + num2) * (sign);
     }
 
-    void reveal(string root_seed, std::vector<uint16_t> & validCardVec, std::vector<card_info> & playerHands, std::vector<card_info> & bankerHands, string & roundResult)
+    void reveal(string root_seed, std::vector<uint16_t> & validCardVec, std::vector<card_info> & playerHands, std::vector<card_info> & bankerHands, string & roundResult, int32_t & sum_b_R)
     {
         // unify 64: root_seed_64.
         checksum256 hash = sha256(root_seed.c_str(), root_seed.size());
@@ -390,6 +390,7 @@ private:
             }
             // ------------------------------ 博牌 end ------------------------------
         }
+        sum_b_R = sum_b;
         eosio::print(" [final-sum_p: ", sum_p, " final-sum_b:", sum_b, "] ");
         //round result
         roundResult = "00000"; //Banker,Player,Tie,BankerPush,PlayerPush
@@ -455,10 +456,11 @@ private:
         std::vector<shuffle_round_result> threeResults_temp;
         for (auto k = 0; k < 3; k++)
         {
+            int32_t sum_b_R = 0;
             string roundResult;
             std::vector<card_info> bankerHands;
             std::vector<card_info> playerHands;
-            reveal(to_string(now()), cardVec_temp, playerHands, bankerHands, roundResult);
+            reveal(to_string(now()), cardVec_temp, playerHands, bankerHands, roundResult, sum_b_R);
             shuffle_round_result temp;
             temp.roundNum = k + 1;
             temp.roundResult = roundResult;
@@ -496,7 +498,7 @@ private:
     name platformaccount = "useraaaaaaae"_n;
 
     const uint16_t CardsMinLimit = 100;
-    const uint32_t betPeriod = 30;
+    const uint32_t betPeriod = 1; //todo default 30 ,1 is test use
     const uint16_t initDecks = 8; //todo default 8 ,2 is test use
     const uint32_t minTableRounds = 10;
     const uint16_t maxinum_table_per_dealer = 100;
@@ -505,5 +507,5 @@ private:
     const char *notableerr = "TableId isn't existing!";
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 
-    float comission_rate_platform_default = 0.005;
+    double comission_rate_platform_default = 0.005;
 };
