@@ -1,6 +1,6 @@
 #  ----------------------------------------------------------- chainstart)
 echo "chain restart, set permission"
-cleos --wallet-url http://127.0.0.1:6666 system newaccount useraaaaaaak game12lizard EOS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr --buy-ram "1000 SYS" --stake-net "1000 SYS" --stake-cpu "1000 SYS" --transfer
+cleos --wallet-url http://127.0.0.1:6666 system newaccount useraaaaaaaa game12lizard EOS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr --buy-ram "1000 SYS" --stake-net "1000 SYS" --stake-cpu "1000 SYS" --transfer
 cleos --wallet-url http://127.0.0.1:6666 transfer useraaaaaabn game12lizard "10000 SYS"
 cleos --wallet-url http://127.0.0.1:6666 system delegatebw game12lizard game12lizard "1000 SYS" "1000 SYS"
 cleos --wallet-url http://127.0.0.1:6666 set account permission useraaaaaaba active '{"threshold":1,"keys":[{"key":"EOS7yBtksm8Kkg85r4in4uCbfN77uRwe82apM8jjbhFVDgEgz3w8S","weight":1}],"accounts":[{"permission":{"actor":"game12lizard","permission":"eosio.code"},"weight":1}]}' owner -p useraaaaaaba
