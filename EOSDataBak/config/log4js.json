@@ -1,0 +1,131 @@
+{
+  "development": {
+    "appenders": {
+      "console": {
+        "type": "console",
+        "level": "DEBUG"
+      },
+      "logServer-1": {
+        "type": "file",
+        "filename": "logs/logServer-1.log",
+        "level": "INFO"
+      },
+      "dbServer-1": {
+        "type": "file",
+        "filename": "logs/dbServer-1.log",
+        "level": "INFO"
+      },
+      "loginServer-1": {
+        "type": "file",
+        "filename": "logs/loginServer-1.log",
+        "level": "INFO"
+      },
+      "gameServer-1": {
+        "type": "file",
+        "filename": "logs/gameServer-1.log",
+        "level": "INFO"
+      },
+      "testServer": {
+        "type": "file",
+        "filename": "logs/test.log",
+        "level": "INFO"
+      }
+    },
+    "replaceConsole": true,
+    "categories": {
+      "default": {
+        "appenders": [
+          "console"
+        ],
+        "level": "DEBUG"
+      }
+    }
+  },
+  "production": {
+    "appenders": {
+      "console": {
+        "type": "console",
+        "level": "DEBUG"
+      },
+      "gateServer-1": {
+        "type": "file",
+        "filename": "logs/gateServer-1.log",
+        "level": "INFO"
+      },
+      "chatServer-1": {
+        "type": "file",
+        "filename": "logs/chatServer-1.log",
+        "level": "INFO"
+      },
+      "logServer-1": {
+        "type": "file",
+        "filename": "logs/logServer-1.log",
+        "level": "INFO"
+      },
+      "worldServer-1": {
+        "type": "file",
+        "filename": "logs/worldServer-1.log",
+        "level": "INFO"
+      },
+      "dbServer-1": {
+        "type": "file",
+        "filename": "logs/dbServer-1.log",
+        "level": "INFO"
+      },
+      "loginServer-1": {
+        "type": "file",
+        "filename": "logs/loginServer-1.log",
+        "level": "INFO"
+      },
+      "gameServer-1": {
+        "type": "file",
+        "filename": "logs/gameServer-1.log",
+        "level": "INFO"
+      },
+      "gameServer-2": {
+        "type": "file",
+        "filename": "logs/gameServer-2.log",
+        "level": "INFO"
+      },
+      "gameServer-3": {
+        "type": "file",
+        "filename": "logs/gameServer-3.log",
+        "level": "INFO"
+      },
+      "connectorServer-1": {
+        "type": "file",
+        "filename": "logs/connectorServer-1.log",
+        "level": "INFO"
+      },
+      "connectorServer-2": {
+        "type": "file",
+        "filename": "logs/connectorServer-2.log",
+        "level": "INFO"
+      },
+      "connectorServer-3": {
+        "type": "file",
+        "filename": "logs/connectorServer-3.log",
+        "level": "INFO"
+      },
+      "connectorServer-4": {
+        "type": "file",
+        "filename": "logs/connectorServer-4.log",
+        "level": "INFO"
+      },
+      "testServer": {
+        "type": "file",
+        "filename": "logs/test.log",
+        "level": "INFO"
+      }
+    },
+    "replaceConsole": true,
+    "categories": {
+      "default": {
+        "appenders": [
+          "console"
+        ],
+        "level": "INFO"
+      }
+    }
+  }
+}

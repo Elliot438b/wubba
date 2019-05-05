@@ -1,0 +1,353 @@
+{
+    "ws_C2S_Login":{
+        "MsgID":"10001",
+        "eosaccount":"string"
+    },
+    "ws_S2C_Login":{
+        "MsgID":"20001",
+        "User":"UserInfo",
+        "Room":"RoomInfo",
+        "gsa":"string"
+    },
+    
+    "ws_C2S_UpdateUser":{
+        "MsgID":"10002",
+        "User":"UserInfo"
+    },
+    "ws_S2C_UpdateUser":{
+        "MsgID":"20002",
+        "Status":"string"
+    },
+    "ws_C2S_GetTableID":{
+        "MsgID":"10003"
+    },
+    "ws_S2C_GetTableID":{
+        "MsgID":"20003",
+        "TableID":"int32"
+    },
+    "ws_C2S_NewTable":{
+        "MsgID":"10004",
+        "Dealer":"string",
+        "Table":"TableInfo",
+        "Sign":"string",
+        "Tr":"string"
+    },
+    "ws_S2C_NewTable":{
+        "MsgID":"20004",
+        "Status":"string"
+    },
+
+    "ws_C2S_UpdateTable":{
+        "MsgID":"10005",
+        "Dealer":"string",
+        "Table":"TableInfo",
+        "Sign":"string",
+        "Tr":"string"
+    },
+    "ws_S2C_UpdateTable":{
+        "MsgID":"20005",
+        "Status":"string"
+    },
+
+    "ws_C2S_GetTables":{
+        "MsgID":"10006",
+        "Dealer":"string"
+    },
+    "ws_S2C_GetTables":{
+        "MsgID":"20006",
+        "Tables":"TableInfo"
+    },
+
+    "ws_C2S_Table_Dispose":{
+        "MsgID":"10007",
+        "TableID":"int32",
+        "Action":"string",
+        "Sign":"string",
+        "Tr":"string"
+    },
+    "ws_S2C_Table_Dispose":{
+        "MsgID":"20007",
+        "TableID":"int32",
+        "Status":"string"
+    },
+
+    "ws_C2S_Table_Pause":{
+        "MsgID":"10008",
+        "TableID":"int32",
+        "Action":"string",
+        "Sign":"string",
+        "Tr":"string"
+    },
+    "ws_S2C_Table_Pause":{
+        "MsgID":"20008",
+        "TableID":"int32",
+        "Status":"string",
+        "tableStatus":"int32"
+    },
+
+    "ws_C2S_Table_Close":{
+        "MsgID":"10009",
+        "TableID":"int32",
+        "Action":"string",
+        "Sign":"string",
+        "Tr":"string"
+    },
+    "ws_S2C_Table_Close":{
+        "MsgID":"20009",
+        "TableID":"int32",
+        "Status":"string"
+    },
+
+    "ws_C2S_Table_In":{
+        "MsgID":"10010",
+        "eosaccount":"string",
+        "TableID":"int32",
+        "code":"string"
+    },
+    "ws_S2C_Table_In":{
+        "MsgID":"20010",
+        "eosaccount":"string",
+        "TableInfo":"TableInfo",
+        "Status":"string",
+        "Waybill":"string"
+    },
+
+    "ws_C2S_Table_Out":{
+        "MsgID":"10011",
+        "eosaccount":"string",
+        "TableID":"int32"
+    },
+    "ws_S2C_Table_Out":{
+        "MsgID":"20011",
+        "eosaccount":"string",
+        "TableID":"int32",
+        "Status":"string"
+    },
+
+    "ws_C2S_SendSeed":{
+        "MsgID":"10012",
+        "TableID":"int32",
+        "eosaccount":"string",
+        "Sign":"string",
+        "Tr":"string"
+    },
+    "ws_S2C_SendSeed":{
+        "MsgID":"20012",
+        "eosaccount":"string",
+        "TableID":"int32",
+        "Status":"string"
+    },
+    "ws_B2C_CreatSeed":{
+        "MsgID":"30012",
+        "TableID":"int32",
+        "Dealer":"string"
+    },
+
+    "ws_C2S_SendTxtSeed":{
+        "MsgID":"10013",
+        "TableID":"int32",
+        "eosaccount":"string",
+        "Sign":"string",
+        "Tr":"string"
+    },
+    "ws_S2C_SendTxtSeed":{
+        "MsgID":"20013",
+        "eosaccount":"string",
+        "TableID":"int32",
+        "Status":"string"
+    },
+    "ws_B2C_CreatTxtSeed":{
+        "MsgID":"30013",
+        "TableID":"int32",
+        "Dealer":"string"
+    },
+
+    "ws_C2S_PlayBet":{
+        "MsgID":"10014",
+        "TableID":"int32",
+        "eosaccount":"string",
+        "betDealer":"string",
+        "betPlayer":"string",
+        "betTie":"string",
+        "betDealerPush":"string",
+        "betPlayerPush":"string",
+        "agentalias":"string",
+        "nickname":"string"
+    },
+    "ws_S2C_PlayBet":{
+        "MsgID":"20014",
+        "eosaccount":"string",
+        "TableID":"int32",
+        "Status":"string"
+    },
+    "ws_B2C_PlayBet":{
+        "MsgID":"30014",
+        "TableID":"int32",
+        "eosaccount":"string",
+        "betDealer":"string",
+        "betPlayer":"string",
+        "betTie":"string",
+        "betDealerPush":"string",
+        "betPlayerPush":"string",
+        "agentalias":"string",
+        "nickname":"string"
+    },
+
+    "ws_C2S_PlayerBet":{
+        "MsgID":"10015",
+        "TableID":"int32",
+        "eosaccount":"string",
+        "Sign":"string",
+        "Tr":"string"
+    },
+    "ws_S2C_PlayerBet":{
+        "MsgID":"20015",
+        "eosaccount":"string",
+        "TableID":"int32",
+        "Status":"string"
+    },
+    "ws_B2C_StopBet":{
+        "MsgID":"30015",
+        "TableID":"int32",
+        "Action":"string"
+    },
+
+    "ws_B2C_EndBet":{
+        "MsgID":"30016",
+        "TableID":"int32",
+        "Action":"string",
+        "tableStatus":"int32"
+    },
+    "ws_B2C_Lottery":{
+        "MsgID":"30017",
+        "TableID":"int32",
+        "Action":"string",
+        "tableStatus":"int32",//RoundRst:obj，佣金：待确定, 开奖结果：待定，
+        "EndcarbBoot":"string"
+    },
+
+    "ws_B2C_BeginCarbBoot":{
+        "MsgID":"30018",
+        "TableID":"int32",
+        "FirstCard":"CardInfo", //"ThreeResults":list({cardNum,cardColor}),
+        "ThreeResults":"array"
+    },
+
+    "ws_B2C_BeginRound":{
+        "MsgID":"30019",
+        "TableID":"int32",
+        "tableStatus":"int32"
+    },
+
+    "ws_B2C_BeginBet":{
+        "MsgID":"30020",
+        "TableID":"int32",
+        "tableStatus":"int32"
+    },
+
+    "ws_C2S_PlayerProfit":{
+        "MsgID":"10021",
+        "eosaccount":"string"
+    },
+    "ws_S2C_PlayerProfit":{
+        "MsgID":"20021",
+        "eosaccount":"string"//datas：具体信息待UI确定后整理
+    },
+
+    "ws_C2S_DealerProfit":{
+        "MsgID":"10022",
+        "eosaccount":"string"
+    },
+    "ws_S2C_DealerProfit":{
+        "MsgID":"20022",
+        "eosaccount":"string"//datas：具体信息待UI确定后整理
+    },
+
+    "ws_C2S_AgentProfit":{
+        "MsgID":"10023",
+        "eosaccount":"string"
+    },
+    "ws_S2C_AgentProfit":{
+        "MsgID":"20023",
+        "eosaccount":"string"//datas：具体信息待UI确定后整理
+    },
+
+    "ws_C2S_GetUserPlayRoom":{
+        "MsgID":"10024",
+        "eosaccount":"string"
+    },
+    "ws_S2C_GetUserPlayRoom":{
+        "MsgID":"20024",
+        "eosaccount":"string",
+        "Rooms":"array"
+    },
+
+    "ws_C2S_GetCollectionTables":{
+        "MsgID":"10025",
+        "eosaccount":"string"
+    },
+    "ws_S2C_GetCollectionTables":{
+        "MsgID":"20025",
+        "eosaccount":"string",
+        "Tables":"array"
+    },
+
+
+    "UserInfo":{
+        "eosaccount":"string",
+        "nickname":"string",
+        "logo":"string",
+        "pubkey" :"string",
+        "eos_balance" :"string",
+        "gcc_balance":"string",
+        "user_type":"int32",
+        "createtime":"string",
+        "online":"int32",
+        "lasttime":"string",
+        "lastip":"string",
+        "code" :"string"
+    },
+
+    "RoomInfo":{
+        "id":"int32",
+        "dealer":"string",
+        "room_name":"string",
+        "createtime":"string",
+        "code":"string"
+    },
+    "TableInfo":{
+        "id" :"int32",
+        "room_id" :"int32",
+        "dealer" :"string",
+        "game_type" :"int32",
+        "trusteeship" :"int32",
+        "isclose" :"int32",
+        "ispause" :"int32",
+        "amountSymbol" :"string",
+        "deposit"  :"string",
+        "dealerBalance" :"string",
+        "validCardVec" :"int32",
+        "carbBoot" :"int32",
+        "ifPrivate" :"int32",
+        "limit_red_min" :"string",
+        "limit_red_max" :"string",
+        "oneRoundMaxTotalBet_BP" :"string",
+        "minPerBet_BP" :"string",
+        "oneRoundMaxTotalBet_Push" :"string",
+        "minPerBet_Push" :"string",
+        "oneRoundMaxTotalBet_Tie" :"string",
+        "minPerBet_Tie" :"string",
+        "oneRoundDealerMaxPay" :"string",
+        "commission_rate_agent" :"string",
+        "commission_rate_player" :"string",
+        "code" :"string",
+        "player_num" :"int32",
+        "createtime" :"string",
+        "updatetime" :"string"
+    },
+    "CardInfo":{
+        "cardNum" :"int32",
+        "cardColor" :"string"
+    }
+
+}

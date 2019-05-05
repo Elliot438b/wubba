@@ -1,0 +1,16 @@
+{
+    "system_rpcCall_c2s":{
+        "MsgID":"101", //消息ID
+        "rpcId":"uint32", //rpc消息id
+        "msgBody":"buffer" //消息内容
+    },
+    "system_rpcCall_s2c":{
+        "MsgID":"102", //消息ID
+        "rpcId":"uint32", //rpc消息id
+        "msgBody":"buffer" //消息内容
+    },
+    "system_rpcNotify_c2s":{
+        "MsgID":"103", //消息ID
+        "msgBody":"buffer" //消息内容
+    }
+}

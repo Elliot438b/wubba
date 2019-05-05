@@ -1,0 +1,14 @@
+{
+    "development": {
+      "host": "192.168.199.40",
+      "port": 6379,
+      "auth_pass": "123456",
+      "db": 1
+    },
+    "production": {
+      "host": "127.0.0.1",
+      "port": 6379,
+      "auth_pass": "qwertyuiop",
+      "db": 1
+    }
+  }
