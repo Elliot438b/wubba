@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Apr 26 18:34:15 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu May  9 14:52:55 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -278,11 +278,11 @@
                 },
                 {
                     "name": "commission_rate_agent",
-                    "type": "float32"
+                    "type": "float64"
                 },
                 {
                     "name": "commission_rate_player",
-                    "type": "float32"
+                    "type": "float64"
                 },
                 {
                     "name": "upgradingFlag",
@@ -379,17 +379,7 @@
             ]
         },
         {
-            "name": "pausetabledea",
-            "base": "",
-            "fields": [
-                {
-                    "name": "tableId",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "pausetablesee",
+            "name": "pausetable",
             "base": "",
             "fields": [
                 {
@@ -632,11 +622,11 @@
                 },
                 {
                     "name": "commission_rate_agent",
-                    "type": "float32"
+                    "type": "float64"
                 },
                 {
                     "name": "commission_rate_player",
-                    "type": "float32"
+                    "type": "float64"
                 },
                 {
                     "name": "upgradingFlag",
@@ -644,6 +634,10 @@
                 },
                 {
                     "name": "redundancy",
+                    "type": "string"
+                },
+                {
+                    "name": "redundancy1",
                     "type": "string"
                 },
                 {
@@ -749,6 +743,10 @@
                 {
                     "name": "seed",
                     "type": "string"
+                },
+                {
+                    "name": "free",
+                    "type": "bool"
                 }
             ]
         }
@@ -821,13 +819,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "pausetabledea",
-            "type": "pausetabledea",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "pausetablesee",
-            "type": "pausetablesee",
+            "name": "pausetable",
+            "type": "pausetable",
             "ricardian_contract": ""
         },
         {

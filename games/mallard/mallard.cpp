@@ -104,7 +104,6 @@ ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sy
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The table can only be edited at the ROUND_END stage!");
 
     asset minPerBet_default_temp;
@@ -160,7 +159,7 @@ ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
                  "tableStatus != end");
     if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
     {
-        INLINE_ACTION_SENDER(mallard, pausetablesee)
+        INLINE_ACTION_SENDER(mallard, pausetable)
         (
             _self, {{serveraccount, "active"_n}},
             {existing->tableId});
@@ -205,7 +204,7 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
         eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
-            INLINE_ACTION_SENDER(mallard, pausetablesee)
+            INLINE_ACTION_SENDER(mallard, pausetable)
             (
                 _self, {{serveraccount, "active"_n}},
                 {existing->tableId});
@@ -532,7 +531,6 @@ ACTION mallard::trusteeship(uint64_t tableId)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer); // dealer trustee server.
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
     tableround.modify(existing, _self, [&](auto &s) {
         s.trusteeship = true;
@@ -544,7 +542,6 @@ ACTION mallard::exitruteship(uint64_t tableId)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer); // dealer exit trusteeship from server.
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
     tableround.modify(existing, _self, [&](auto &s) {
         s.trusteeship = false;
@@ -597,25 +594,12 @@ ACTION mallard::clear12cache(int64_t key)
     }
 }
 
-ACTION mallard::pausetabledea(uint64_t tableId)
+ACTION mallard::pausetable(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer); // dealer of the table permission.
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't pause table");
-    tableround.modify(existing, _self, [&](auto &s) {
-        s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
-    });
-}
-
-ACTION mallard::pausetablesee(uint64_t tableId)
-{
-    require_auth(serveraccount); // server permission.
-    auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't pause table");
-    require_recipient(existing->dealer); // inform dealer whose table is paused.
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
     });
@@ -626,7 +610,6 @@ ACTION mallard::continuetable(uint64_t tableId)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer);
     eosio_assert(existing->dealerBalance >= existing->oneRoundDealerMaxPay * 2, "Can't recover table, dealer balance isn't enough!");
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED, "The tableid not paused, can`t continuetable");
     tableround.modify(existing, _self, [&](auto &s) {
@@ -639,7 +622,6 @@ ACTION mallard::closetable(uint64_t tableId)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't close!");
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
@@ -726,8 +708,11 @@ ACTION mallard::upgrading(bool isupgrading)
 }
 
 ACTION mallard::import12data(uint64_t tableId, uint64_t tableStatus, uint64_t cardBoot, name dealer, bool trusteeship,
-                             bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie,
-                             asset oneRoundMaxTotalBet_Push, asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit, double commission_rate_agent, double commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec)
+                             bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP,
+                             asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push,
+                             asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit,
+                             double commission_rate_agent, double commission_rate_player, bool upgradingFlag,
+                             extended_symbol amountSymbol, std::vector<uint16_t> validCardVec)
 {
     require_auth(_self);
 
@@ -754,4 +739,4 @@ ACTION mallard::import12data(uint64_t tableId, uint64_t tableStatus, uint64_t ca
         s.upgradingFlag = true;
     });
 }
-EOSIO_DISPATCH(mallard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(upgrading)(import12data))
+EOSIO_DISPATCH(mallard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetable)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(upgrading)(import12data))
