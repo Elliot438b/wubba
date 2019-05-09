@@ -31,7 +31,8 @@ public:
     ACTION exitruteship(uint64_t tableId);
     ACTION disconnecthi(name informed, uint64_t tableId);
     ACTION clear12cache(int64_t key);
-    ACTION pausetable(uint64_t tableId);
+    ACTION pausetabledea(uint64_t tableId);
+    ACTION pausetablesee(uint64_t tableId);
     ACTION continuetable(uint64_t tableId);
     ACTION closetable(uint64_t tableId);
     ACTION depositable(uint64_t tableId, asset deposit);
@@ -55,7 +56,8 @@ public:
     using exitruteship_action = action_wrapper<"exitruteship"_n, &mallard::exitruteship>;
     using disconnecthi_action = action_wrapper<"disconnecthi"_n, &mallard::disconnecthi>;
     using clear12cache_action = action_wrapper<"clear12cache"_n, &mallard::clear12cache>;
-    using pausetable_action = action_wrapper<"pausetable"_n, &mallard::pausetable>;
+    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &mallard::pausetabledea>;
+    using pausetablesee_action = action_wrapper<"pausetablesee"_n, &mallard::pausetablesee>;
     using continuetable_action = action_wrapper<"continuetable"_n, &mallard::continuetable>;
     using closetable_action = action_wrapper<"closetable"_n, &mallard::closetable>;
     using depositable_action = action_wrapper<"depositable"_n, &mallard::depositable>;

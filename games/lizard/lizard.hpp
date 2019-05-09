@@ -54,7 +54,7 @@ public:
     using disconnecthi_action = action_wrapper<"disconnecthi"_n, &lizard::disconnecthi>;
     using clear12cache_action = action_wrapper<"clear12cache"_n, &lizard::clear12cache>;
     using pausetabledea_action = action_wrapper<"pausetabledea"_n, &lizard::pausetabledea>;
-    using pausetableser_action = action_wrapper<"pausetablesee"_n, &lizard::pausetablesee>;
+    using pausetablesee_action = action_wrapper<"pausetablesee"_n, &lizard::pausetablesee>;
     using continuetable_action = action_wrapper<"continuetable"_n, &lizard::continuetable>;
     using closetable_action = action_wrapper<"closetable"_n, &lizard::closetable>;
     using depositable_action = action_wrapper<"depositable"_n, &lizard::depositable>;

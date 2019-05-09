@@ -1,5 +1,5 @@
 {
-    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Fri Apr 26 18:33:36 2019",
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT Thu May  9 15:51:43 2019",
     "version": "eosio::abi/1.1",
     "structs": [
         {
@@ -320,11 +320,11 @@
                 },
                 {
                     "name": "commission_rate_agent",
-                    "type": "float32"
+                    "type": "float64"
                 },
                 {
                     "name": "commission_rate_player",
-                    "type": "float32"
+                    "type": "float64"
                 },
                 {
                     "name": "upgradingFlag",

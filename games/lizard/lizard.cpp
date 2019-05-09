@@ -124,7 +124,6 @@ ACTION lizard::edittable(uint64_t tableId, bool isPrivate, name code, string sym
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The table can only be edited at the ROUND_END stage!");
 
     extended_symbol cur_ex_sym = defaultSym;
@@ -784,7 +783,6 @@ ACTION lizard::trusteeship(uint64_t tableId)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer); // dealer trustee server.
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
     tableround.modify(existing, _self, [&](auto &s) {
         s.trusteeship = true;
@@ -796,7 +794,6 @@ ACTION lizard::exitruteship(uint64_t tableId)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer); // dealer exit trusteeship from server.
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
     tableround.modify(existing, _self, [&](auto &s) {
         s.trusteeship = false;
@@ -854,7 +851,6 @@ ACTION lizard::pausetabledea(uint64_t tableId)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer); // dealer of the table permission.
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't pause table");
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
@@ -878,7 +874,6 @@ ACTION lizard::continuetable(uint64_t tableId)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer);
     eosio_assert(existing->dealerBalance >= existing->oneRoundDealerMaxPay * 2, "Can't recover table, dealer balance isn't enough!");
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED, "The tableid not paused, can`t continuetable");
     tableround.modify(existing, _self, [&](auto &s) {
@@ -891,7 +886,6 @@ ACTION lizard::closetable(uint64_t tableId)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-    require_auth(existing->dealer);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't close!");
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
