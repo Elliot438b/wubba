@@ -16,16 +16,16 @@ echo "temptest"
 eosio-cpp -abigen lizard.cpp -o lizard.wasm
 cleos --wallet-url http://127.0.0.1:6666 set contract game12lizard ./ lizard.wasm lizard.abi
 # init currencyinfo
-cleos --wallet-url http://127.0.0.1:6666 push action game12lizard initsymbol '["useraaaaaaaj","TES","0.1000 TES"]' -p useraaaaaaak
-cleos --wallet-url http://127.0.0.1:6666 push action game12lizard initsymbol '["eosio.token","SYS","0.1000 SYS"]' -p useraaaaaaak
+cleos --wallet-url http://127.0.0.1:6666 push action game12lizard initsymbol '["useraaaaaaaj","TES","0.1000 TES"]' -p game12lizard
+cleos --wallet-url http://127.0.0.1:6666 push action game12lizard initsymbol '["eosio.token","SYS","0.1000 SYS"]' -p game12lizard
 cleos get table game12lizard game12lizard currencyinfo
 
 #tableid=`cleos get table game12lizard game12lizard tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 #tableid=tableid+1
-cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '[230,useraaaaaaba,"4000.0000 SYS", 1, "eosio.token", "SYS", "0.005", "0.002", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaba useraaaaaaah
+cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '[230,useraaaaaaab,"4000.0000 SYS", 1, "eosio.token", "SYS", "0.005", "0.002", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaab useraaaaaaah
 tableid=`cleos get table game12lizard game12lizard tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
-#    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '['$tableid',useraaaaaaba,"4000.0000 SYS", 1, "eosio.token", "SYS", "0.005", "0.002", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaba useraaaaaaah
+#    cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '['$tableid',useraaaaaaab,"4000.0000 SYS", 1, "eosio.token", "SYS", "0.005", "0.002", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaab useraaaaaaah
 
 sleep 5s
 
@@ -40,7 +40,7 @@ sleep 5s
 cleos get table game12lizard game12lizard tablesinfo -L $tableid -U $tableid
 
 sleep 3s
-#cleos --wallet-url http://127.0.0.1:6666 push action game12lizard upgrading '["1"]' -p useraaaaaaak
+#cleos --wallet-url http://127.0.0.1:6666 push action game12lizard upgrading '["1"]' -p game12lizard
 cleos --wallet-url http://127.0.0.1:6666 push action game12lizard dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaba useraaaaaaah
 cleos --wallet-url http://127.0.0.1:6666 push action game12lizard serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
 cleos --wallet-url http://127.0.0.1:6666 push action game12lizard playerbet '['$tableid',useraaaaaabb,"{\"small\": \"1.6000 SYS\",\"total6\": \"1.5000 SYS\",\"tri2\": \"1.0000 SYS\"}", useraaaaaabb, "小马"]' -p useraaaaaabb useraaaaaaah
@@ -72,13 +72,13 @@ cleos --wallet-url http://127.0.0.1:6666 push action game12lizard edittable '['$
 # ----------------------------------------------------------- erasedata)
 #the second parameter is (103718369455 = erase end&&pause|| -2 = erase close)
 echo "erase old data(second parameter is (103718369455 = erase end&&pause|| -2 = erase close)"
-cleos --wallet-url http://127.0.0.1:6666 push action game12lizard clear12cache '['$2']' -p useraaaaaaak
+cleos --wallet-url http://127.0.0.1:6666 push action game12lizard clear12cache '['$2']' -p game12lizard
 
 # ----------------------------------------------------------- importdata)
 echo "importdata test"
 nums=(29 100 13 8 91 44);
-cleos --wallet-url http://127.0.0.1:6666 push action game12lizard import12data '[155,0,"useraaaaaaba","0","0","100.0000 SYS","2.0000 SYS","3.0000 SYS","4.0000 SYS","5.0000 SYS","6.0000 SYS","7.0000 SYS","8.0000 SYS","9.0000 SYS","10.0000 SYS","11.0000 SYS","12.0000 SYS","13.0000 SYS","14.0000 SYS","15.0000 SYS","16.0000 SYS","17.0000 SYS",0.003,0.002,"0",{"symbol":"4,TES","contract":"useraaaaaaaj"}]' -p useraaaaaaak
-#cleos --wallet-url http://127.0.0.1:6666 push action game12lizard import12data '[13,${nums[@]}]' -p useraaaaaaak
+cleos --wallet-url http://127.0.0.1:6666 push action game12lizard import12data '[155,0,"useraaaaaaba","0","0","100.0000 SYS","2.0000 SYS","3.0000 SYS","4.0000 SYS","5.0000 SYS","6.0000 SYS","7.0000 SYS","8.0000 SYS","9.0000 SYS","10.0000 SYS","11.0000 SYS","12.0000 SYS","13.0000 SYS","14.0000 SYS","15.0000 SYS","16.0000 SYS","17.0000 SYS",0.003,0.002,"0",{"symbol":"4,TES","contract":"useraaaaaaaj"}]' -p game12lizard
+#cleos --wallet-url http://127.0.0.1:6666 push action game12lizard import12data '[13,${nums[@]}]' -p game12lizard
 
 # ----------------------------------------------------------- shuffle)
 #test shuffle for sic
@@ -179,7 +179,7 @@ cleos --wallet-url http://127.0.0.1:6666 set contract game12lizard ./ lizard.was
 cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '[30,useraaaaaaba,"4000.0000 SYS", 1, "eosio.token", "SYS", "0.005", "0.002", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaba useraaaaaaah
 tableid=`cleos get table game12lizard game12lizard tablesinfo -l 30 -U 30|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 
-cleos --wallet-url http://127.0.0.1:6666 push action game12lizard upgrading '["1"]' -p useraaaaaaak
+cleos --wallet-url http://127.0.0.1:6666 push action game12lizard upgrading '["1"]' -p game12lizard
 cleos --wallet-url http://127.0.0.1:6666 push action game12lizard trusteeship '['$tableid']' -p useraaaaaaba useraaaaaaah
 cleos --wallet-url http://127.0.0.1:6666 push action game12lizard dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaba useraaaaaaah
 cleos --wallet-url http://127.0.0.1:6666 push action game12lizard serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah

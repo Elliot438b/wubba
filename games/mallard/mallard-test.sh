@@ -56,7 +56,7 @@ cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["
 cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaal","GDP","0.1000 GDA"]' -p gamemallards
 
 cleos get table gamemallards gamemallards currencyinfo
-cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '[1,useraaaaaaab,"4000.0000 TES", 1,"useraaaaaaaj","TES", "0.005", "0.002", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaab useraaaaaaah
+cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '[10,useraaaaaaab,"4000.0000 TES", 1,"useraaaaaaaj","TES", "0.005", "0.002", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaab useraaaaaaah
 tableid=`cleos get table gamemallards gamemallards tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 cleos --wallet-url http://127.0.0.1:6666 push action gamemallards shuffle '['$tableid']' -p useraaaaaaah
 sleep 5s
@@ -114,13 +114,13 @@ cleos get table gamemallards gamemallards tablesinfo -L $tableid -U $tableid
 #  ----------------------------------------------------------- erasedata)
 #the second parameter is (103718369455 = erase end&&pause|| -2 = erase close)
 echo "erase old data(second parameter is (103718369455 = erase end&&pause|| -2 = erase close)"
-cleos --wallet-url http://127.0.0.1:6666 push action game12lizard clear12cache '['$2']' -p useraaaaaaak
+cleos --wallet-url http://127.0.0.1:6666 push action gamemallards clear12cache '['$2']' -p useraaaaaaak
 
 #  ----------------------------------------------------------- importdata)
 echo "importdata test"
 nums=(29 100 13 8 91 44);
-cleos --wallet-url http://127.0.0.1:6666 push action game12lizard import12data '[180,0,"useraaaaaaab","0","0","100.0000 SYS","2.0000 SYS","3.0000 SYS","4.0000 SYS","5.0000 SYS","6.0000 SYS","7.0000 SYS","8.0000 SYS","9.0000 SYS","10.0000 SYS","11.0000 SYS","12.0000 SYS","13.0000 SYS","14.0000 SYS","15.0000 SYS","16.0000 SYS","17.0000 SYS",0.003,0.002,"0",{"symbol":"4,TES","contract":"useraaaaaaaj"}]' -p useraaaaaaak
-#cleos --wallet-url http://127.0.0.1:6666 push action game12lizard import12data '[13,${nums[@]}]' -p useraaaaaaak
+cleos --wallet-url http://127.0.0.1:6666 push action gamemallards import12data '[180,0,"useraaaaaaab","0","0","100.0000 SYS","2.0000 SYS","3.0000 SYS","4.0000 SYS","5.0000 SYS","6.0000 SYS","7.0000 SYS","8.0000 SYS","9.0000 SYS","10.0000 SYS","11.0000 SYS","12.0000 SYS","13.0000 SYS","14.0000 SYS","15.0000 SYS","16.0000 SYS","17.0000 SYS",0.003,0.002,"0",{"symbol":"4,TES","contract":"useraaaaaaaj"}]' -p useraaaaaaak
+#cleos --wallet-url http://127.0.0.1:6666 push action gamemallards import12data '[13,${nums[@]}]' -p useraaaaaaak
 
 #  ----------------------------------------------------------- shuffle)
 #test shuffle for bac

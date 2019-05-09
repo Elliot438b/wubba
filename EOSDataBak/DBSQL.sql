@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS T_TABLE_BAC_BAK;
 CREATE TABLE T_TABLE_BAC_BAK
 (
    id                   	INT(11) NOT NULL AUTO_INCREMENT,
-   validCardVec  			VARCHAR(64) COMMENT '有效牌数组，即除去每轮消耗的牌剩余的牌堆',
+   validCardVec  			VARCHAR(512) COMMENT '有效牌数组，即除去每轮消耗的牌剩余的牌堆',
    tableId 				INT(11)  COMMENT '桌主键',
    cardBoot 				VARCHAR(64) COMMENT '靴牌次数',
    dealer 					VARCHAR(64) COMMENT '桌的拥有者，即庄',

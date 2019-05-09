@@ -205,6 +205,8 @@ var EosTr=/** @class */ (function () {
         return new Promise(function(resolve,reject){
             try{
                 let info = rpc.get_table_rows({"scope":scope, "code":code, "table":'tablesinfo', "table_key":'tableId',"limit":limitNum,"json": true});
+                //let info = rpc.get_table_rows({"scope":scope, "code":code, "table":'tablesinfo', "json": true});
+                console.log(info);
                 resolve(info);   
             }catch(e)
             {

@@ -46,6 +46,7 @@ ToEOS.DataToEos = function(){
     let isContinue=true;
     // while(isContinue){
         var sql = 'SELECT * FROM `T_TABLE_BAC_BAK` where `upgradingFlag`=1 ORDER BY id ASC LIMIT '+Global.batchNum;
+        //var sql = 'SELECT * FROM T_TABLE_BAC_BAK;';
         try{
         Global.userDb.query(sql, null, function(err, res){
             if (err) {
