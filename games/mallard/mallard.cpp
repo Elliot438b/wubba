@@ -170,14 +170,23 @@ ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     eosio_assert(!existing->upgradingFlag, "system upgrading...");
     // start a new round. table_round init.
     std::vector<player_bet_info> emptyPlayers;
+    std::vector<card_info> emptyCards;
     eosio::print(" before===validCardVec.size:", existing->validCardVec.size());
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     tableround.modify(existing, _self, [&](auto &s) {
+        s.betStartTime = 0;
         s.currRoundBetSum_BP = init_asset_empty;
         s.currRoundBetSum_Tie = init_asset_empty;
         s.currRoundBetSum_Push = init_asset_empty;
         s.dealerSeedHash = encodeSeed;
+        s.dealerSeed = "";
+        s.serverSeed = "";
+        s.dSeedVerity = 0;
+        s.sSeedVerity = 0;
         s.playerInfo = emptyPlayers;
+        s.roundResult = "";
+        s.playerHands = emptyCards;
+        s.bankerHands = emptyCards;
     });
 }
 
@@ -230,6 +239,7 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     else
     {
         std::vector<player_bet_info> emptyPlayers;
+        std::vector<card_info> emptyCards;
         asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
         tableround.modify(existing, _self, [&](auto &s) {
             s.currRoundBetSum_BP = init_asset_empty;
@@ -238,7 +248,14 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
             s.serverSeedHash = encodeSeed;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
             s.betStartTime = now();
+            s.dealerSeed = "";
+            s.serverSeed = "";
+            s.dSeedVerity = 0;
+            s.sSeedVerity = 0;
             s.playerInfo = emptyPlayers;
+            s.roundResult = "";
+            s.playerHands = emptyCards;
+            s.bankerHands = emptyCards;
         });
     }
 }
@@ -424,9 +441,9 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed, bool free)
         if (platformtotransfer > init_asset_empty)
         {
             INLINE_ACTION_SENDER(eosio::token, transfer)
-                    (
-                            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                            {_self, platformaccount, platformtotransfer, std::string("platformcommission")});
+            (
+                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                {_self, platformaccount, platformtotransfer, std::string("platformcommission")});
         }
         // agent
         asset agentotransfer = init_asset_empty;
@@ -437,9 +454,9 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed, bool free)
             if (agentotransfer > init_asset_empty)
             {
                 INLINE_ACTION_SENDER(eosio::token, transfer)
-                        (
-                                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                                {_self, playerBet.agent, agentotransfer, std::string("agentcommission")});
+                (
+                    existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                    {_self, playerBet.agent, agentotransfer, std::string("agentcommission")});
             }
         }
         // player
@@ -448,9 +465,9 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed, bool free)
         if (playertotransfer > init_asset_empty)
         {
             INLINE_ACTION_SENDER(eosio::token, transfer)
-                    (
-                            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                            {_self, playerBet.player, playertotransfer, std::string("playercommission")});
+            (
+                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                {_self, playerBet.player, playertotransfer, std::string("playercommission")});
         }
 
         playerBet.playercommission = playertotransfer;
