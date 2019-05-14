@@ -136,7 +136,6 @@ private:
 
         enum class status_fields : uint64_t
         {
-            ROUND_START = 1,
             ROUND_BET = 2,
             ROUND_REVEAL = 4,
             ROUND_END = 0,
@@ -378,11 +377,12 @@ private:
     name serveraccount = "useraaaaaaah"_n;
     name platformaccount = "useraaaaaaae"_n;
 
-    const uint32_t betPeriod = 30;
+    const uint32_t betPeriod = 60;//todo default 30 ,60 is test use
     const uint32_t minTableRounds = 2;
     double comission_rate_platform_default = 0.005;
     const uint16_t maxinum_table_per_dealer = 100;
     const uint64_t delall_key = 103718369455;
+    const string invaild_seed_flag = "623";
     const string salt = "w3H5OthR6PVYQnKL";
     const char *notableerr = "TableId isn't existing!";
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);

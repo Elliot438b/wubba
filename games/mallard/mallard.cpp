@@ -169,6 +169,7 @@ ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     //system upgrading
     eosio_assert(!existing->upgradingFlag, "system upgrading...");
     // start a new round. table_round init.
+    checksum256 hash;
     std::vector<player_bet_info> emptyPlayers;
     std::vector<card_info> emptyCards;
     eosio::print(" before===validCardVec.size:", existing->validCardVec.size());
@@ -238,6 +239,7 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     }
     else
     {
+        checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
         std::vector<card_info> emptyCards;
         asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
