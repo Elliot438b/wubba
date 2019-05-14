@@ -503,6 +503,7 @@ private:
     const uint32_t minTableRounds = 10;
     const uint16_t maxinum_table_per_dealer = 100;
     const uint64_t delall_key = 103718369455;
+    const string invaild_seed_flag = "623";
     const string salt = "w3H5OthR6PVYQnKL";
     const char *notableerr = "TableId isn't existing!";
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);

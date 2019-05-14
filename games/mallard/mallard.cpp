@@ -185,7 +185,7 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
-    
+
     if (existing->trusteeship)
     {
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
@@ -399,6 +399,23 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed, bool free)
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "table status != reveal");
     eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time to verify server seed yet.");
     assert_sha256(seed.c_str(), seed.size(), ((*existing).serverSeedHash));
+    // plaintext seed invaild（lost）
+    if (0 == seed.compare(invaild_seed_flag))
+    {
+        // refund
+        for (auto playerBet : existing->playerInfo)
+        {
+            asset depositAmount = (playerBet.betDealer + playerBet.betPlayer + playerBet.betTie + playerBet.betDealerPush + playerBet.betPlayerPush);
+            INLINE_ACTION_SENDER(eosio::token, transfer)
+            (
+                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                {_self, playerBet.player, depositAmount, std::string("seed invaild:playerbet refund")});
+        }
+        tableround.modify(existing, _self, [&](auto &s) {
+            s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
+        });
+        return;
+    }
     tableround.modify(existing, _self, [&](auto &s) {
         s.sSeedVerity = true;
         s.serverSeed = seed;
