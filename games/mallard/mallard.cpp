@@ -77,7 +77,7 @@ ACTION mallard::newtable(uint64_t newtableId, name dealer, asset deposit, bool i
     std::vector<uint16_t> validCardVec_empty;
     tableround.emplace(_self, [&](auto &s) {
         s.tableId = newtableId;
-        s.cardBoot = 1;
+        s.cardBoot = 0;
         s.trusteeship = false;
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_SHUFFLE;
         s.dealer = dealer;
