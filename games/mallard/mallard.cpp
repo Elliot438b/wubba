@@ -326,15 +326,11 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
     temp.agent = agent;
     temp.nickname = nickname;
 
-    asset balance = existing->dealerBalance;
-    balance += depositAmount;
-
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
         s.currRoundBetSum_BP = player_amount_sum_bp;
         s.currRoundBetSum_Tie = player_amount_sum_tie;
         s.currRoundBetSum_Push = player_amount_sum_push;
-        s.dealerBalance = balance;
     });
 }
 
@@ -377,7 +373,6 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed, bool free)
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "table status != reveal");
     eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time to verify server seed yet.");
     // plaintext seed invaild（lost）
-    asset dealerBalance_refund = existing->dealerBalance;
     if (0 == seed.compare(invaild_seed_flag))
     {
         // refund
@@ -388,11 +383,9 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed, bool free)
             (
                 existing->amountSymbol.get_contract(), {{_self, "active"_n}},
                 {_self, playerBet.player, depositAmount, std::string("seed invaild:playerbet refund")});
-            dealerBalance_refund -= depositAmount;
         }
         tableround.modify(existing, _self, [&](auto &s) {
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
-            s.dealerBalance = dealerBalance_refund;
         });
         return;
     }
