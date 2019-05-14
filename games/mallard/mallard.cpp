@@ -180,6 +180,7 @@ ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         s.currRoundBetSum_Tie = init_asset_empty;
         s.currRoundBetSum_Push = init_asset_empty;
         s.dealerSeedHash = encodeSeed;
+        s.serverSeedHash = hash;
         s.dealerSeed = "";
         s.serverSeed = "";
         s.dSeedVerity = 0;
@@ -239,7 +240,6 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     }
     else
     {
-        checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
         std::vector<card_info> emptyCards;
         asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
