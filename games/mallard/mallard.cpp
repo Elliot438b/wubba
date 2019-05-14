@@ -170,26 +170,12 @@ ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     eosio_assert(!existing->upgradingFlag, "system upgrading...");
     // start a new round. table_round init.
     eosio::print(" before===validCardVec.size:", existing->validCardVec.size());
-    checksum256 hash;
-    std::vector<player_bet_info> emptyPlayers;
-    std::vector<card_info> emptyCards;
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     tableround.modify(existing, _self, [&](auto &s) {
-        s.betStartTime = 0;
-        s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_START;
         s.currRoundBetSum_BP = init_asset_empty;
         s.currRoundBetSum_Tie = init_asset_empty;
         s.currRoundBetSum_Push = init_asset_empty;
         s.dealerSeedHash = encodeSeed;
-        s.serverSeedHash = hash;
-        s.dealerSeed = "";
-        s.serverSeed = "";
-        s.dSeedVerity = 0;
-        s.sSeedVerity = 0;
-        s.playerInfo = emptyPlayers;
-        s.roundResult = "";
-        s.playerHands = emptyCards;
-        s.bankerHands = emptyCards;
     });
 }
 
@@ -198,10 +184,10 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
-
+    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
+    
     if (existing->trusteeship)
     {
-        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
             INLINE_ACTION_SENDER(mallard, pausetablesee)
@@ -241,8 +227,11 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     }
     else
     {
-        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_START, "Dealer should send hash seed first!");
+        asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
         tableround.modify(existing, _self, [&](auto &s) {
+            s.currRoundBetSum_BP = init_asset_empty;
+            s.currRoundBetSum_Tie = init_asset_empty;
+            s.currRoundBetSum_Push = init_asset_empty;
             s.serverSeedHash = encodeSeed;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
             s.betStartTime = now();

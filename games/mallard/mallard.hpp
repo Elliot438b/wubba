@@ -145,7 +145,6 @@ private:
 
         enum class status_fields : uint64_t
         {
-            ROUND_START = 1,
             ROUND_BET = 2,
             ROUND_REVEAL = 4,
             ROUND_END = 0,
