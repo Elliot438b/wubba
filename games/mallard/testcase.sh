@@ -432,7 +432,7 @@ case $1 in
         done
 !
 
-        tableid=6092
+        tableid=6095
         cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '['$tableid',useraaaaaaac,"4000.0000 TES", 1,"useraaaaaaaj","TES", "0.005", "0.002", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaac useraaaaaaah
         cleos --wallet-url http://127.0.0.1:6666 push action gamemallards shuffle '['$tableid']' -p useraaaaaaah
         cleos --wallet-url http://127.0.0.1:6666 push action gamemallards dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaac useraaaaaaah
@@ -446,7 +446,7 @@ case $1 in
         cleos --wallet-url http://127.0.0.1:6666 push action gamemallards verdealeseed '['$tableid',10]' -p useraaaaaaac useraaaaaaah
         cleos get table gamemallards gamemallards tablesinfo -L $tableid -U $tableid
         sleep 3s
-        cleos --wallet-url http://127.0.0.1:6666 push action gamemallards verserveseed '['$tableid',704,"0"]' -p useraaaaaaah
+        cleos --wallet-url http://127.0.0.1:6666 push action gamemallards verserveseed '['$tableid',623,"0"]' -p useraaaaaaah
         cleos get table gamemallards gamemallards tablesinfo -L $tableid -U $tableid
 :<<!
         tableid=$(($tableid + 1))
