@@ -498,7 +498,7 @@ private:
     name platformaccount = "useraaaaaaae"_n;
 
     const uint16_t CardsMinLimit = 100;
-    const uint32_t betPeriod = 1; //todo default 30 ,1 is test use
+    const uint32_t betPeriod = 60; //todo default 30 ,60 is test use
     const uint16_t initDecks = 8; //todo default 8 ,2 is test use
     const uint32_t minTableRounds = 10;
     const uint16_t maxinum_table_per_dealer = 100;
