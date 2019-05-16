@@ -20,7 +20,7 @@ ACTION mallard::initsymbol(name code, string sym, asset minperbet)
 
 ACTION mallard::newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
                          asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
-                         asset oneRoundMaxTotalBet_push, asset minPerBet_push)
+                         asset oneRoundMaxTotalBet_pair, asset minPerBet_pair)
 {
     require_auth(dealer);
     require_auth(serveraccount);
@@ -54,7 +54,7 @@ ACTION mallard::newtable(uint64_t newtableId, name dealer, asset deposit, bool i
     }
 
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
-    eosio_assert(oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp > minPerBet_default_temp && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie > minPerBet_default_temp && oneRoundMaxTotalBet_push > init_asset_empty && minPerBet_push > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
+    eosio_assert(oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp > minPerBet_default_temp && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie > minPerBet_default_temp && oneRoundMaxTotalBet_pair > init_asset_empty && minPerBet_pair > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
     //auto temp_rate_platform = Round(comission_rate_platform_default, 4);
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
@@ -62,9 +62,9 @@ ACTION mallard::newtable(uint64_t newtableId, name dealer, asset deposit, bool i
     eosio_assert(temp_rate_agent >= 0 && temp_rate_player >= 0, "Commission rate can't be set negtive!");
     eosio::print(" temp_rate_platform:", comission_rate_platform_default, " temp_rate_agent:", temp_rate_agent, " temp_rate_player", temp_rate_player);
 
-    asset oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_push * 11 * 2 + max(oneRoundMaxTotalBet_bp * 1, oneRoundMaxTotalBet_tie * 8);
+    asset oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_pair * 11 * 2 + max(oneRoundMaxTotalBet_bp * 1, oneRoundMaxTotalBet_tie * 8);
     eosio::print(" before====oneRoundDealerMaxPay_temp:", oneRoundDealerMaxPay_temp);
-    oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_tie + oneRoundMaxTotalBet_bp + oneRoundMaxTotalBet_push) * (comission_rate_platform_default + temp_rate_agent + temp_rate_player);
+    oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_tie + oneRoundMaxTotalBet_bp + oneRoundMaxTotalBet_pair) * (comission_rate_platform_default + temp_rate_agent + temp_rate_player);
     eosio::print(" end====oneRoundDealerMaxPay_temp:", oneRoundDealerMaxPay_temp);
     asset deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
 
@@ -88,8 +88,8 @@ ACTION mallard::newtable(uint64_t newtableId, name dealer, asset deposit, bool i
         s.minPerBet_BP = minPerBet_bp;
         s.oneRoundMaxTotalBet_Tie = oneRoundMaxTotalBet_tie;
         s.minPerBet_Tie = minPerBet_tie;
-        s.oneRoundMaxTotalBet_Push = oneRoundMaxTotalBet_push;
-        s.minPerBet_Push = minPerBet_push;
+        s.oneRoundMaxTotalBet_Pair = oneRoundMaxTotalBet_pair;
+        s.minPerBet_Pair = minPerBet_pair;
         s.oneRoundDealerMaxPay = oneRoundDealerMaxPay_temp;
         s.minTableDeposit = deposit_tmp;
         s.amountSymbol = cur_ex_sym;
@@ -99,7 +99,7 @@ ACTION mallard::newtable(uint64_t newtableId, name dealer, asset deposit, bool i
     });
 }
 
-ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_push, asset minPerBet_push)
+ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_pair, asset minPerBet_pair)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -120,7 +120,7 @@ ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sy
 
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
 
-    eosio_assert(oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp > minPerBet_default_temp && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie > minPerBet_default_temp && oneRoundMaxTotalBet_push > init_asset_empty && minPerBet_push > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
+    eosio_assert(oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp > minPerBet_default_temp && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie > minPerBet_default_temp && oneRoundMaxTotalBet_pair > init_asset_empty && minPerBet_pair > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
     //auto temp_rate_platform = Round(comission_rate_platform_default, 4);
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
@@ -128,8 +128,8 @@ ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sy
     // verify the {player, agent} rate can't be set <0
     eosio_assert(temp_rate_agent >= 0 && temp_rate_player >= 0, "Commission rate can't be set negtive!");
 
-    asset oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_push * 11 * 2 + max(oneRoundMaxTotalBet_bp * 1, oneRoundMaxTotalBet_tie * 8);
-    oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_tie + oneRoundMaxTotalBet_bp + oneRoundMaxTotalBet_push) * (comission_rate_platform_default + temp_rate_agent + temp_rate_player);
+    asset oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_pair * 11 * 2 + max(oneRoundMaxTotalBet_bp * 1, oneRoundMaxTotalBet_tie * 8);
+    oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_tie + oneRoundMaxTotalBet_bp + oneRoundMaxTotalBet_pair) * (comission_rate_platform_default + temp_rate_agent + temp_rate_player);
     asset deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
 
     tableround.modify(existing, _self, [&](auto &s) {
@@ -138,8 +138,8 @@ ACTION mallard::edittable(uint64_t tableId, bool isPrivate, name code, string sy
         s.minPerBet_BP = minPerBet_bp;
         s.oneRoundMaxTotalBet_Tie = oneRoundMaxTotalBet_tie;
         s.minPerBet_Tie = minPerBet_tie;
-        s.oneRoundMaxTotalBet_Push = oneRoundMaxTotalBet_push;
-        s.minPerBet_Push = minPerBet_push;
+        s.oneRoundMaxTotalBet_Pair = oneRoundMaxTotalBet_pair;
+        s.minPerBet_Pair = minPerBet_pair;
         s.oneRoundDealerMaxPay = oneRoundDealerMaxPay_temp;
         s.minTableDeposit = deposit_tmp;
         s.amountSymbol = cur_ex_sym;
@@ -178,7 +178,7 @@ ACTION mallard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         s.betStartTime = 0;
         s.currRoundBetSum_BP = init_asset_empty;
         s.currRoundBetSum_Tie = init_asset_empty;
-        s.currRoundBetSum_Push = init_asset_empty;
+        s.currRoundBetSum_Pair = init_asset_empty;
         s.dealerSeedHash = encodeSeed;
         s.serverSeedHash = hash;
         s.dealerSeed = "";
@@ -225,7 +225,7 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
             s.currRoundBetSum_BP = init_asset_empty;
             s.currRoundBetSum_Tie = init_asset_empty;
-            s.currRoundBetSum_Push = init_asset_empty;
+            s.currRoundBetSum_Pair = init_asset_empty;
             s.dealerSeedHash = hash;
             s.serverSeedHash = encodeSeed;
             s.dealerSeed = "";
@@ -246,7 +246,7 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
         tableround.modify(existing, _self, [&](auto &s) {
             s.currRoundBetSum_BP = init_asset_empty;
             s.currRoundBetSum_Tie = init_asset_empty;
-            s.currRoundBetSum_Push = init_asset_empty;
+            s.currRoundBetSum_Pair = init_asset_empty;
             s.serverSeedHash = encodeSeed;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
             s.betStartTime = now();
@@ -262,7 +262,7 @@ ACTION mallard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     }
 }
 
-ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, name agent, string nickname)
+ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPair, asset betPlayerPair, name agent, string nickname)
 {
     require_auth(player);
     require_auth(serveraccount);
@@ -277,14 +277,14 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
         eosio_assert(betPlayer >= existing->minPerBet_BP, "Player bet is too small!");
     if (betTie > init_asset_empty)
         eosio_assert(betTie >= existing->minPerBet_Tie, "Tie bet is too small!");
-    if (betDealerPush > init_asset_empty)
-        eosio_assert(betDealerPush >= existing->minPerBet_Push, "BankerPush bet is too small!");
-    if (betPlayerPush > init_asset_empty)
-        eosio_assert(betPlayerPush >= existing->minPerBet_Push, "PlayerPush bet is too small!");
+    if (betDealerPair > init_asset_empty)
+        eosio_assert(betDealerPair >= existing->minPerBet_Pair, "BankerPair bet is too small!");
+    if (betPlayerPair > init_asset_empty)
+        eosio_assert(betPlayerPair >= existing->minPerBet_Pair, "PlayerPair bet is too small!");
 
     asset player_amount_sum_bp = existing->currRoundBetSum_BP;
     asset player_amount_sum_tie = existing->currRoundBetSum_Tie;
-    asset player_amount_sum_push = existing->currRoundBetSum_Push;
+    asset player_amount_sum_pair = existing->currRoundBetSum_Pair;
 
     bool flag = false;
     for (const auto &p : existing->playerInfo)
@@ -304,11 +304,11 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
     player_amount_sum_tie += betTie;
     eosio_assert(player_amount_sum_tie < existing->oneRoundMaxTotalBet_Tie, "Over the peak of total bet_tie amount of this round!");
 
-    player_amount_sum_push += betDealerPush;
-    player_amount_sum_push += betPlayerPush;
-    eosio_assert(player_amount_sum_push < existing->oneRoundMaxTotalBet_Push, "Over the peak of total bet_push amount of this round!");
+    player_amount_sum_pair += betDealerPair;
+    player_amount_sum_pair += betPlayerPair;
+    eosio_assert(player_amount_sum_pair < existing->oneRoundMaxTotalBet_Pair, "Over the peak of total bet_pair amount of this round!");
 
-    asset depositAmount = (betDealer + betPlayer + betTie + betDealerPush + betPlayerPush);
+    asset depositAmount = (betDealer + betPlayer + betTie + betDealerPair + betPlayerPair);
     if (depositAmount > init_asset_empty)
     {
         INLINE_ACTION_SENDER(eosio::token, transfer)
@@ -321,8 +321,8 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
     temp.betDealer = betDealer;
     temp.betPlayer = betPlayer;
     temp.betTie = betTie;
-    temp.betDealerPush = betDealerPush;
-    temp.betPlayerPush = betPlayerPush;
+    temp.betDealerPair = betDealerPair;
+    temp.betPlayerPair = betPlayerPair;
     temp.pBonus = init_asset_empty;
     temp.dBonus = init_asset_empty;
     temp.agent = agent;
@@ -332,7 +332,7 @@ ACTION mallard::playerbet(uint64_t tableId, name player, asset betDealer, asset 
         s.playerInfo.emplace_back(temp);
         s.currRoundBetSum_BP = player_amount_sum_bp;
         s.currRoundBetSum_Tie = player_amount_sum_tie;
-        s.currRoundBetSum_Push = player_amount_sum_push;
+        s.currRoundBetSum_Pair = player_amount_sum_pair;
     });
 }
 
@@ -380,7 +380,7 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed, bool free)
         // refund
         for (auto playerBet : existing->playerInfo)
         {
-            asset depositAmount = (playerBet.betDealer + playerBet.betPlayer + playerBet.betTie + playerBet.betDealerPush + playerBet.betPlayerPush);
+            asset depositAmount = (playerBet.betDealer + playerBet.betPlayer + playerBet.betTie + playerBet.betDealerPair + playerBet.betPlayerPair);
             INLINE_ACTION_SENDER(eosio::token, transfer)
             (
                 existing->amountSymbol.get_contract(), {{_self, "active"_n}},
@@ -429,7 +429,7 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed, bool free)
     {
         // -------------------------------- commission start --------------------------------
         // platform
-        asset depositAmount = (playerBet.betDealer + playerBet.betPlayer + playerBet.betTie + playerBet.betDealerPush + playerBet.betPlayerPush);
+        asset depositAmount = (playerBet.betDealer + playerBet.betPlayer + playerBet.betTie + playerBet.betDealerPair + playerBet.betPlayerPair);
         auto temp_rate_platform = comission_rate_platform_default;
         asset platformtotransfer = asset(depositAmount.amount * comission_rate_platform_default, existing->amountSymbol.get_symbol());
         eosio::print(" sum_bet_amount:", depositAmount.amount, " platformtotransfer:", platformtotransfer, " temp_rate_platform:", temp_rate_platform, " ");
@@ -512,16 +512,16 @@ ACTION mallard::verserveseed(uint64_t tableId, string seed, bool free)
             pBonus += playerBet.betTie * (1 + 8);
         else
             dBonus += playerBet.betTie;
-        // DealerPush field
+        // DealerPair field
         if (roundResult[3] == '1')
-            pBonus += playerBet.betDealerPush * (1 + 11);
+            pBonus += playerBet.betDealerPair * (1 + 11);
         else
-            dBonus += playerBet.betDealerPush;
-        // PlayerPush field
+            dBonus += playerBet.betDealerPair;
+        // PlayerPair field
         if (roundResult[4] == '1')
-            pBonus += playerBet.betPlayerPush * (1 + 11);
+            pBonus += playerBet.betPlayerPair * (1 + 11);
         else
-            dBonus += playerBet.betPlayerPush;
+            dBonus += playerBet.betPlayerPair;
 
         eosio::print(" [player:", playerBet.player, ", total bonus:", pBonus, "] ");
 
@@ -748,8 +748,8 @@ ACTION mallard::upgrading(bool isupgrading)
 
 ACTION mallard::import12data(uint64_t tableId, uint64_t tableStatus, uint64_t cardBoot, name dealer, bool trusteeship,
                              bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP,
-                             asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push,
-                             asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit,
+                             asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Pair,
+                             asset minPerBet_Pair, asset oneRoundDealerMaxPay, asset minTableDeposit,
                              double commission_rate_agent, double commission_rate_player, bool upgradingFlag,
                              extended_symbol amountSymbol, std::vector<uint16_t> validCardVec)
 {
@@ -768,8 +768,8 @@ ACTION mallard::import12data(uint64_t tableId, uint64_t tableStatus, uint64_t ca
         s.minPerBet_BP = minPerBet_BP;
         s.oneRoundMaxTotalBet_Tie = oneRoundMaxTotalBet_Tie;
         s.minPerBet_Tie = minPerBet_Tie;
-        s.oneRoundMaxTotalBet_Push = oneRoundMaxTotalBet_Push;
-        s.minPerBet_Push = minPerBet_Push;
+        s.oneRoundMaxTotalBet_Pair = oneRoundMaxTotalBet_Pair;
+        s.minPerBet_Pair = minPerBet_Pair;
         s.oneRoundDealerMaxPay = oneRoundDealerMaxPay;
         s.minTableDeposit = minTableDeposit;
         s.amountSymbol = amountSymbol;

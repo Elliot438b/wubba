@@ -20,10 +20,10 @@ public:
         : contract(receiver, code, ds), tableround(receiver, receiver.value), tableshuffle(receiver, receiver.value), tablecurrency(receiver, receiver.value) {}
 
     ACTION initsymbol(name code, string sym, asset minperbet);
-    ACTION newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Push, asset minPerBet_Push);
+    ACTION newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Pair, asset minPerBet_Pair);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
-    ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPush, asset betPlayerPush, name agent, string nickname);
+    ACTION playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPair, asset betPlayerPair, name agent, string nickname);
     ACTION endbet(uint64_t tableId);
     ACTION verdealeseed(uint64_t tableId, string seed);
     ACTION verserveseed(uint64_t tableId, string seed, bool free);
@@ -38,11 +38,11 @@ public:
     ACTION depositable(uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
     ACTION shuffle(uint64_t tableId);
-    ACTION edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_push, asset minPerBet_push);
+    ACTION edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_pair, asset minPerBet_pair);
     ACTION upgrading(bool isupgrading);
     ACTION import12data(uint64_t tableId, uint64_t tableStatus, uint64_t cardBoot, name dealer, bool trusteeship,
                         bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie,
-                        asset oneRoundMaxTotalBet_Push, asset minPerBet_Push, asset oneRoundDealerMaxPay, asset minTableDeposit, double commission_rate_agent, double commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec);
+                        asset oneRoundMaxTotalBet_Pair, asset minPerBet_Pair, asset oneRoundDealerMaxPay, asset minTableDeposit, double commission_rate_agent, double commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec);
 
     using initsymbol_action = action_wrapper<"initsymbol"_n, &mallard::initsymbol>;
     using newtable_action = action_wrapper<"newtable"_n, &mallard::newtable>;
@@ -83,8 +83,8 @@ private:
         asset betDealer;
         asset betPlayer;
         asset betTie;
-        asset betDealerPush;
-        asset betPlayerPush;
+        asset betDealerPair;
+        asset betPlayerPair;
         asset pBonus;
         asset dBonus;
         name agent;
@@ -92,7 +92,7 @@ private:
         asset playercommission;
         asset agentcommission;
 
-        EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPush)(betPlayerPush)(pBonus)(dBonus)(agent)(nickname)(playercommission)(agentcommission))
+        EOSLIB_SERIALIZE(player_bet_info, (player)(betDealer)(betPlayer)(betTie)(betDealerPair)(betPlayerPair)(pBonus)(dBonus)(agent)(nickname)(playercommission)(agentcommission))
     };
 
     TABLE table_stats
@@ -110,8 +110,8 @@ private:
         asset minPerBet_BP;
         asset oneRoundMaxTotalBet_Tie;
         asset minPerBet_Tie;
-        asset oneRoundMaxTotalBet_Push;
-        asset minPerBet_Push;
+        asset oneRoundMaxTotalBet_Pair;
+        asset minPerBet_Pair;
 
         asset oneRoundDealerMaxPay;
         asset minTableDeposit;
@@ -125,7 +125,7 @@ private:
         uint64_t betStartTime; // for keeping bet stage/round.
         asset currRoundBetSum_BP;
         asset currRoundBetSum_Tie;
-        asset currRoundBetSum_Push;
+        asset currRoundBetSum_Pair;
 
         checksum256 dealerSeedHash;
         checksum256 serverSeedHash;
@@ -152,7 +152,7 @@ private:
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
         };
-        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(tableStatus)(cardBoot)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Push)(minPerBet_Push)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(commission_rate_agent)(commission_rate_player)(upgradingFlag)(redundancy)(redundancy1)(betStartTime)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Push)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
+        EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(tableStatus)(cardBoot)(dealer)(trusteeship)(isPrivate)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Pair)(minPerBet_Pair)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(commission_rate_agent)(commission_rate_player)(upgradingFlag)(redundancy)(redundancy1)(betStartTime)(currRoundBetSum_BP)(currRoundBetSum_Tie)(currRoundBetSum_Pair)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
     };
 
     struct shuffle_round_result
@@ -393,16 +393,16 @@ private:
         sum_b_R = sum_b;
         eosio::print(" [final-sum_p: ", sum_p, " final-sum_b:", sum_b, "] ");
         //round result
-        roundResult = "00000"; //Banker,Player,Tie,BankerPush,PlayerPush
+        roundResult = "00000"; //Banker,Player,Tie,BankerPair,PlayerPair
         if (sum_p < sum_b)     //Banker
             roundResult[0] = '1';
         else if (sum_p > sum_b) //Player
             roundResult[1] = '1';
         else if (sum_p == sum_b) //Tie
             roundResult[2] = '1';
-        if (bankerHands[0].cardNum == bankerHands[1].cardNum) //BankerPush
+        if (bankerHands[0].cardNum == bankerHands[1].cardNum) //BankerPair
             roundResult[3] = '1';
-        if (playerHands[0].cardNum == playerHands[1].cardNum) //PlayerPush
+        if (playerHands[0].cardNum == playerHands[1].cardNum) //PlayerPair
             roundResult[4] = '1';
     }
 
