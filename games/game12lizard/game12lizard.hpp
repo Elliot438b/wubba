@@ -10,12 +10,12 @@ using namespace eosio;
 using namespace std;
 using std::string;
 
-CONTRACT lizard : public contract
+CONTRACT game12lizard : public contract
 {
 public:
     using contract::contract;
 
-    lizard(name receiver, name code, datastream<const char *> ds)
+    game12lizard(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value), tablecurrency(receiver, receiver.value) {}
 
     ACTION initsymbol(name code, string sym, asset minperbet);
@@ -41,27 +41,27 @@ public:
     ACTION import12data(uint64_t tableId, uint64_t tableStatus, name dealer, bool trusteeship,
                         bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single, asset oneRoundDealerMaxPay, asset minTableDeposit, double commission_rate_agent, double commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol);
 
-    using initsymbol_action = action_wrapper<"initsymbol"_n, &lizard::initsymbol>;
-    using newtable_action = action_wrapper<"newtable"_n, &lizard::newtable>;
-    using dealerseed_action = action_wrapper<"dealerseed"_n, &lizard::dealerseed>;
-    using serverseed_action = action_wrapper<"serverseed"_n, &lizard::serverseed>;
-    using playerbet_action = action_wrapper<"playerbet"_n, &lizard::playerbet>;
-    using endbet_action = action_wrapper<"endbet"_n, &lizard::endbet>;
-    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &lizard::verdealeseed>;
-    using verserveseed_action = action_wrapper<"verserveseed"_n, &lizard::verserveseed>;
-    using trusteeship_action = action_wrapper<"trusteeship"_n, &lizard::trusteeship>;
-    using exitruteship_action = action_wrapper<"exitruteship"_n, &lizard::exitruteship>;
-    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &lizard::disconnecthi>;
-    using clear12cache_action = action_wrapper<"clear12cache"_n, &lizard::clear12cache>;
-    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &lizard::pausetabledea>;
-    using pausetablesee_action = action_wrapper<"pausetablesee"_n, &lizard::pausetablesee>;
-    using continuetable_action = action_wrapper<"continuetable"_n, &lizard::continuetable>;
-    using closetable_action = action_wrapper<"closetable"_n, &lizard::closetable>;
-    using depositable_action = action_wrapper<"depositable"_n, &lizard::depositable>;
-    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &lizard::dealerwitdaw>;
-    using edittable_action = action_wrapper<"edittable"_n, &lizard::edittable>;
-    using upgrading_action = action_wrapper<"upgrading"_n, &lizard::upgrading>;
-    using import12data_action = action_wrapper<"import12data"_n, &lizard::import12data>;
+    using initsymbol_action = action_wrapper<"initsymbol"_n, &game12lizard::initsymbol>;
+    using newtable_action = action_wrapper<"newtable"_n, &game12lizard::newtable>;
+    using dealerseed_action = action_wrapper<"dealerseed"_n, &game12lizard::dealerseed>;
+    using serverseed_action = action_wrapper<"serverseed"_n, &game12lizard::serverseed>;
+    using playerbet_action = action_wrapper<"playerbet"_n, &game12lizard::playerbet>;
+    using endbet_action = action_wrapper<"endbet"_n, &game12lizard::endbet>;
+    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &game12lizard::verdealeseed>;
+    using verserveseed_action = action_wrapper<"verserveseed"_n, &game12lizard::verserveseed>;
+    using trusteeship_action = action_wrapper<"trusteeship"_n, &game12lizard::trusteeship>;
+    using exitruteship_action = action_wrapper<"exitruteship"_n, &game12lizard::exitruteship>;
+    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &game12lizard::disconnecthi>;
+    using clear12cache_action = action_wrapper<"clear12cache"_n, &game12lizard::clear12cache>;
+    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &game12lizard::pausetabledea>;
+    using pausetablesee_action = action_wrapper<"pausetablesee"_n, &game12lizard::pausetablesee>;
+    using continuetable_action = action_wrapper<"continuetable"_n, &game12lizard::continuetable>;
+    using closetable_action = action_wrapper<"closetable"_n, &game12lizard::closetable>;
+    using depositable_action = action_wrapper<"depositable"_n, &game12lizard::depositable>;
+    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &game12lizard::dealerwitdaw>;
+    using edittable_action = action_wrapper<"edittable"_n, &game12lizard::edittable>;
+    using upgrading_action = action_wrapper<"upgrading"_n, &game12lizard::upgrading>;
+    using import12data_action = action_wrapper<"import12data"_n, &game12lizard::import12data>;
 
 private:
     struct player_bet_info
@@ -156,8 +156,8 @@ private:
         EOSLIB_SERIALIZE(currency_info, (code)(sym)(minPerBet_default))
     };
 
-    typedef eosio::multi_index<"tablesinfo"_n, lizard::table_stats, indexed_by<"dealer"_n, const_mem_fun<lizard::table_stats, uint64_t, &lizard::table_stats::get_dealer>>> singletable_t;
-    typedef eosio::multi_index<"currencyinfo"_n, lizard::currency_info> currencyinfo_t;
+    typedef eosio::multi_index<"tablesinfo"_n, game12lizard::table_stats, indexed_by<"dealer"_n, const_mem_fun<game12lizard::table_stats, uint64_t, &game12lizard::table_stats::get_dealer>>> singletable_t;
+    typedef eosio::multi_index<"currencyinfo"_n, game12lizard::currency_info> currencyinfo_t;
 
     struct bet_info
     {
@@ -177,7 +177,7 @@ private:
         {
             string temp_name = bet.substr(pos_end + 2, pos - pos_end - 3);
             result = false;
-            for (auto j : lizard::betOptions)
+            for (auto j : game12lizard::betOptions)
             {
                 if (j == temp_name)
                 {
@@ -387,4 +387,4 @@ private:
     const char *notableerr = "TableId isn't existing!";
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 };
-const std::vector<string> lizard::betOptions = lizard::createBetOptions();
+const std::vector<string> game12lizard::betOptions = game12lizard::createBetOptions();

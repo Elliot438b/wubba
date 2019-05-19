@@ -1,6 +1,6 @@
-#include "lizard.hpp"
+#include "game12lizard.hpp"
 
-ACTION lizard::initsymbol(name code, string sym, asset minperbet)
+ACTION game12lizard::initsymbol(name code, string sym, asset minperbet)
 {
     require_auth(_self);
     eosio_assert(0 == minperbet.symbol.code().to_string().compare(sym), "The minperbet's symbol not match!");
@@ -18,7 +18,7 @@ ACTION lizard::initsymbol(name code, string sym, asset minperbet)
     });
 }
 
-ACTION lizard::newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
+ACTION game12lizard::newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
 {
     require_auth(dealer);
     require_auth(serveraccount);
@@ -119,7 +119,7 @@ ACTION lizard::newtable(uint64_t newtableId, name dealer, asset deposit, bool is
     });
 }
 
-ACTION lizard::edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
+ACTION game12lizard::edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -182,7 +182,7 @@ ACTION lizard::edittable(uint64_t tableId, bool isPrivate, name code, string sym
     });
 }
 
-ACTION lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
+ACTION game12lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -194,7 +194,7 @@ ACTION lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 
     if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
     {
-        INLINE_ACTION_SENDER(lizard, pausetablesee)
+        INLINE_ACTION_SENDER(game12lizard, pausetablesee)
         (
             _self, {{serveraccount, "active"_n}},
             {existing->tableId});
@@ -228,7 +228,7 @@ ACTION lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     });
 }
 
-ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
+ACTION game12lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -239,7 +239,7 @@ ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     {
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
-            INLINE_ACTION_SENDER(lizard, pausetablesee)
+            INLINE_ACTION_SENDER(game12lizard, pausetablesee)
             (
                 _self, {{serveraccount, "active"_n}},
                 {existing->tableId});
@@ -298,7 +298,7 @@ ACTION lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
     }
 }
 
-ACTION lizard::playerbet(uint64_t tableId, name player, string bet, name agent, string nickname)
+ACTION game12lizard::playerbet(uint64_t tableId, name player, string bet, name agent, string nickname)
 {
     require_auth(player);
     require_auth(serveraccount);
@@ -432,7 +432,7 @@ ACTION lizard::playerbet(uint64_t tableId, name player, string bet, name agent, 
 }
 
 // server defer action: end bet
-ACTION lizard::endbet(uint64_t tableId)
+ACTION game12lizard::endbet(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -447,7 +447,7 @@ ACTION lizard::endbet(uint64_t tableId)
     });
 }
 
-ACTION lizard::verdealeseed(uint64_t tableId, string seed)
+ACTION game12lizard::verdealeseed(uint64_t tableId, string seed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -466,7 +466,7 @@ ACTION lizard::verdealeseed(uint64_t tableId, string seed)
 }
 
 // Server push defer 3' action, once got ROUND_REVEAL.
-ACTION lizard::verserveseed(uint64_t tableId, string seed)
+ACTION game12lizard::verserveseed(uint64_t tableId, string seed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -506,11 +506,11 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
     {
         eosio::print("Dealer trusteeship, don't need dealer seed.");
     }
-    // non-trustee server, so table_round is waiting for ACTION::lizard::dealerseed until dealer reconnect.
-    // TODO Can be considered: auto trustee server until dealer reconnect and ACTION::lizard::exitruteship.
+    // non-trustee server, so table_round is waiting for ACTION::game12lizard::dealerseed until dealer reconnect.
+    // TODO Can be considered: auto trustee server until dealer reconnect and ACTION::game12lizard::exitruteship.
     else if (!existing->dSeedVerity)
     { // dealer disconnect notify
-        INLINE_ACTION_SENDER(lizard, disconnecthi)
+        INLINE_ACTION_SENDER(game12lizard, disconnecthi)
         (
             _self, {{serveraccount, "active"_n}},
             {existing->dealer, existing->tableId});
@@ -816,7 +816,7 @@ ACTION lizard::verserveseed(uint64_t tableId, string seed)
     });
 }
 
-ACTION lizard::trusteeship(uint64_t tableId)
+ACTION game12lizard::trusteeship(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -827,7 +827,7 @@ ACTION lizard::trusteeship(uint64_t tableId)
     });
 }
 
-ACTION lizard::exitruteship(uint64_t tableId)
+ACTION game12lizard::exitruteship(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -838,7 +838,7 @@ ACTION lizard::exitruteship(uint64_t tableId)
     });
 }
 
-ACTION lizard::disconnecthi(name informed, uint64_t tableId)
+ACTION game12lizard::disconnecthi(name informed, uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -847,7 +847,7 @@ ACTION lizard::disconnecthi(name informed, uint64_t tableId)
     require_recipient(informed); // inform dealer who is disconnect.
 }
 
-ACTION lizard::clear12cache(int64_t key)
+ACTION game12lizard::clear12cache(int64_t key)
 {
     require_auth(_self);
     if (key == delall_key)
@@ -884,7 +884,7 @@ ACTION lizard::clear12cache(int64_t key)
     }
 }
 
-ACTION lizard::pausetabledea(uint64_t tableId)
+ACTION game12lizard::pausetabledea(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -895,7 +895,7 @@ ACTION lizard::pausetabledea(uint64_t tableId)
     });
 }
 
-ACTION lizard::pausetablesee(uint64_t tableId)
+ACTION game12lizard::pausetablesee(uint64_t tableId)
 {
     require_auth(serveraccount); // server permission.
     auto existing = tableround.find(tableId);
@@ -907,7 +907,7 @@ ACTION lizard::pausetablesee(uint64_t tableId)
     });
 }
 
-ACTION lizard::continuetable(uint64_t tableId)
+ACTION game12lizard::continuetable(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -919,7 +919,7 @@ ACTION lizard::continuetable(uint64_t tableId)
     });
 }
 
-ACTION lizard::closetable(uint64_t tableId)
+ACTION game12lizard::closetable(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -938,7 +938,7 @@ ACTION lizard::closetable(uint64_t tableId)
     });
 }
 
-ACTION lizard::depositable(uint64_t tableId, asset deposit)
+ACTION game12lizard::depositable(uint64_t tableId, asset deposit)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -956,14 +956,14 @@ ACTION lizard::depositable(uint64_t tableId, asset deposit)
     // automate recover the table round.
     // if (existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED)
     // {
-    //     INLINE_ACTION_SENDER(lizard, continuetable)
+    //     INLINE_ACTION_SENDER(game12lizard, continuetable)
     //     (
     //         _self, {{existing->dealer, "active"_n}},
     //         {existing->tableId});
     // }
 }
 
-ACTION lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
+ACTION game12lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -980,7 +980,7 @@ ACTION lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
     });
 }
 
-ACTION lizard::upgrading(bool isupgrading)
+ACTION game12lizard::upgrading(bool isupgrading)
 {
     require_auth(_self);
     auto existing = tableround.begin();
@@ -992,7 +992,7 @@ ACTION lizard::upgrading(bool isupgrading)
     }
 }
 
-ACTION lizard::import12data(uint64_t tableId, uint64_t tableStatus, name dealer, bool trusteeship, bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single, asset oneRoundDealerMaxPay, asset minTableDeposit, double commission_rate_agent, double commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol)
+ACTION game12lizard::import12data(uint64_t tableId, uint64_t tableStatus, name dealer, bool trusteeship, bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_bsoe, asset minPerBet_bsoe, asset oneRoundMaxTotalBet_anytri, asset minPerBet_anytri, asset oneRoundMaxTotalBet_trinum, asset minPerBet_trinum, asset oneRoundMaxTotalBet_pairnum, asset minPerBet_pairnum, asset oneRoundMaxTotalBet_txx, asset minPerBet_txx, asset oneRoundMaxTotalBet_twocom, asset minPerBet_twocom, asset oneRoundMaxTotalBet_single, asset minPerBet_single, asset oneRoundDealerMaxPay, asset minTableDeposit, double commission_rate_agent, double commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol)
 {
     require_auth(_self);
 
@@ -1025,4 +1025,4 @@ ACTION lizard::import12data(uint64_t tableId, uint64_t tableStatus, name dealer,
         s.upgradingFlag = true;
     });
 }
-EOSIO_DISPATCH(lizard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(edittable)(upgrading)(import12data))
+EOSIO_DISPATCH(game12lizard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(edittable)(upgrading)(import12data))
