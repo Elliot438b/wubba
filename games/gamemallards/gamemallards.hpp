@@ -11,12 +11,12 @@ using namespace eosio;
 using namespace std;
 using std::string;
 
-CONTRACT mallard : public contract
+CONTRACT gamemallards : public contract
 {
 public:
     using contract::contract;
 
-    mallard(name receiver, name code, datastream<const char *> ds)
+gamemallards(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value), tableshuffle(receiver, receiver.value), tablecurrency(receiver, receiver.value) {}
 
     ACTION initsymbol(name code, string sym, asset minperbet);
@@ -44,28 +44,28 @@ public:
                         bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie,
                         asset oneRoundMaxTotalBet_Pair, asset minPerBet_Pair, asset oneRoundDealerMaxPay, asset minTableDeposit, double commission_rate_agent, double commission_rate_player, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec);
 
-    using initsymbol_action = action_wrapper<"initsymbol"_n, &mallard::initsymbol>;
-    using newtable_action = action_wrapper<"newtable"_n, &mallard::newtable>;
-    using dealerseed_action = action_wrapper<"dealerseed"_n, &mallard::dealerseed>;
-    using serverseed_action = action_wrapper<"serverseed"_n, &mallard::serverseed>;
-    using playerbet_action = action_wrapper<"playerbet"_n, &mallard::playerbet>;
-    using endbet_action = action_wrapper<"endbet"_n, &mallard::endbet>;
-    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &mallard::verdealeseed>;
-    using verserveseed_action = action_wrapper<"verserveseed"_n, &mallard::verserveseed>;
-    using trusteeship_action = action_wrapper<"trusteeship"_n, &mallard::trusteeship>;
-    using exitruteship_action = action_wrapper<"exitruteship"_n, &mallard::exitruteship>;
-    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &mallard::disconnecthi>;
-    using clear12cache_action = action_wrapper<"clear12cache"_n, &mallard::clear12cache>;
-    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &mallard::pausetabledea>;
-    using pausetablesee_action = action_wrapper<"pausetablesee"_n, &mallard::pausetablesee>;
-    using continuetable_action = action_wrapper<"continuetable"_n, &mallard::continuetable>;
-    using closetable_action = action_wrapper<"closetable"_n, &mallard::closetable>;
-    using depositable_action = action_wrapper<"depositable"_n, &mallard::depositable>;
-    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &mallard::dealerwitdaw>;
-    using shuffle_action = action_wrapper<"shuffle"_n, &mallard::shuffle>;
-    using edittable_action = action_wrapper<"edittable"_n, &mallard::edittable>;
-    using upgrading_action = action_wrapper<"upgrading"_n, &mallard::upgrading>;
-    using import12data_action = action_wrapper<"import12data"_n, &mallard::import12data>;
+    using initsymbol_action = action_wrapper<"initsymbol"_n, &gamemallards::initsymbol>;
+    using newtable_action = action_wrapper<"newtable"_n, &gamemallards::newtable>;
+    using dealerseed_action = action_wrapper<"dealerseed"_n, &gamemallards::dealerseed>;
+    using serverseed_action = action_wrapper<"serverseed"_n, &gamemallards::serverseed>;
+    using playerbet_action = action_wrapper<"playerbet"_n, &gamemallards::playerbet>;
+    using endbet_action = action_wrapper<"endbet"_n, &gamemallards::endbet>;
+    using verdealeseed_action = action_wrapper<"verdealeseed"_n, &gamemallards::verdealeseed>;
+    using verserveseed_action = action_wrapper<"verserveseed"_n, &gamemallards::verserveseed>;
+    using trusteeship_action = action_wrapper<"trusteeship"_n, &gamemallards::trusteeship>;
+    using exitruteship_action = action_wrapper<"exitruteship"_n, &gamemallards::exitruteship>;
+    using disconnecthi_action = action_wrapper<"disconnecthi"_n, &gamemallards::disconnecthi>;
+    using clear12cache_action = action_wrapper<"clear12cache"_n, &gamemallards::clear12cache>;
+    using pausetabledea_action = action_wrapper<"pausetabledea"_n, &gamemallards::pausetabledea>;
+    using pausetablesee_action = action_wrapper<"pausetablesee"_n, &gamemallards::pausetablesee>;
+    using continuetable_action = action_wrapper<"continuetable"_n, &gamemallards::continuetable>;
+    using closetable_action = action_wrapper<"closetable"_n, &gamemallards::closetable>;
+    using depositable_action = action_wrapper<"depositable"_n, &gamemallards::depositable>;
+    using dealerwitdaw_action = action_wrapper<"dealerwitdaw"_n, &gamemallards::dealerwitdaw>;
+    using shuffle_action = action_wrapper<"shuffle"_n, &gamemallards::shuffle>;
+    using edittable_action = action_wrapper<"edittable"_n, &gamemallards::edittable>;
+    using upgrading_action = action_wrapper<"upgrading"_n, &gamemallards::upgrading>;
+    using import12data_action = action_wrapper<"import12data"_n, &gamemallards::import12data>;
 
 private:
     struct card_info
@@ -187,9 +187,9 @@ private:
         EOSLIB_SERIALIZE(currency_info, (code)(sym)(minPerBet_default))
     };
 
-    typedef eosio::multi_index<"tablesinfo"_n, mallard::table_stats, indexed_by<"dealer"_n, const_mem_fun<mallard::table_stats, uint64_t, &mallard::table_stats::get_dealer>>> singletable_t;
-    typedef eosio::multi_index<"shuffleinfo"_n, mallard::shuffle_info> shuffleinfo_t;
-    typedef eosio::multi_index<"currencyinfo"_n, mallard::currency_info> currencyinfo_t;
+    typedef eosio::multi_index<"tablesinfo"_n, gamemallards::table_stats, indexed_by<"dealer"_n, const_mem_fun<gamemallards::table_stats, uint64_t, &gamemallards::table_stats::get_dealer>>> singletable_t;
+    typedef eosio::multi_index<"shuffleinfo"_n, gamemallards::shuffle_info> shuffleinfo_t;
+    typedef eosio::multi_index<"currencyinfo"_n, gamemallards::currency_info> currencyinfo_t;
 
     // std random
     struct WBRNG
@@ -318,22 +318,18 @@ private:
             card.deck = deck;
             card.cardNum = cardnumber;
             card.cardColor = suitcolor;
-            uint64_t point = card.cardNum;
-            if(point > 10){
-                point = 10;
-            }
             eosio::print(" [card : ", deck, " 【", cardnumber, "】 ", suitcolor, "] ");
             // ------------------------------ 博牌 start ------------------------------
             if (i == 1 || i == 3) // 第一次和第三次取牌
             {
                 playerHands.emplace_back(card);                 // 插入到闲家手牌集合中
-                sum_p = (sum_p + point) % 10;            // 计算闲家手牌总点数，超过以及等于10，只算个位数
+                sum_p = (sum_p + card.cardNum) % 10;            // 计算闲家手牌总点数，超过以及等于10，只算个位数
                 validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
             }
             else if (i == 2 || i == 4) // 第二次和第四次取牌
             {
                 bankerHands.emplace_back(card);                 // 插入到庄家手牌集合中
-                sum_b = (sum_b + point) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
+                sum_b = (sum_b + card.cardNum) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
                 validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
             }
             else if (i == 5) // 第五次取牌
@@ -350,7 +346,7 @@ private:
                 else if (sum_p < 6) // 当闲家手牌（两张）总点数小于6{0,1,2,3,4,5}时，闲拿第五张牌
                 {
                     playerHands.emplace_back(card);                 // 第五张牌插入到闲家手牌集合中
-                    sum_p = (sum_p + point) % 10;            // 计算闲家手牌总点数，超过以及等于10，只算个位数
+                    sum_p = (sum_p + card.cardNum) % 10;            // 计算闲家手牌总点数，超过以及等于10，只算个位数
                     validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
                 }
                 else if (sum_b < 6) // 如果闲家未拿到第五张牌，这里讨论庄是否能拿第五张牌：
@@ -362,7 +358,7 @@ private:
                      * ④庄两张总点数5，庄拿第五张牌（庄不博牌的情况是基于闲拿第五张，闲未能拿第五张，庄一定可以拿）
                      **/
                     bankerHands.emplace_back(card);                 // 第五张牌插入到庄家手牌集合中
-                    sum_b = (sum_b + point) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
+                    sum_b = (sum_b + card.cardNum) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
                     validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
                     break;                                          // 庄拿到第五张牌，共使用五张牌，跳出循环，没有第六次取牌
                 }
@@ -383,7 +379,7 @@ private:
                 if (sum_b < 3 || (sum_b == 3 && sum_p != 8) || (sum_b == 4 && sum_p != 0 && sum_p != 1 && sum_p != 8 && sum_p != 9) || (sum_b == 5 && sum_p != 0 && sum_p != 1 && sum_p != 2 && sum_p != 3 && sum_p != 8 && sum_p != 9) || (sum_b == 6 && (sum_p == 6 || sum_p == 7)))
                 {
                     bankerHands.emplace_back(card);                 // 第六张牌插入到庄家手牌集合中
-                    sum_b = (sum_b + point) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
+                    sum_b = (sum_b + card.cardNum) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
                     validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
                     break;                                          // 跳出循环，六张牌全部取出，取牌结束
                 }

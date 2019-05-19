@@ -44,9 +44,9 @@ cleos --wallet-url http://127.0.0.1:6666 get currency balance useraaaaaaal usera
 
 # ----------------------------------------------------------- test shuffle for bac
 echo "temptest"
-#eosio-cpp -abigen mallard.cpp -o mallard.wasm
-eosio-cpp -o mallard.wasm mallard.cpp --abigen -I.
-cleos --wallet-url http://127.0.0.1:6666 set contract gamemallards ./ mallard.wasm mallard.abi
+#eosio-cpp -abigen gamemallards.cpp -o gamemallards.wasm
+eosio-cpp -o gamemallards.wasm gamemallards.cpp --abigen -I.
+cleos --wallet-url http://127.0.0.1:6666 set contract gamemallards ./ gamemallards.wasm gamemallards.abi
 # init currencyinfo
 cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaaj","TES","0.1000 TES"]' -p gamemallards
 cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaal","GDP","0.1000 GDP"]' -p gamemallards
@@ -57,7 +57,7 @@ cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["
 cleos --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaal","GDP","0.1000 GDA"]' -p gamemallards
 
 cleos get table gamemallards gamemallards currencyinfo
-cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '[1,useraaaaaaab,"4000.0000 TES", 1,"useraaaaaaaj","TES", "0.005", "0.002", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaab useraaaaaaah
+cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '[10,useraaaaaaab,"4000.0000 TES", 1,"useraaaaaaaj","TES", "0.005", "0.002", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaab useraaaaaaah
 tableid=`cleos get table gamemallards gamemallards tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 cleos --wallet-url http://127.0.0.1:6666 push action gamemallards shuffle '['$tableid']' -p useraaaaaaah
 sleep 5s
@@ -210,8 +210,8 @@ sleep 3s
 #   ----------------------------------------------------------- trusteeship)
 # start
 echo "trusteeship test"
-eosio-cpp -abigen mallard.cpp -o mallard.wasm
-cleos --wallet-url http://127.0.0.1:6666 set contract gamemallards ./ mallard.wasm mallard.abi
+eosio-cpp -abigen gamemallards.cpp -o gamemallards.wasm
+cleos --wallet-url http://127.0.0.1:6666 set contract gamemallards ./ gamemallards.wasm gamemallards.abi
 #cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '[useraaaaaaab,"23000.0000 SYS", 1, "0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS","0.0000 SYS"]' -p useraaaaaaab
 #tableid=`cleos get table gamemallards gamemallards tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 cleos --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '[20,useraaaaaaab,"4000.0000 TES", 1,"useraaaaaaaj","TES", "0.005", "0.002", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaab useraaaaaaah
