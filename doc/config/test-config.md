@@ -1,0 +1,9 @@
+gamemallards: 
+Private key: 5J4ZiJ2rYeziyzi2PQfPLXgHHra5rBaxxYYgBEWTRY6JPrnviZu
+Public key: EOS5uenwn1i3UXTrxnpnsjAGz7NWjMeW3e9XQ2sKqyvFgfCWUEfam
+
+jungle-chainid:e70aaab8997e1dfce58fbfac80cbbb8fecec7b99cf982a9444273cbc64c41473
+
+game12lizard:
+Private key: 5KYDF8GUdxD5MBexhMrvMWEJkRheSgJRrR6iZ7MDjTUhK68XouK
+Public key: EOS5cnHuRqC6rjLZsSwVEoz2fCDmeXVpyiCAdfisWPeC5L2m4aG1b
