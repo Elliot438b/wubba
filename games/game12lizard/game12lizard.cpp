@@ -418,7 +418,6 @@ ACTION game12lizard::playerbet(uint64_t tableId, name player, string bet, name a
     temp.agent = agent;
     temp.nickname = nickname;
 
-
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
         s.currRoundBetSum_bsoe = player_amount_sum_bsoe;
@@ -485,9 +484,9 @@ ACTION game12lizard::verserveseed(uint64_t tableId, string seed)
             std::vector<bet_info> betAmountVec;
             bool ret = checkBetOptions(playerBet.bet, existing->amountSymbol.get_symbol(), depositAmount, betAmountVec);
             INLINE_ACTION_SENDER(eosio::token, transfer)
-                    (
-                            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                            {_self, playerBet.player, depositAmount, std::string("seed invaild:playerbet refund")});
+            (
+                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                {_self, playerBet.player, depositAmount, std::string("seed invaild:playerbet refund")});
         }
         tableround.modify(existing, _self, [&](auto &s) {
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
@@ -657,9 +656,9 @@ ACTION game12lizard::verserveseed(uint64_t tableId, string seed)
         if (platformtotransfer > init_asset_empty)
         {
             INLINE_ACTION_SENDER(eosio::token, transfer)
-                    (
-                            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                            {_self, platformaccount, platformtotransfer, std::string("platformcommission")});
+            (
+                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                {_self, platformaccount, platformtotransfer, std::string("platformcommission")});
         }
         // agent
         asset agentotransfer = init_asset_empty;
@@ -670,9 +669,9 @@ ACTION game12lizard::verserveseed(uint64_t tableId, string seed)
             if (agentotransfer > init_asset_empty)
             {
                 INLINE_ACTION_SENDER(eosio::token, transfer)
-                        (
-                                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                                {_self, playerBet.agent, agentotransfer, std::string("agentcommission")});
+                (
+                    existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                    {_self, playerBet.agent, agentotransfer, std::string("agentcommission")});
             }
         }
         // player
@@ -681,9 +680,9 @@ ACTION game12lizard::verserveseed(uint64_t tableId, string seed)
         if (playertotransfer > init_asset_empty)
         {
             INLINE_ACTION_SENDER(eosio::token, transfer)
-                    (
-                            existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                            {_self, playerBet.player, playertotransfer, std::string("playercommission")});
+            (
+                existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                {_self, playerBet.player, playertotransfer, std::string("playercommission")});
         }
 
         playerBet.playercommission = playertotransfer;
