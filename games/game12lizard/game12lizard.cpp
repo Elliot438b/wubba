@@ -56,7 +56,7 @@ ACTION game12lizard::newtable(uint64_t newtableId, name dealer, asset deposit, b
     }
 
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
-    eosio_assert(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe > minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri > minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum > minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum > minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx > minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom > minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
+    eosio_assert(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe >= minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri >= minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum >= minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum >= minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx >= minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom >= minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single >= minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
     auto temp_rate_player = Atof(commission_rate_player.c_str());
@@ -139,7 +139,7 @@ ACTION game12lizard::edittable(uint64_t tableId, bool isPrivate, name code, stri
     }
 
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
-    eosio_assert(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe > minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri > minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum > minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum > minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx > minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom > minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
+    eosio_assert(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe >= minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri >= minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum >= minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum >= minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx >= minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom >= minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single >= minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
     auto temp_rate_player = Atof(commission_rate_player.c_str());
@@ -342,7 +342,7 @@ ACTION game12lizard::playerbet(uint64_t tableId, name player, string bet, name a
                 eosio_assert(p.amount >= existing->minPerBet_bsoe, "bsoe bet is too small!");
                 eosio::print("name=", p.name, " [amount=]", p.amount, " player_amount_sum_bsoe=", player_amount_sum_bsoe, " ...");
                 player_amount_sum_bsoe += p.amount;
-                eosio_assert(player_amount_sum_bsoe < existing->oneRoundMaxTotalBet_bsoe, "Over the peak of total bet_bsoe amount of this round!");
+                eosio_assert(player_amount_sum_bsoe <= existing->oneRoundMaxTotalBet_bsoe, "Over the peak of total bet_bsoe amount of this round!");
             }
         }
         else if (0 == p.name.compare("anytri"))
@@ -351,7 +351,7 @@ ACTION game12lizard::playerbet(uint64_t tableId, name player, string bet, name a
             {
                 eosio_assert(p.amount >= existing->minPerBet_anytri, "anytri bet is too small!");
                 player_amount_sum_anytri += p.amount;
-                eosio_assert(player_amount_sum_anytri < existing->oneRoundMaxTotalBet_anytri, "Over the peak of total bet_anytri amount of this round!");
+                eosio_assert(player_amount_sum_anytri <= existing->oneRoundMaxTotalBet_anytri, "Over the peak of total bet_anytri amount of this round!");
             }
         }
         else if (0 == p.name.compare("tri1") || 0 == p.name.compare("tri2") || 0 == p.name.compare("tri3") || 0 == p.name.compare("tri4") || 0 == p.name.compare("tri5") || 0 == p.name.compare("tri6"))
@@ -360,7 +360,7 @@ ACTION game12lizard::playerbet(uint64_t tableId, name player, string bet, name a
             {
                 eosio_assert(p.amount >= existing->minPerBet_trinum, "trinum bet is too small!");
                 player_amount_sum_trinum += p.amount;
-                eosio_assert(player_amount_sum_trinum < existing->oneRoundMaxTotalBet_trinum, "Over the peak of total bet_trinum amount of this round!");
+                eosio_assert(player_amount_sum_trinum <= existing->oneRoundMaxTotalBet_trinum, "Over the peak of total bet_trinum amount of this round!");
             }
         }
         else if (string::npos != p.name.find("pair"))
@@ -369,7 +369,7 @@ ACTION game12lizard::playerbet(uint64_t tableId, name player, string bet, name a
             {
                 eosio_assert(p.amount >= existing->minPerBet_pairnum, "pairnum bet is too small!");
                 player_amount_sum_pairnum += p.amount;
-                eosio_assert(player_amount_sum_pairnum < existing->oneRoundMaxTotalBet_pairnum, "Over the peak of total bet_pairnum amount of this round!");
+                eosio_assert(player_amount_sum_pairnum <= existing->oneRoundMaxTotalBet_pairnum, "Over the peak of total bet_pairnum amount of this round!");
             }
         }
         else if (string::npos != p.name.find("total"))
@@ -378,7 +378,7 @@ ACTION game12lizard::playerbet(uint64_t tableId, name player, string bet, name a
             {
                 eosio_assert(p.amount >= existing->minPerBet_txx, "total bet is too small!");
                 player_amount_sum_txx += p.amount;
-                eosio_assert(player_amount_sum_txx < existing->oneRoundMaxTotalBet_txx, "Over the peak of total bet_txx amount of this round!");
+                eosio_assert(player_amount_sum_txx <= existing->oneRoundMaxTotalBet_txx, "Over the peak of total bet_txx amount of this round!");
             }
         }
         else if (string::npos != p.name.find("c"))
@@ -387,7 +387,7 @@ ACTION game12lizard::playerbet(uint64_t tableId, name player, string bet, name a
             {
                 eosio_assert(p.amount >= existing->minPerBet_twocom, "twocom bet is too small!");
                 player_amount_sum_twocom += p.amount;
-                eosio_assert(player_amount_sum_twocom < existing->oneRoundMaxTotalBet_twocom, "Over the peak of total bet_twocom amount of this round!");
+                eosio_assert(player_amount_sum_twocom <= existing->oneRoundMaxTotalBet_twocom, "Over the peak of total bet_twocom amount of this round!");
             }
         }
         else if (0 == p.name.compare("s1") || 0 == p.name.compare("s2") || 0 == p.name.compare("s3") || 0 == p.name.compare("s4") || 0 == p.name.compare("s5") || 0 == p.name.compare("s6"))
@@ -396,7 +396,7 @@ ACTION game12lizard::playerbet(uint64_t tableId, name player, string bet, name a
             {
                 eosio_assert(p.amount >= existing->minPerBet_single, "single bet is too small!");
                 player_amount_sum_single += p.amount;
-                eosio_assert(player_amount_sum_single < existing->oneRoundMaxTotalBet_single, "Over the peak of total bet_single amount of this round!");
+                eosio_assert(player_amount_sum_single <= existing->oneRoundMaxTotalBet_single, "Over the peak of total bet_single amount of this round!");
             }
         }
     }
@@ -969,7 +969,7 @@ ACTION game12lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
-    eosio_assert((existing->dealerBalance - withdraw) > existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
+    eosio_assert((existing->dealerBalance - withdraw) >= existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (

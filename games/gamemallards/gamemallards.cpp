@@ -19,8 +19,8 @@ ACTION gamemallards::initsymbol(name code, string sym, asset minperbet)
 }
 
 ACTION gamemallards::newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
-                         asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
-                         asset oneRoundMaxTotalBet_pair, asset minPerBet_pair)
+                              asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
+                              asset oneRoundMaxTotalBet_pair, asset minPerBet_pair)
 {
     require_auth(dealer);
     require_auth(serveraccount);
@@ -57,7 +57,7 @@ ACTION gamemallards::newtable(uint64_t newtableId, name dealer, asset deposit, b
     }
 
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
-    eosio_assert(oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp > minPerBet_default_temp && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie > minPerBet_default_temp && oneRoundMaxTotalBet_pair > init_asset_empty && minPerBet_pair > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
+    eosio_assert(oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp >= minPerBet_default_temp && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie >= minPerBet_default_temp && oneRoundMaxTotalBet_pair > init_asset_empty && minPerBet_pair >= minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
     //auto temp_rate_platform = Round(comission_rate_platform_default, 4);
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
@@ -123,7 +123,7 @@ ACTION gamemallards::edittable(uint64_t tableId, bool isPrivate, name code, stri
 
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
 
-    eosio_assert(oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp > minPerBet_default_temp && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie > minPerBet_default_temp && oneRoundMaxTotalBet_pair > init_asset_empty && minPerBet_pair > minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
+    eosio_assert(oneRoundMaxTotalBet_bp > init_asset_empty && minPerBet_bp >= minPerBet_default_temp && oneRoundMaxTotalBet_tie > init_asset_empty && minPerBet_tie >= minPerBet_default_temp && oneRoundMaxTotalBet_pair > init_asset_empty && minPerBet_pair >= minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
     //auto temp_rate_platform = Round(comission_rate_platform_default, 4);
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
@@ -302,14 +302,14 @@ ACTION gamemallards::playerbet(uint64_t tableId, name player, asset betDealer, a
     eosio_assert(!flag, "Player can't bet more than once in one round!");
     player_amount_sum_bp += betDealer;
     player_amount_sum_bp += betPlayer;
-    eosio_assert(player_amount_sum_bp < existing->oneRoundMaxTotalBet_BP, "Over the peak of total bet_bp amount of this round!");
+    eosio_assert(player_amount_sum_bp <= existing->oneRoundMaxTotalBet_BP, "Over the peak of total bet_bp amount of this round!");
 
     player_amount_sum_tie += betTie;
-    eosio_assert(player_amount_sum_tie < existing->oneRoundMaxTotalBet_Tie, "Over the peak of total bet_tie amount of this round!");
+    eosio_assert(player_amount_sum_tie <= existing->oneRoundMaxTotalBet_Tie, "Over the peak of total bet_tie amount of this round!");
 
     player_amount_sum_pair += betDealerPair;
     player_amount_sum_pair += betPlayerPair;
-    eosio_assert(player_amount_sum_pair < existing->oneRoundMaxTotalBet_Pair, "Over the peak of total bet_pair amount of this round!");
+    eosio_assert(player_amount_sum_pair <= existing->oneRoundMaxTotalBet_Pair, "Over the peak of total bet_pair amount of this round!");
 
     asset depositAmount = (betDealer + betPlayer + betTie + betDealerPair + betPlayerPair);
     if (depositAmount > init_asset_empty)
@@ -348,7 +348,7 @@ ACTION gamemallards::endbet(uint64_t tableId)
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     uint64_t useTime = now() - existing->betStartTime;
     eosio::print("spend time : ", useTime, "s, need ", betPeriod, "s!");
-    eosio_assert(useTime > betPeriod, "Bet time is not end now, wait... ");
+    eosio_assert(useTime >= betPeriod, "Bet time is not end now, wait... ");
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_REVEAL;
     });
@@ -362,7 +362,7 @@ ACTION gamemallards::verdealeseed(uint64_t tableId, string seed)
     require_auth(existing->dealer);
     eosio_assert(!existing->trusteeship, "Dealer is hosted.");
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
-    eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time to verify dealer seed yet.");
+    eosio_assert((now() - existing->betStartTime) >= betPeriod, "It's not time to verify dealer seed yet.");
     assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerSeedHash));
     tableround.modify(existing, _self, [&](auto &s) {
         s.dSeedVerity = true;
@@ -376,7 +376,7 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed, bool free)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "table status != reveal");
-    eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time to verify server seed yet.");
+    eosio_assert((now() - existing->betStartTime) >= betPeriod, "It's not time to verify server seed yet.");
     // plaintext seed invaild（lost）
     if (0 == seed.compare(invaild_seed_flag))
     {
@@ -710,7 +710,7 @@ ACTION gamemallards::dealerwitdaw(uint64_t tableId, asset withdraw)
     auto existing = tableround.find(tableId);
     eosio_assert(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
-    eosio_assert((existing->dealerBalance - withdraw) > existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
+    eosio_assert((existing->dealerBalance - withdraw) >= existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
@@ -750,11 +750,11 @@ ACTION gamemallards::upgrading(bool isupgrading)
 }
 
 ACTION gamemallards::import12data(uint64_t tableId, uint64_t tableStatus, uint64_t cardBoot, name dealer, bool trusteeship,
-                             bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP,
-                             asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Pair,
-                             asset minPerBet_Pair, asset oneRoundDealerMaxPay, asset minTableDeposit,
-                             double commission_rate_agent, double commission_rate_player, bool upgradingFlag,
-                             extended_symbol amountSymbol, std::vector<uint16_t> validCardVec)
+                                  bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP,
+                                  asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Pair,
+                                  asset minPerBet_Pair, asset oneRoundDealerMaxPay, asset minTableDeposit,
+                                  double commission_rate_agent, double commission_rate_player, bool upgradingFlag,
+                                  extended_symbol amountSymbol, std::vector<uint16_t> validCardVec)
 {
     require_auth(_self);
 
