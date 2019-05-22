@@ -13,8 +13,8 @@ cleos --wallet-url http://127.0.0.1:6666 set account permission game12lizard act
 # ----------------------------------------------------------- temptest)
 #test shuffle for sic
 echo "temptest"
-eosio-cpp -abigen lizard.cpp -o lizard.wasm
-cleos --wallet-url http://127.0.0.1:6666 set contract game12lizard ./ lizard.wasm lizard.abi
+eosio-cpp -abigen game12lizard.cpp -o game12lizard.wasm
+cleos --wallet-url http://127.0.0.1:6666 set contract game12lizard ./ game12lizard.wasm game12lizard.abi
 # init currencyinfo
 cleos --wallet-url http://127.0.0.1:6666 push action game12lizard initsymbol '["useraaaaaaaj","TES","0.1000 TES"]' -p game12lizard
 cleos --wallet-url http://127.0.0.1:6666 push action game12lizard initsymbol '["eosio.token","SYS","0.1000 SYS"]' -p game12lizard
@@ -172,8 +172,8 @@ sleep 3s
 
 # ----------------------------------------------------------- trusteeship)
 echo "trusteeship test"
-eosio-cpp -abigen lizard.cpp -o lizard.wasm
-cleos --wallet-url http://127.0.0.1:6666 set contract game12lizard ./ lizard.wasm lizard.abi
+eosio-cpp -abigen game12lizard.cpp -o game12lizard.wasm
+cleos --wallet-url http://127.0.0.1:6666 set contract game12lizard ./ game12lizard.wasm game12lizard.abi
 #tableid=`cleos get table game12lizard game12lizard tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 #tableid=tableid+1
 cleos --wallet-url http://127.0.0.1:6666 push action game12lizard newtable '[30,useraaaaaaba,"4000.0000 SYS", 1, "eosio.token", "SYS", "0.005", "0.002", "5.0000 SYS","1.0000 SYS", "5.0000 SYS","1.0000 SYS","10.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS","5.0000 SYS","1.0000 SYS"]' -p useraaaaaaba useraaaaaaah
