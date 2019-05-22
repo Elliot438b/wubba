@@ -1,14 +1,13 @@
 #pragma once
 
-#include <eosiolib/transaction.hpp>
-#include <eosiolib/permission.hpp>
-#include <eosiolib/crypto.hpp>
+#include <eosio/transaction.hpp>
+#include <eosio/permission.hpp>
+#include <eosio/crypto.hpp>
 #include "../../library/eosio.token/eosio.token.hpp"
 #include <cmath>
 
 using namespace eosio;
 using namespace std;
-using std::string;
 
 CONTRACT game12lizard : public contract
 {
@@ -304,9 +303,9 @@ private:
     {
         string s = trim(from);
         auto space_pos = s.find(' ');
-        eosio_assert(space_pos != string::npos, "Asset's amount and symbol should be separated with space");
+        eosio::check(space_pos != string::npos, "Asset's amount and symbol should be separated with space");
         string symbol_str = trim(s.substr(space_pos + 1));
-        eosio_assert(symbol_str == sym.code().to_string(), "Asset's symbol is not match!");
+        eosio::check(symbol_str == sym.code().to_string(), "Asset's symbol is not match!");
         auto amount_str = s.substr(0, space_pos);
         auto amount = Atof(amount_str.c_str());
         amount *= pow(10, int64_t(sym.precision()));

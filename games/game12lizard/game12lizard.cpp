@@ -3,14 +3,14 @@
 ACTION game12lizard::initsymbol(name code, string sym, asset minperbet)
 {
     require_auth(_self);
-    eosio_assert(0 == minperbet.symbol.code().to_string().compare(sym), "The minperbet's symbol not match!");
+    eosio::check(0 == minperbet.symbol.code().to_string().compare(sym), "The minperbet's symbol not match!");
     auto existing = tablecurrency.find(code.value);
-    eosio_assert(existing == tablecurrency.end(), "Symbol already exsits!");
+    eosio::check(existing == tablecurrency.end(), "Symbol already exsits!");
     symbol symB = symbol(symbol_code(sym), 4);
     asset init_asset_empty = asset(0, symB);
     eosio::print("------ insert symbol ------");
     asset selfSymBalance = eosio::token::get_balance(code, _self, symB.code());
-    eosio_assert(selfSymBalance > init_asset_empty, "_self must own the token itself!");
+    eosio::check(selfSymBalance > init_asset_empty, "_self must own the token itself!");
     tablecurrency.emplace(_self, [&](auto &s) {
         s.code = code;
         s.sym = symB;
@@ -23,7 +23,7 @@ ACTION game12lizard::newtable(uint64_t newtableId, name dealer, asset deposit, b
     require_auth(dealer);
     require_auth(serveraccount);
     auto existing = tableround.find(newtableId);
-    eosio_assert(existing == tableround.end(), "tableId exist...");
+    eosio::check(existing == tableround.end(), "tableId exist...");
 
     asset minPerBet_default_temp;
     asset oneRoundDealerMaxPay_temp;
@@ -42,7 +42,7 @@ ACTION game12lizard::newtable(uint64_t newtableId, name dealer, asset deposit, b
             continue;
         table_num += 1;
     }
-    eosio_assert(table_num <= maxinum_table_per_dealer, "Exceeding the maxinum_table_per_dealer limit!");
+    eosio::check(table_num <= maxinum_table_per_dealer, "Exceeding the maxinum_table_per_dealer limit!");
 
     auto existing_cur = tablecurrency.find(code.value);
     if (existing_cur != tablecurrency.end())
@@ -56,12 +56,12 @@ ACTION game12lizard::newtable(uint64_t newtableId, name dealer, asset deposit, b
     }
 
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
-    eosio_assert(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe >= minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri >= minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum >= minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum >= minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx >= minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom >= minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single >= minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
+    eosio::check(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe >= minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri >= minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum >= minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum >= minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx >= minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom >= minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single >= minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
     auto temp_rate_player = Atof(commission_rate_player.c_str());
     // verify the {player, agent} rate can't be set <0
-    eosio_assert(temp_rate_agent >= 0 && temp_rate_player >= 0, "Commission rate can't be set negtive!");
+    eosio::check(temp_rate_agent >= 0 && temp_rate_player >= 0, "Commission rate can't be set negtive!");
 
     auto diff_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_txx * 14 + oneRoundMaxTotalBet_twocom * 5 * 3 + oneRoundMaxTotalBet_single * 3;
     auto pair_nontri_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_pairnum * 8 + oneRoundMaxTotalBet_txx * 50 + oneRoundMaxTotalBet_twocom * 5 + oneRoundMaxTotalBet_single * 2;
@@ -74,7 +74,7 @@ ACTION game12lizard::newtable(uint64_t newtableId, name dealer, asset deposit, b
     oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_bsoe + oneRoundMaxTotalBet_anytri + oneRoundMaxTotalBet_trinum + oneRoundMaxTotalBet_pairnum + oneRoundMaxTotalBet_txx + oneRoundMaxTotalBet_twocom + oneRoundMaxTotalBet_single) * (comission_rate_platform_default + temp_rate_agent + temp_rate_player);
     deposit_tmp = oneRoundDealerMaxPay_temp * minTableRounds;
 
-    eosio_assert(deposit >= deposit_tmp, "Table deposit is not enough!");
+    eosio::check(deposit >= deposit_tmp, "Table deposit is not enough!");
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
@@ -123,8 +123,8 @@ ACTION game12lizard::edittable(uint64_t tableId, bool isPrivate, name code, stri
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The table can only be edited at the ROUND_END stage!");
+    eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The table can only be edited at the ROUND_END stage!");
 
     extended_symbol cur_ex_sym = defaultSym;
     asset minPerBet_default_temp;
@@ -139,12 +139,12 @@ ACTION game12lizard::edittable(uint64_t tableId, bool isPrivate, name code, stri
     }
 
     asset init_asset_empty = asset(0, cur_ex_sym.get_symbol());
-    eosio_assert(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe >= minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri >= minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum >= minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum >= minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx >= minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom >= minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single >= minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
+    eosio::check(oneRoundMaxTotalBet_bsoe > init_asset_empty && minPerBet_bsoe >= minPerBet_default_temp && oneRoundMaxTotalBet_anytri > init_asset_empty && minPerBet_anytri >= minPerBet_default_temp && oneRoundMaxTotalBet_trinum > init_asset_empty && minPerBet_trinum >= minPerBet_default_temp && oneRoundMaxTotalBet_pairnum > init_asset_empty && minPerBet_pairnum >= minPerBet_default_temp && oneRoundMaxTotalBet_txx > init_asset_empty && minPerBet_txx >= minPerBet_default_temp && oneRoundMaxTotalBet_twocom > init_asset_empty && minPerBet_twocom >= minPerBet_default_temp && oneRoundMaxTotalBet_single > init_asset_empty && minPerBet_single >= minPerBet_default_temp, "max bet amount is < 0 || min bet amount < minPerBet_default_temp!");
 
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
     auto temp_rate_player = Atof(commission_rate_player.c_str());
     // verify the {player, agent} rate can't be set <0
-    eosio_assert(temp_rate_agent >= 0 && temp_rate_player >= 0, "Commission rate can't be set negtive!");
+    eosio::check(temp_rate_agent >= 0 && temp_rate_player >= 0, "Commission rate can't be set negtive!");
 
     auto diff_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_txx * 14 + oneRoundMaxTotalBet_twocom * 5 * 3 + oneRoundMaxTotalBet_single * 3;
     auto pair_nontri_max = oneRoundMaxTotalBet_bsoe * 2 + oneRoundMaxTotalBet_pairnum * 8 + oneRoundMaxTotalBet_txx * 50 + oneRoundMaxTotalBet_twocom * 5 + oneRoundMaxTotalBet_single * 2;
@@ -186,10 +186,10 @@ ACTION game12lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
+    eosio::check(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
-    eosio_assert(!existing->trusteeship, "Dealer is hosted.");
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END,
+    eosio::check(!existing->trusteeship, "Dealer is hosted.");
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END,
                  "tableStatus != end");
 
     if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
@@ -198,10 +198,10 @@ ACTION game12lizard::dealerseed(uint64_t tableId, checksum256 encodeSeed)
         (
             _self, {{serveraccount, "active"_n}},
             {existing->tableId});
-        return;
+        eosio_exit(0);
     }
 
-    eosio_assert(!existing->upgradingFlag, "system upgrading...");
+    eosio::check(!existing->upgradingFlag, "system upgrading...");
 
     // start a new round. table_round init.
     checksum256 hash;
@@ -232,8 +232,8 @@ ACTION game12lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
+    eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
 
     if (existing->trusteeship)
     {
@@ -243,16 +243,16 @@ ACTION game12lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
             (
                 _self, {{serveraccount, "active"_n}},
                 {existing->tableId});
-            return;
+            eosio_exit(0);
         }
 
-        eosio_assert(!existing->upgradingFlag, "system upgrading...");
+        eosio::check(!existing->upgradingFlag, "system upgrading...");
         // start a new round. table_round init.
         checksum256 hash;
         std::vector<player_bet_info> emptyPlayers;
         asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
         tableround.modify(existing, _self, [&](auto &s) {
-            s.betStartTime = now();
+            s.betStartTime = eosio::current_time_point().sec_since_epoch();
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
             s.dealerSeedHash = hash;
             s.serverSeedHash = encodeSeed;
@@ -279,7 +279,7 @@ ACTION game12lizard::serverseed(uint64_t tableId, checksum256 encodeSeed)
         tableround.modify(existing, _self, [&](auto &s) {
             s.serverSeedHash = encodeSeed;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
-            s.betStartTime = now();
+            s.betStartTime = eosio::current_time_point().sec_since_epoch();
             s.playerInfo = emptyPlayers;
             s.currRoundBetSum_bsoe = init_asset_empty;
             s.currRoundBetSum_anytri = init_asset_empty;
@@ -303,9 +303,9 @@ ACTION game12lizard::playerbet(uint64_t tableId, name player, string bet, name a
     require_auth(player);
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
-    eosio_assert((now() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
+    eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
+    eosio::check((eosio::current_time_point().sec_since_epoch() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
 
     bool flag = false;
     for (const auto &p : existing->playerInfo)
@@ -317,12 +317,12 @@ ACTION game12lizard::playerbet(uint64_t tableId, name player, string bet, name a
         }
     }
 
-    eosio_assert(!flag, "Player can't bet more than once in one round!");
+    eosio::check(!flag, "Player can't bet more than once in one round!");
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     asset betAmount = init_asset_empty;
     std::vector<bet_info> betAmountVec;
     bool ret = checkBetOptions(bet, existing->amountSymbol.get_symbol(), betAmount, betAmountVec);
-    eosio_assert(ret, "Unknown bet option!");
+    eosio::check(ret, "Unknown bet option!");
 
     asset player_amount_sum_bsoe = existing->currRoundBetSum_bsoe;
     asset player_amount_sum_anytri = existing->currRoundBetSum_anytri;
@@ -339,64 +339,64 @@ ACTION game12lizard::playerbet(uint64_t tableId, name player, string bet, name a
             //eosio::print(" [amount=]",p.amount,"init_asset_empty=",init_asset_empty);
             if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amount >= existing->minPerBet_bsoe, "bsoe bet is too small!");
+                eosio::check(p.amount >= existing->minPerBet_bsoe, "bsoe bet is too small!");
                 eosio::print("name=", p.name, " [amount=]", p.amount, " player_amount_sum_bsoe=", player_amount_sum_bsoe, " ...");
                 player_amount_sum_bsoe += p.amount;
-                eosio_assert(player_amount_sum_bsoe <= existing->oneRoundMaxTotalBet_bsoe, "Over the peak of total bet_bsoe amount of this round!");
+                eosio::check(player_amount_sum_bsoe <= existing->oneRoundMaxTotalBet_bsoe, "Over the peak of total bet_bsoe amount of this round!");
             }
         }
         else if (0 == p.name.compare("anytri"))
         {
             if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amount >= existing->minPerBet_anytri, "anytri bet is too small!");
+                eosio::check(p.amount >= existing->minPerBet_anytri, "anytri bet is too small!");
                 player_amount_sum_anytri += p.amount;
-                eosio_assert(player_amount_sum_anytri <= existing->oneRoundMaxTotalBet_anytri, "Over the peak of total bet_anytri amount of this round!");
+                eosio::check(player_amount_sum_anytri <= existing->oneRoundMaxTotalBet_anytri, "Over the peak of total bet_anytri amount of this round!");
             }
         }
         else if (0 == p.name.compare("tri1") || 0 == p.name.compare("tri2") || 0 == p.name.compare("tri3") || 0 == p.name.compare("tri4") || 0 == p.name.compare("tri5") || 0 == p.name.compare("tri6"))
         {
             if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amount >= existing->minPerBet_trinum, "trinum bet is too small!");
+                eosio::check(p.amount >= existing->minPerBet_trinum, "trinum bet is too small!");
                 player_amount_sum_trinum += p.amount;
-                eosio_assert(player_amount_sum_trinum <= existing->oneRoundMaxTotalBet_trinum, "Over the peak of total bet_trinum amount of this round!");
+                eosio::check(player_amount_sum_trinum <= existing->oneRoundMaxTotalBet_trinum, "Over the peak of total bet_trinum amount of this round!");
             }
         }
         else if (string::npos != p.name.find("pair"))
         {
             if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amount >= existing->minPerBet_pairnum, "pairnum bet is too small!");
+                eosio::check(p.amount >= existing->minPerBet_pairnum, "pairnum bet is too small!");
                 player_amount_sum_pairnum += p.amount;
-                eosio_assert(player_amount_sum_pairnum <= existing->oneRoundMaxTotalBet_pairnum, "Over the peak of total bet_pairnum amount of this round!");
+                eosio::check(player_amount_sum_pairnum <= existing->oneRoundMaxTotalBet_pairnum, "Over the peak of total bet_pairnum amount of this round!");
             }
         }
         else if (string::npos != p.name.find("total"))
         {
             if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amount >= existing->minPerBet_txx, "total bet is too small!");
+                eosio::check(p.amount >= existing->minPerBet_txx, "total bet is too small!");
                 player_amount_sum_txx += p.amount;
-                eosio_assert(player_amount_sum_txx <= existing->oneRoundMaxTotalBet_txx, "Over the peak of total bet_txx amount of this round!");
+                eosio::check(player_amount_sum_txx <= existing->oneRoundMaxTotalBet_txx, "Over the peak of total bet_txx amount of this round!");
             }
         }
         else if (string::npos != p.name.find("c"))
         {
             if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amount >= existing->minPerBet_twocom, "twocom bet is too small!");
+                eosio::check(p.amount >= existing->minPerBet_twocom, "twocom bet is too small!");
                 player_amount_sum_twocom += p.amount;
-                eosio_assert(player_amount_sum_twocom <= existing->oneRoundMaxTotalBet_twocom, "Over the peak of total bet_twocom amount of this round!");
+                eosio::check(player_amount_sum_twocom <= existing->oneRoundMaxTotalBet_twocom, "Over the peak of total bet_twocom amount of this round!");
             }
         }
         else if (0 == p.name.compare("s1") || 0 == p.name.compare("s2") || 0 == p.name.compare("s3") || 0 == p.name.compare("s4") || 0 == p.name.compare("s5") || 0 == p.name.compare("s6"))
         {
             if (p.amount > init_asset_empty)
             {
-                eosio_assert(p.amount >= existing->minPerBet_single, "single bet is too small!");
+                eosio::check(p.amount >= existing->minPerBet_single, "single bet is too small!");
                 player_amount_sum_single += p.amount;
-                eosio_assert(player_amount_sum_single <= existing->oneRoundMaxTotalBet_single, "Over the peak of total bet_single amount of this round!");
+                eosio::check(player_amount_sum_single <= existing->oneRoundMaxTotalBet_single, "Over the peak of total bet_single amount of this round!");
             }
         }
     }
@@ -435,11 +435,11 @@ ACTION game12lizard::endbet(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
-    uint64_t useTime = now() - existing->betStartTime;
+    eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
+    uint64_t useTime = eosio::current_time_point().sec_since_epoch() - existing->betStartTime;
     eosio::print("spend time : ", useTime, "s, need ", betPeriod, "s!");
-    eosio_assert(useTime > betPeriod, "Bet time is not end now, wait... ");
+    eosio::check(useTime > betPeriod, "Bet time is not end eosio::current_time_point::sec_since_epoch, wait... ");
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_REVEAL;
@@ -450,12 +450,12 @@ ACTION game12lizard::verdealeseed(uint64_t tableId, string seed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
+    eosio::check(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
     if (!existing->trusteeship)
     {
-        eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
-        eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time to verify dealer seed yet.");
+        eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
+        eosio::check((eosio::current_time_point().sec_since_epoch() - existing->betStartTime) > betPeriod, "It's not time to verify dealer seed yet.");
         assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerSeedHash));
         tableround.modify(existing, _self, [&](auto &s) {
             s.dSeedVerity = true;
@@ -469,9 +469,9 @@ ACTION game12lizard::verserveseed(uint64_t tableId, string seed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
-    eosio_assert((now() - existing->betStartTime) > betPeriod, "It's not time to verify server seed yet.");
+    eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
+    eosio::check((eosio::current_time_point().sec_since_epoch() - existing->betStartTime) > betPeriod, "It's not time to verify server seed yet.");
 
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     if (0 == seed.compare(invaild_seed_flag))
@@ -491,7 +491,7 @@ ACTION game12lizard::verserveseed(uint64_t tableId, string seed)
         tableround.modify(existing, _self, [&](auto &s) {
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
         });
-        return;
+        eosio_exit(0);
     }
 
     assert_sha256(seed.c_str(), seed.size(), ((*existing).serverSeedHash));
@@ -819,8 +819,8 @@ ACTION game12lizard::trusteeship(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
+    eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
     tableround.modify(existing, _self, [&](auto &s) {
         s.trusteeship = true;
     });
@@ -830,8 +830,8 @@ ACTION game12lizard::exitruteship(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
+    eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "tableStatus != end");
     tableround.modify(existing, _self, [&](auto &s) {
         s.trusteeship = false;
     });
@@ -841,8 +841,8 @@ ACTION game12lizard::disconnecthi(name informed, uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->dealer == informed, "People informed is not the dealer of table!");
+    eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(existing->dealer == informed, "People informed is not the dealer of table!");
     require_recipient(informed); // inform dealer who is disconnect.
 }
 
@@ -887,8 +887,8 @@ ACTION game12lizard::pausetabledea(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't pause table");
+    eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't pause table");
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
     });
@@ -898,8 +898,8 @@ ACTION game12lizard::pausetablesee(uint64_t tableId)
 {
     require_auth(serveraccount); // server permission.
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't pause table");
+    eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't pause table");
     require_recipient(existing->dealer); // inform dealer whose table is paused.
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::PAUSED;
@@ -910,9 +910,9 @@ ACTION game12lizard::continuetable(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->dealerBalance >= existing->oneRoundDealerMaxPay * 2, "Can't recover table, dealer balance isn't enough!");
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED, "The tableid not paused, can`t continuetable");
+    eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(existing->dealerBalance >= existing->oneRoundDealerMaxPay * 2, "Can't recover table, dealer balance isn't enough!");
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED, "The tableid not paused, can`t continuetable");
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;
     });
@@ -922,8 +922,8 @@ ACTION game12lizard::closetable(uint64_t tableId)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
-    eosio_assert(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't close!");
+    eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't close!");
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
@@ -941,9 +941,9 @@ ACTION game12lizard::depositable(uint64_t tableId, asset deposit)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
+    eosio::check(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
-    eosio_assert(deposit + existing->dealerBalance >= existing->minTableDeposit, "Table deposit is not enough!");
+    eosio::check(deposit + existing->dealerBalance >= existing->minTableDeposit, "Table deposit is not enough!");
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
         existing->amountSymbol.get_contract(), {{existing->dealer, "active"_n}},
@@ -966,9 +966,9 @@ ACTION game12lizard::dealerwitdaw(uint64_t tableId, asset withdraw)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
-    eosio_assert(existing != tableround.end(), notableerr);
+    eosio::check(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
-    eosio_assert((existing->dealerBalance - withdraw) >= existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
+    eosio::check((existing->dealerBalance - withdraw) >= existing->minTableDeposit, "Table dealerBalance is not enough to support next round!");
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
