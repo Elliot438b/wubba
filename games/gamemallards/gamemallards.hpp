@@ -16,7 +16,7 @@ CONTRACT gamemallards : public contract
 public:
     using contract::contract;
 
-gamemallards(name receiver, name code, datastream<const char *> ds)
+    gamemallards(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds), tableround(receiver, receiver.value), tableshuffle(receiver, receiver.value), tablecurrency(receiver, receiver.value) {}
 
     ACTION initsymbol(name code, string sym, asset minperbet);
@@ -120,7 +120,7 @@ private:
         double commission_rate_player;
         bool upgradingFlag;
         string redundancy;
-	string redundancy1;
+        string redundancy1;
         // ------------------------------ round field ------------------------------
         uint64_t betStartTime; // for keeping bet stage/round.
         asset currRoundBetSum_BP;
@@ -319,7 +319,8 @@ private:
             card.cardNum = cardnumber;
             card.cardColor = suitcolor;
             uint64_t point = card.cardNum;
-            if(point > 10){
+            if (point > 10)
+            {
                 point = 10;
             }
             eosio::print(" [card : ", deck, " 【", cardnumber, "】 ", suitcolor, "] ");
@@ -327,13 +328,13 @@ private:
             if (i == 1 || i == 3) // 第一次和第三次取牌
             {
                 playerHands.emplace_back(card);                 // 插入到闲家手牌集合中
-                sum_p = (sum_p + point) % 10;            // 计算闲家手牌总点数，超过以及等于10，只算个位数
+                sum_p = (sum_p + point) % 10;                   // 计算闲家手牌总点数，超过以及等于10，只算个位数
                 validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
             }
             else if (i == 2 || i == 4) // 第二次和第四次取牌
             {
                 bankerHands.emplace_back(card);                 // 插入到庄家手牌集合中
-                sum_b = (sum_b + point) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
+                sum_b = (sum_b + point) % 10;                   // 计算庄家手牌总点数，超过以及等于10，只算个位数
                 validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
             }
             else if (i == 5) // 第五次取牌
@@ -350,7 +351,7 @@ private:
                 else if (sum_p < 6) // 当闲家手牌（两张）总点数小于6{0,1,2,3,4,5}时，闲拿第五张牌
                 {
                     playerHands.emplace_back(card);                 // 第五张牌插入到闲家手牌集合中
-                    sum_p = (sum_p + point) % 10;            // 计算闲家手牌总点数，超过以及等于10，只算个位数
+                    sum_p = (sum_p + point) % 10;                   // 计算闲家手牌总点数，超过以及等于10，只算个位数
                     validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
                 }
                 else if (sum_b < 6) // 如果闲家未拿到第五张牌，这里讨论庄是否能拿第五张牌：
@@ -362,7 +363,7 @@ private:
                      * ④庄两张总点数5，庄拿第五张牌（庄不博牌的情况是基于闲拿第五张，闲未能拿第五张，庄一定可以拿）
                      **/
                     bankerHands.emplace_back(card);                 // 第五张牌插入到庄家手牌集合中
-                    sum_b = (sum_b + point) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
+                    sum_b = (sum_b + point) % 10;                   // 计算庄家手牌总点数，超过以及等于10，只算个位数
                     validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
                     break;                                          // 庄拿到第五张牌，共使用五张牌，跳出循环，没有第六次取牌
                 }
@@ -383,7 +384,7 @@ private:
                 if (sum_b < 3 || (sum_b == 3 && sum_p != 8) || (sum_b == 4 && sum_p != 0 && sum_p != 1 && sum_p != 8 && sum_p != 9) || (sum_b == 5 && sum_p != 0 && sum_p != 1 && sum_p != 2 && sum_p != 3 && sum_p != 8 && sum_p != 9) || (sum_b == 6 && (sum_p == 6 || sum_p == 7)))
                 {
                     bankerHands.emplace_back(card);                 // 第六张牌插入到庄家手牌集合中
-                    sum_b = (sum_b + point) % 10;            // 计算庄家手牌总点数，超过以及等于10，只算个位数
+                    sum_b = (sum_b + point) % 10;                   // 计算庄家手牌总点数，超过以及等于10，只算个位数
                     validCardVec.erase(validCardVec.begin() + pos); // 从牌靴中删除这张牌
                     break;                                          // 跳出循环，六张牌全部取出，取牌结束
                 }
@@ -503,7 +504,7 @@ private:
 
     const uint16_t CardsMinLimit = 100;
     const uint32_t betPeriod = 32; //todo default 30 ,60 is test use
-    const uint16_t initDecks = 8; //todo default 8 ,2 is test use
+    const uint16_t initDecks = 8;  //todo default 8 ,2 is test use
     const uint32_t minTableRounds = 10;
     const uint16_t maxinum_table_per_dealer = 100;
     const uint64_t delall_key = 103718369455;

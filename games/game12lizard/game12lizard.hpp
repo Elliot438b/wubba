@@ -376,7 +376,7 @@ private:
     name serveraccount = "useraaaaaaah"_n;
     name platformaccount = "useraaaaaaae"_n;
 
-    const uint32_t betPeriod = 60;//todo default 30 ,60 is test use
+    const uint32_t betPeriod = 32; //todo default 30 ,60 is test use
     const uint32_t minTableRounds = 2;
     double comission_rate_platform_default = 0.005;
     const uint16_t maxinum_table_per_dealer = 100;
