@@ -13,7 +13,7 @@ cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 set accoun
 # ----------------------------------------------------------- temptest)
 #test shuffle for sic
 echo "temptest"
-eosio-cpp -abigen game12lizard.cpp -o game12lizard.wasm
+eosio-cpp -abigen game12lizard.cpp -o game12lizard.wasm -I .
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 set contract game12lizard ./ game12lizard.wasm game12lizard.abi
 # init currencyinfo
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action game12lizard initsymbol '["useraaaaaaaj","TES","0.1000 TES"]' -p game12lizard

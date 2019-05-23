@@ -45,7 +45,7 @@ cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 get curren
 # ----------------------------------------------------------- test shuffle for bac
 echo "temptest"
 #eosio-cpp -abigen gamemallards.cpp -o gamemallards.wasm
-eosio-cpp -o gamemallards.wasm gamemallards.cpp --abigen -I.
+eosio-cpp -o gamemallards.wasm gamemallards.cpp --abigen -I .
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 set contract gamemallards ./ gamemallards.wasm gamemallards.abi
 # init currencyinfo
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaaj","TES","0.1000 TES"]' -p gamemallards
