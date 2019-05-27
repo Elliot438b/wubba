@@ -782,107 +782,107 @@
         {
             "name": "clear12cache",
             "type": "clear12cache",
-            "ricardian_contract": "Stub for clear12cache action's ricardian contract"
+            "ricardian_contract": "Stub for clear12cache action's ricardian contract\n\nImplied parameters:\n\n* `_self`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "closetable",
             "type": "closetable",
-            "ricardian_contract": "Stub for closetable action's ricardian contract"
+            "ricardian_contract": "Stub for closetable action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "continuetable",
             "type": "continuetable",
-            "ricardian_contract": "Stub for continuetable action's ricardian contract"
+            "ricardian_contract": "Stub for continuetable action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "dealerseed",
             "type": "dealerseed",
-            "ricardian_contract": "Stub for dealerseed action's ricardian contract"
+            "ricardian_contract": "Stub for dealerseed action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n* `dealer`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "dealerwitdaw",
             "type": "dealerwitdaw",
-            "ricardian_contract": "Stub for dealerwitdaw action's ricardian contract"
+            "ricardian_contract": "Stub for dealerwitdaw action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n* `dealer`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "depositable",
             "type": "depositable",
-            "ricardian_contract": "Stub for depositable action's ricardian contract"
+            "ricardian_contract": "Stub for depositable action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n* `dealer`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "disconnecthi",
             "type": "disconnecthi",
-            "ricardian_contract": "Stub for disconnecthi action's ricardian contract"
+            "ricardian_contract": "Stub for disconnecthi action's ricardian contract\nInput parameters:\n\n* `informed`(informed=dealer)\n\nImplied parameters:\n\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "edittable",
             "type": "edittable",
-            "ricardian_contract": "Stub for edittable action's ricardian contract"
+            "ricardian_contract": "Stub for edittable action's ricardian contract\nInput parameters:\n\n* `code`(symbol owner)\n\nImplied parameters:\n\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "endbet",
             "type": "endbet",
-            "ricardian_contract": "Stub for endbet action's ricardian contract"
+            "ricardian_contract": "Stub for endbet action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "exitruteship",
             "type": "exitruteship",
-            "ricardian_contract": "Stub for exitruteship action's ricardian contract"
+            "ricardian_contract": "Stub for exitruteship action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "import12data",
             "type": "import12data",
-            "ricardian_contract": "Stub for import12data action's ricardian contract"
+            "ricardian_contract": "Stub for import12data action's ricardian contract\nInput parameters:\n\n* `dealer`(table owner)\n\nImplied parameters:\n\n* `_self`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "initsymbol",
             "type": "initsymbol",
-            "ricardian_contract": "Stub for initsymbol action's ricardian contract\nInput parameters:\n\n* `code`\n\nImplied parameters: \n\n* `name`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
+            "ricardian_contract": "Stub for initsymbol action's ricardian contract\nInput parameters:\n\n* `code`(symbol owner)\n\nImplied parameters: \n\n* `_self`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "newtable",
             "type": "newtable",
-            "ricardian_contract": "Stub for newtable action's ricardian contract"
+            "ricardian_contract": "Stub for newtable action's ricardian contract\nInput parameters:\n\n* `dealer`(table owner)\n* `code`(symbol owner)\n\nImplied parameters:\n\n* `dealer`\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "pausetabledea",
             "type": "pausetabledea",
-            "ricardian_contract": "Stub for pausetabledea action's ricardian contract"
+            "ricardian_contract": "Stub for pausetabledea action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "pausetablesee",
             "type": "pausetablesee",
-            "ricardian_contract": "Stub for pausetablesee action's ricardian contract"
+            "ricardian_contract": "Stub for pausetablesee action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "playerbet",
             "type": "playerbet",
-            "ricardian_contract": "Stub for playerbet action's ricardian contract"
+            "ricardian_contract": "Stub for playerbet action's ricardian contract\nInput parameters:\n\n* `player`(Game player)\n* `agent`(Game agent)\n\nImplied parameters:\n\n* `player`\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "serverseed",
             "type": "serverseed",
-            "ricardian_contract": "Stub for serverseed action's ricardian contract"
+            "ricardian_contract": "Stub for serverseed action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "trusteeship",
             "type": "trusteeship",
-            "ricardian_contract": "Stub for trusteeship action's ricardian contract"
+            "ricardian_contract": "Stub for trusteeship action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "upgrading",
             "type": "upgrading",
-            "ricardian_contract": "Stub for upgrading action's ricardian contract"
+            "ricardian_contract": "Stub for upgrading action's ricardian contract\n\nImplied parameters:\n\n* `_self`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "verdealeseed",
             "type": "verdealeseed",
-            "ricardian_contract": "Stub for verdealeseed action's ricardian contract"
+            "ricardian_contract": "Stub for verdealeseed action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n* `dealer`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         },
         {
             "name": "verserveseed",
             "type": "verserveseed",
-            "ricardian_contract": "Stub for verserveseed action's ricardian contract"
+            "ricardian_contract": "Stub for verserveseed action's ricardian contract\n\nImplied parameters:\n\n* `serveraccount`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
         }
     ],
     "tables": [
