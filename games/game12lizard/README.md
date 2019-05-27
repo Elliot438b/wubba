@@ -1,4 +1,4 @@
---- game12lizard Project ---
+## game12lizard Project
 
  - How to Build -
    - cd to 'build' directory

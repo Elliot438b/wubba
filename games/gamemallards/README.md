@@ -1,4 +1,4 @@
---- gamemallards Project ---
+## gamemallards Project
 
  - How to Build -
    - cd to 'build' directory
