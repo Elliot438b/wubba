@@ -1,27 +1,18 @@
-project(gamemallards)
 cmake_minimum_required(VERSION 3.11)
+include(ExternalProject)
+# if no cdt root is given use default path
+if(EOSIO_CDT_ROOT STREQUAL "" OR NOT EOSIO_CDT_ROOT)
+   find_package(eosio.cdt)
+endif()
 
-SET(CMAKE_SOURCE_DIR .)
-aux_source_directory(. DIR_SRCS)
-
-find_package(eosio.cdt)
-
-INCLUDE_DIRECTORIES(
- ${CMAKE_SOURCE_DIR}
- /usr/local/include
- ${CMAKE_SOURCE_DIR}/../../library
+ExternalProject_Add(
+   gamemallards_project
+   SOURCE_DIR ${CMAKE_SOURCE_DIR}/src
+   BINARY_DIR ${CMAKE_BINARY_DIR}/gamemallards
+   CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${EOSIO_CDT_ROOT}/lib/cmake/eosio.cdt/EosioWasmToolchain.cmake
+   UPDATE_COMMAND ""
+   PATCH_COMMAND ""
+   TEST_COMMAND ""
+   INSTALL_COMMAND ""
+   BUILD_ALWAYS 1
 )
-
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin/)
-
-macro(add_contract CONTRACT_NAME TARGET)
-      add_executable( ${TARGET}.wasm ${ARGN} )
-      target_compile_options( ${TARGET}.wasm PUBLIC -abigen )
-      get_target_property(BINOUTPUT ${TARGET}.wasm BINARY_DIR)
-      target_compile_options( ${TARGET}.wasm PUBLIC -abigen_output=${BINOUTPUT}/${TARGET}.abi )
-      target_compile_options( ${TARGET}.wasm PUBLIC -contract ${CONTRACT_NAME} )
-endmacro()
-
-add_contract( gamemallards gamemallards gamemallards.cpp )
-

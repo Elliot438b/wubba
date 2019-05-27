@@ -1,4 +1,4 @@
-#include "gamemallards.hpp"
+#include <gamemallards.hpp>
 
 ACTION gamemallards::initsymbol(name code, string sym, asset minperbet)
 {
@@ -781,4 +781,3 @@ ACTION gamemallards::import12data(uint64_t tableId, uint64_t tableStatus, uint64
         s.upgradingFlag = true;
     });
 }
-EOSIO_DISPATCH(gamemallards, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(shuffle)(edittable)(upgrading)(import12data))
