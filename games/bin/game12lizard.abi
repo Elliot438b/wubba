@@ -1,0 +1,906 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT ",
+    "version": "eosio::abi/1.1",
+    "types": [],
+    "structs": [
+        {
+            "name": "clear12cache",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "closetable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "continuetable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "currency_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "name"
+                },
+                {
+                    "name": "sym",
+                    "type": "symbol"
+                },
+                {
+                    "name": "minPerBet_default",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "dealerseed",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "encodeSeed",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "dealerwitdaw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "withdraw",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "depositable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "deposit",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "disconnecthi",
+            "base": "",
+            "fields": [
+                {
+                    "name": "informed",
+                    "type": "name"
+                },
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "edittable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "isPrivate",
+                    "type": "bool"
+                },
+                {
+                    "name": "code",
+                    "type": "name"
+                },
+                {
+                    "name": "sym",
+                    "type": "string"
+                },
+                {
+                    "name": "commission_rate_agent",
+                    "type": "string"
+                },
+                {
+                    "name": "commission_rate_player",
+                    "type": "string"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_single",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "endbet",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "exitruteship",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "extended_symbol",
+            "base": "",
+            "fields": [
+                {
+                    "name": "symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "import12data",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "tableStatus",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dealer",
+                    "type": "name"
+                },
+                {
+                    "name": "trusteeship",
+                    "type": "bool"
+                },
+                {
+                    "name": "isPrivate",
+                    "type": "bool"
+                },
+                {
+                    "name": "dealerBalance",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundDealerMaxPay",
+                    "type": "asset"
+                },
+                {
+                    "name": "minTableDeposit",
+                    "type": "asset"
+                },
+                {
+                    "name": "commission_rate_agent",
+                    "type": "float64"
+                },
+                {
+                    "name": "commission_rate_player",
+                    "type": "float64"
+                },
+                {
+                    "name": "upgradingFlag",
+                    "type": "bool"
+                },
+                {
+                    "name": "amountSymbol",
+                    "type": "extended_symbol"
+                }
+            ]
+        },
+        {
+            "name": "initsymbol",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "name"
+                },
+                {
+                    "name": "sym",
+                    "type": "string"
+                },
+                {
+                    "name": "minperbet",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "newtable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "newtableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dealer",
+                    "type": "name"
+                },
+                {
+                    "name": "deposit",
+                    "type": "asset"
+                },
+                {
+                    "name": "isPrivate",
+                    "type": "bool"
+                },
+                {
+                    "name": "code",
+                    "type": "name"
+                },
+                {
+                    "name": "sym",
+                    "type": "string"
+                },
+                {
+                    "name": "commission_rate_agent",
+                    "type": "string"
+                },
+                {
+                    "name": "commission_rate_player",
+                    "type": "string"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_single",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "pausetabledea",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "pausetablesee",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "player_bet_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "player",
+                    "type": "name"
+                },
+                {
+                    "name": "bet",
+                    "type": "string"
+                },
+                {
+                    "name": "pBonus",
+                    "type": "asset"
+                },
+                {
+                    "name": "dBonus",
+                    "type": "asset"
+                },
+                {
+                    "name": "agent",
+                    "type": "name"
+                },
+                {
+                    "name": "nickname",
+                    "type": "string"
+                },
+                {
+                    "name": "playercommission",
+                    "type": "asset"
+                },
+                {
+                    "name": "agentcommission",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "playerbet",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "player",
+                    "type": "name"
+                },
+                {
+                    "name": "bet",
+                    "type": "string"
+                },
+                {
+                    "name": "agent",
+                    "type": "name"
+                },
+                {
+                    "name": "nickname",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "serverseed",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "encodeSeed",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "table_stats",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "tableStatus",
+                    "type": "uint64"
+                },
+                {
+                    "name": "dealer",
+                    "type": "name"
+                },
+                {
+                    "name": "trusteeship",
+                    "type": "bool"
+                },
+                {
+                    "name": "isPrivate",
+                    "type": "bool"
+                },
+                {
+                    "name": "dealerBalance",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundMaxTotalBet_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "minPerBet_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "oneRoundDealerMaxPay",
+                    "type": "asset"
+                },
+                {
+                    "name": "minTableDeposit",
+                    "type": "asset"
+                },
+                {
+                    "name": "amountSymbol",
+                    "type": "extended_symbol"
+                },
+                {
+                    "name": "commission_rate_agent",
+                    "type": "float64"
+                },
+                {
+                    "name": "commission_rate_player",
+                    "type": "float64"
+                },
+                {
+                    "name": "upgradingFlag",
+                    "type": "bool"
+                },
+                {
+                    "name": "redundancy",
+                    "type": "string"
+                },
+                {
+                    "name": "betStartTime",
+                    "type": "uint64"
+                },
+                {
+                    "name": "currRoundBetSum_bsoe",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_anytri",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_trinum",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_pairnum",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_txx",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_twocom",
+                    "type": "asset"
+                },
+                {
+                    "name": "currRoundBetSum_single",
+                    "type": "asset"
+                },
+                {
+                    "name": "dealerSeedHash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "serverSeedHash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "dealerSeed",
+                    "type": "string"
+                },
+                {
+                    "name": "serverSeed",
+                    "type": "string"
+                },
+                {
+                    "name": "dSeedVerity",
+                    "type": "bool"
+                },
+                {
+                    "name": "sSeedVerity",
+                    "type": "bool"
+                },
+                {
+                    "name": "playerInfo",
+                    "type": "player_bet_info[]"
+                },
+                {
+                    "name": "roundResult",
+                    "type": "string"
+                },
+                {
+                    "name": "diceResult",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "trusteeship",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "upgrading",
+            "base": "",
+            "fields": [
+                {
+                    "name": "isupgrading",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "verdealeseed",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "seed",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "verserveseed",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tableId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "seed",
+                    "type": "string"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "clear12cache",
+            "type": "clear12cache",
+            "ricardian_contract": "Stub for clear12cache action's ricardian contract"
+        },
+        {
+            "name": "closetable",
+            "type": "closetable",
+            "ricardian_contract": "Stub for closetable action's ricardian contract"
+        },
+        {
+            "name": "continuetable",
+            "type": "continuetable",
+            "ricardian_contract": "Stub for continuetable action's ricardian contract"
+        },
+        {
+            "name": "dealerseed",
+            "type": "dealerseed",
+            "ricardian_contract": "Stub for dealerseed action's ricardian contract"
+        },
+        {
+            "name": "dealerwitdaw",
+            "type": "dealerwitdaw",
+            "ricardian_contract": "Stub for dealerwitdaw action's ricardian contract"
+        },
+        {
+            "name": "depositable",
+            "type": "depositable",
+            "ricardian_contract": "Stub for depositable action's ricardian contract"
+        },
+        {
+            "name": "disconnecthi",
+            "type": "disconnecthi",
+            "ricardian_contract": "Stub for disconnecthi action's ricardian contract"
+        },
+        {
+            "name": "edittable",
+            "type": "edittable",
+            "ricardian_contract": "Stub for edittable action's ricardian contract"
+        },
+        {
+            "name": "endbet",
+            "type": "endbet",
+            "ricardian_contract": "Stub for endbet action's ricardian contract"
+        },
+        {
+            "name": "exitruteship",
+            "type": "exitruteship",
+            "ricardian_contract": "Stub for exitruteship action's ricardian contract"
+        },
+        {
+            "name": "import12data",
+            "type": "import12data",
+            "ricardian_contract": "Stub for import12data action's ricardian contract"
+        },
+        {
+            "name": "initsymbol",
+            "type": "initsymbol",
+            "ricardian_contract": "Stub for initsymbol action's ricardian contract\nInput parameters:\n\n* `code`\n\nImplied parameters: \n\n* `name`\n\n### Intent\nINTENT. The intention of the author and the invoker of this contract is to print output. It shall have no other effect.\n\n### Term\nTERM. This Contract expires at the conclusion of code execution."
+        },
+        {
+            "name": "newtable",
+            "type": "newtable",
+            "ricardian_contract": "Stub for newtable action's ricardian contract"
+        },
+        {
+            "name": "pausetabledea",
+            "type": "pausetabledea",
+            "ricardian_contract": "Stub for pausetabledea action's ricardian contract"
+        },
+        {
+            "name": "pausetablesee",
+            "type": "pausetablesee",
+            "ricardian_contract": "Stub for pausetablesee action's ricardian contract"
+        },
+        {
+            "name": "playerbet",
+            "type": "playerbet",
+            "ricardian_contract": "Stub for playerbet action's ricardian contract"
+        },
+        {
+            "name": "serverseed",
+            "type": "serverseed",
+            "ricardian_contract": "Stub for serverseed action's ricardian contract"
+        },
+        {
+            "name": "trusteeship",
+            "type": "trusteeship",
+            "ricardian_contract": "Stub for trusteeship action's ricardian contract"
+        },
+        {
+            "name": "upgrading",
+            "type": "upgrading",
+            "ricardian_contract": "Stub for upgrading action's ricardian contract"
+        },
+        {
+            "name": "verdealeseed",
+            "type": "verdealeseed",
+            "ricardian_contract": "Stub for verdealeseed action's ricardian contract"
+        },
+        {
+            "name": "verserveseed",
+            "type": "verserveseed",
+            "ricardian_contract": "Stub for verserveseed action's ricardian contract"
+        }
+    ],
+    "tables": [
+        {
+            "name": "currencyinfo",
+            "type": "currency_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "tablesinfo",
+            "type": "table_stats",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": []
+}
