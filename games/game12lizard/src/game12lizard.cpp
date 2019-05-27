@@ -1,4 +1,4 @@
-#include "game12lizard.hpp"
+#include <game12lizard.hpp>
 
 ACTION game12lizard::initsymbol(name code, string sym, asset minperbet)
 {
@@ -1024,4 +1024,3 @@ ACTION game12lizard::import12data(uint64_t tableId, uint64_t tableStatus, name d
         s.upgradingFlag = true;
     });
 }
-EOSIO_DISPATCH(game12lizard, (initsymbol)(newtable)(dealerseed)(serverseed)(endbet)(playerbet)(verdealeseed)(verserveseed)(trusteeship)(exitruteship)(disconnecthi)(clear12cache)(pausetabledea)(pausetablesee)(continuetable)(closetable)(depositable)(dealerwitdaw)(edittable)(upgrading)(import12data))
