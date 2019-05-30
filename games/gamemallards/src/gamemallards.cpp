@@ -512,7 +512,10 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed, bool free)
             dBonus += playerBet.betPlayer;
         // Tie field
         if (roundResult[2] == '1')
-            pBonus += playerBet.betTie * (1 + 8);
+        {
+            pBonus += playerBet.betDealer + playerBet.betPlayer + playerBet.betTie * (1 + 8);
+            dBonus = init_asset_empty;
+        }
         else
             dBonus += playerBet.betTie;
         // DealerPair field
