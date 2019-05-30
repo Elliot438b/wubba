@@ -12,21 +12,28 @@
     while [ $count -le $lineNum ]
     do
         lineserver=`cat serverseed.txt|head -$count|tail -1`
-        linedealer=`cat serverseed.txt|head -$count|tail -1`
+        linedealer=`cat dealerseed.txt|head -$count|tail -1`
 
         echo "lineserver=$lineserver linedealer=$linedealer"
 
         dealerseedhash=`echo -n $linedealer | sha256sum | awk '{print $1}'`
         serverseedhash=`echo -n $lineserver | sha256sum | awk '{print $1}'`
 
-        cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards dealerseed '['$1','$dealerseedhash']' -p useraaaaaaab useraaaaaaah
+        if [ ! -n "$linedealer" ]; then
+            echo "linedealer is NULL"
+        else
+            #echo "linedealer no null"
+            cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards dealerseed '['$1','$dealerseedhash']' -p useraaaaaaab useraaaaaaah
+        fi
+
         cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards serverseed '['$1','$serverseedhash']' -p useraaaaaaah
+        #cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$1',useraaaaaaac,"0.0000 TES","2.0000 TES","2.0000 TES","2.0000 TES","2.0000 TES", "useraaaaaaah",""]' -p useraaaaaaac useraaaaaaah
         sleep 5s
         cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards endbet '['$1']' -p useraaaaaaah
         cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verdealeseed '['$1','$linedealer']' -p useraaaaaaab useraaaaaaah
         #sleep 1s
         cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verserveseed '['$1','$lineserver', 0]' -p useraaaaaaah
-
+        cleos --url http://127.0.0.1:51043 get table gamemallards gamemallards tablesinfo -L $1 -U $1
         #if status=6,shuffle
         status_result=`cleos --url http://127.0.0.1:51043 get table gamemallards gamemallards tablesinfo -L $1 -U $1 |grep tableStatus |awk -F ':' '{print $2}'|awk -F ',' '{print $1}'|awk -F ' ' '{print $1}'`
         if [ "$status_result" -eq 6 ];then
