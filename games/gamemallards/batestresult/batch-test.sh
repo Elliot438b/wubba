@@ -21,7 +21,6 @@
 
         cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards dealerseed '['$1','$dealerseedhash']' -p useraaaaaaab useraaaaaaah
         cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards serverseed '['$1','$serverseedhash']' -p useraaaaaaah
-        cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$1',useraaaaaaac,"0.0000 TES","2.0000 TES","2.0000 TES","2.0000 TES","2.0000 TES", "useraaaaaaah",""]' -p useraaaaaaac useraaaaaaah
         sleep 5s
         cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards endbet '['$1']' -p useraaaaaaah
         cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verdealeseed '['$1','$linedealer']' -p useraaaaaaab useraaaaaaah
