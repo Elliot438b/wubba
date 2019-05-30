@@ -20,6 +20,7 @@ do
     dealerseedhash=`echo -n $linedealer | sha256sum | awk '{print $1}'`
     serverseedhash=`echo -n $lineserver | sha256sum | awk '{print $1}'`
     
+
     if [ ! -n "$linedealer" ]; then
         echo "linedealer is NULL"
     else
@@ -28,6 +29,7 @@ do
     fi
     cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards serverseed '['$1','$serverseedhash']' -p useraaaaaaah
     sleep 5s
+
     cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards endbet '['$1']' -p useraaaaaaah
     cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verdealeseed '['$1','$linedealer']' -p useraaaaaaab useraaaaaaah
     cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verserveseed '['$1','$lineserver', 0]' -p useraaaaaaah
