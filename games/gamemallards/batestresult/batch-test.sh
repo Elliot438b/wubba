@@ -1,6 +1,4 @@
 #!/bin/bash
-
-
 rm result.txt
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '['$1',useraaaaaaab,"4000.0000 TES", 1,"useraaaaaaaj","TES", "0.005", "0.002", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaab useraaaaaaah
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards shuffle '['$1']' -p useraaaaaaah
@@ -12,24 +10,21 @@ echo "lineNum=$lineNum"
 
 while [ $count -le $lineNum ]
 do
+    echo "count=$count"
     lineserver=`cat serverseed.txt|head -$count|tail -1`
     linedealer=`cat dealerseed.txt|head -$count|tail -1`
-    
     echo "lineserver=$lineserver linedealer=$linedealer"
     
-    dealerseedhash=`echo -n $linedealer | sha256sum | awk '{print $1}'`
-    serverseedhash=`echo -n $lineserver | sha256sum | awk '{print $1}'`
-    
-
     if [ ! -n "$linedealer" ]; then
-        echo "linedealer is NULL"
+        echo "dealer seed is empty"
     else
-        #echo "linedealer no null"
+        dealerseedhash=`echo -n $linedealer | sha256sum | awk '{print $1}'`
         cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards dealerseed '['$1','$dealerseedhash']' -p useraaaaaaab useraaaaaaah
     fi
+    serverseedhash=`echo -n $lineserver | sha256sum | awk '{print $1}'`
     cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards serverseed '['$1','$serverseedhash']' -p useraaaaaaah
-    sleep 5s
-
+    sleep 1s
+    
     cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards endbet '['$1']' -p useraaaaaaah
     cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verdealeseed '['$1','$linedealer']' -p useraaaaaaab useraaaaaaah
     cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verserveseed '['$1','$lineserver', 0]' -p useraaaaaaah
