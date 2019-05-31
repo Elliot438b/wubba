@@ -49,11 +49,3 @@ do
     let count++
 done
 cat result.txt
-
-
-
-
-
-
-
-
