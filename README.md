@@ -1,4 +1,4 @@
-# Devlog [CURRENT](https://github.com/evsward/wubba#v083-target)
+# Devlog [CURRENT](https://github.com/evsward/wubba#测试阶段修改点列表：)
 ## v0.1-v0.3 BM_rand + round
 - v0.1 base BM_rand. 0-1, tag release.
     - ~~v0.1.2 workflow control. Timely and step dependency.~~
@@ -542,3 +542,6 @@ seedHash | result of hash seed
 - Adjust variate of the solution to obtain a best result.
 - Seed source.
 
+## 测试阶段修改点列表：
+1. 限红改为五个格子分别限制，庄闲分开不再共享。
+2. 庄不在线且未托管时，暂停牌桌。
