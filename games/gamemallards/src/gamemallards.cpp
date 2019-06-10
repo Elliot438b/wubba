@@ -448,6 +448,7 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed)
         // -------------------------------- commission start --------------------------------
         // platform
         asset depositAmount = (playerBet.betDealer + playerBet.betPlayer + playerBet.betTie + playerBet.betDealerPair + playerBet.betPlayerPair);
+        dealerBalance_temp += depositAmount;
         auto temp_rate_platform = comission_rate_platform_default;
         asset platformtotransfer = asset(depositAmount.amount * comission_rate_platform_default, existing->amountSymbol.get_symbol());
         eosio::print(" sum_bet_amount:", depositAmount.amount, " platformtotransfer:", platformtotransfer, " temp_rate_platform:", temp_rate_platform, " ");
@@ -486,9 +487,8 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed)
         playerBet.playercommission = playertotransfer;
         playerBet.agentcommission = agentotransfer;
 
-        dealerBalance_temp -= platformtotransfer;
-        dealerBalance_temp -= agentotransfer;
-        dealerBalance_temp -= playertotransfer;
+        asset commission_sum = platformtotransfer + agentotransfer + playertotransfer;
+        dealerBalance_temp -= commission_sum;
         // -------------------------------- commission end --------------------------------
 
         auto pBonus = init_asset_empty;
@@ -516,33 +516,20 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed)
                 }
             }
         }
-        else
-        {
-            dBonus = playerBet.betDealer;
-        }
         // Player field
         if (roundResult[1] == '1')
             pBonus += playerBet.betPlayer * (1 + 1);
-        else
-            dBonus += playerBet.betPlayer;
         // Tie field
         if (roundResult[2] == '1')
         {
             pBonus += playerBet.betDealer + playerBet.betPlayer + playerBet.betTie * (1 + 8);
-            dBonus = init_asset_empty;
         }
-        else
-            dBonus += playerBet.betTie;
         // DealerPair field
         if (roundResult[3] == '1')
             pBonus += playerBet.betDealerPair * (1 + 11);
-        else
-            dBonus += playerBet.betDealerPair;
         // PlayerPair field
         if (roundResult[4] == '1')
             pBonus += playerBet.betPlayerPair * (1 + 11);
-        else
-            dBonus += playerBet.betPlayerPair;
 
         eosio::print(" [player:", playerBet.player, ", total bonus:", pBonus, "] ");
 
@@ -554,9 +541,8 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed)
                 {_self, playerBet.player, pBonus, std::string("playerbet win")});
         }
         dealerBalance_temp -= pBonus;
-        dealerBalance_temp += dBonus;
-        playerBet.pBonus = pBonus;
-        playerBet.dBonus = dBonus;
+        playerBet.pBonus = pBonus - depositAmount;
+        playerBet.dBonus = depositAmount - pBonus - commission_sum;
         tempPlayerVec.emplace_back(playerBet);
     }
     // shuffle trigger

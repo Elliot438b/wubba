@@ -57,27 +57,26 @@ cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push actio
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards initsymbol '["useraaaaaaal","GDP","0.1000 GDA"]' -p gamemallards
 cleos --url http://127.0.0.1:51043 get table gamemallards gamemallards currencyinfo
 #——————————————————————————————————————————————————————————————————————————————————————————————————————
-cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '[11,useraaaaaaab,"4000.0000 TES", 1,1,"useraaaaaaaj","TES", "0.005", "0.002", "5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES","5.0000 TES","1.0000 TES"]' -p useraaaaaaab useraaaaaaah
+cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards newtable '[16,useraaaaaaab,"4000.0000 TES", 1,0,"useraaaaaaaj","TES", "0", "0", "25.0000 TES","1.0000 TES","10.0000 TES","1.0000 TES","10.0000 TES","1.0000 TES"]' -p useraaaaaaab useraaaaaaah
 tableid=`cleos --url http://127.0.0.1:51043 get table gamemallards gamemallards tablesinfo -l 100|grep tableId|awk -F' ' 'END {print $NF}' |awk -F ',' '{print $1}'`
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards shuffle '['$tableid']' -p useraaaaaaah
-sleep 5s
-cleos --url http://127.0.0.1:51043 get table gamemallards gamemallards shuffleinfo -L $tableid -U $tableid
-
 cleos --url http://127.0.0.1:51043 get table gamemallards gamemallards tablesinfo -L $tableid -U $tableid
-sleep 3s
+sleep 5s
 
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards dealerseed '['$tableid',4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5]' -p useraaaaaaab useraaaaaaah
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards serverseed '['$tableid',e4e549408422875958476160732390defefcac7c2bd8353d918fe452d20de2a6]' -p useraaaaaaah
-cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaac,"1.0000 TES","0.0000 TES","0.0000 TES","0.0000 TES","0.0000 TES", "","小明"]' -p useraaaaaaac useraaaaaaah
-cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaad,"5.0000 TES","5.0000 TES","5.0000 TES","5.0000 TES","5.0000 TES", "","中明"]' -p useraaaaaaad useraaaaaaah
-cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaab,"0.0000 TES","1.0000 TES","0.0000 TES","0.0000 TES","0.0000 TES", useraaaaaaah,"abc"]' -p useraaaaaaab useraaaaaaah
-cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaaf,"0.0000 TES","0.0000 TES","1.0000 TES","0.0000 TES","0.0000 TES", useraaaaaaab,"小军"]' -p useraaaaaaaf useraaaaaaah
-cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaaa,"0.0000 TES","0.0000 TES","0.0000 TES","1.0000 TES","0.0000 TES", useraaaaaaac,"李飞"]' -p useraaaaaaaa useraaaaaaah
-cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaab,"0.0000 TES","0.0000 TES","0.0000 TES","0.0000 TES","1.0000 TES", useraaaaaaac,"杜力"]' -p useraaaaaaab useraaaaaaah
-sleep 2s
+cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaac,"10.0000 TES","10.0000 TES","10.0000 TES","10.0000 TES","10.0000 TES", "","小明"]' -p useraaaaaaac useraaaaaaah
+sleep 6s
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards endbet '['$tableid']' -p useraaaaaaah
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verdealeseed '['$tableid',10]' -p useraaaaaaab useraaaaaaah
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verserveseed '['$tableid',704,1]' -p useraaaaaaah
+cleos --url http://127.0.0.1:51043 get table gamemallards gamemallards tablesinfo -L $tableid -U $tableid
+
+# cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaad,"5.0000 TES","5.0000 TES","5.0000 TES","5.0000 TES","5.0000 TES", "","中明"]' -p useraaaaaaad useraaaaaaah
+# cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaab,"0.0000 TES","1.0000 TES","0.0000 TES","0.0000 TES","0.0000 TES", useraaaaaaah,"abc"]' -p useraaaaaaab useraaaaaaah
+# cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaaf,"0.0000 TES","0.0000 TES","1.0000 TES","0.0000 TES","0.0000 TES", useraaaaaaab,"小军"]' -p useraaaaaaaf useraaaaaaah
+# cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaaa,"0.0000 TES","0.0000 TES","0.0000 TES","1.0000 TES","0.0000 TES", useraaaaaaac,"李飞"]' -p useraaaaaaaa useraaaaaaah
+# cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards playerbet '['$tableid',useraaaaaaab,"0.0000 TES","0.0000 TES","0.0000 TES","0.0000 TES","1.0000 TES", useraaaaaaac,"杜力"]' -p useraaaaaaab useraaaaaaah
 sleep 36s
 
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verdealeseed '['$tableid',10]' -p useraaaaaaab useraaaaaaah
