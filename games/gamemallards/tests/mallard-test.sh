@@ -62,6 +62,7 @@ tableid=`cleos --url http://127.0.0.1:51043 get table gamemallards gamemallards 
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards shuffle '['$tableid']' -p useraaaaaaah
 sleep 5s
 cleos --url http://127.0.0.1:51043 get table gamemallards gamemallards shuffleinfo -L $tableid -U $tableid
+
 cleos --url http://127.0.0.1:51043 get table gamemallards gamemallards tablesinfo -L $tableid -U $tableid
 sleep 3s
 
@@ -78,7 +79,6 @@ cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push actio
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verdealeseed '['$tableid',10]' -p useraaaaaaab useraaaaaaah
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verserveseed '['$tableid',704,1]' -p useraaaaaaah
 sleep 36s
-
 
 cleos --url http://127.0.0.1:51043 --wallet-url http://127.0.0.1:6666 push action gamemallards verdealeseed '['$tableid',10]' -p useraaaaaaab useraaaaaaah
 sleep 3s

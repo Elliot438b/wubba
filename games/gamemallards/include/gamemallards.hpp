@@ -147,9 +147,10 @@ private:
 
         enum class status_fields : uint64_t
         {
+            ROUND_END = 0,
+            ROUND_START = 1,
             ROUND_BET = 2,
             ROUND_REVEAL = 4,
-            ROUND_END = 0,
             ROUND_SHUFFLE = 6,
             PAUSED = 3, // must be changed under ROUND_END status.
             CLOSED = 5
