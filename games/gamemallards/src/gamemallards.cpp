@@ -18,7 +18,7 @@ ACTION gamemallards::initsymbol(name code, string sym, asset minperbet)
     });
 }
 
-ACTION gamemallards::newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
+ACTION gamemallards::newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, bool isFree, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
                               asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
                               asset oneRoundMaxTotalBet_pair, asset minPerBet_pair)
 {
@@ -86,6 +86,7 @@ ACTION gamemallards::newtable(uint64_t newtableId, name dealer, asset deposit, b
         s.dealer = dealer;
         s.dealerBalance = deposit;
         s.isPrivate = isPrivate;
+        s.isFree = isFree;
         s.validCardVec = validCardVec_empty;
         s.oneRoundMaxTotalBet_BP = oneRoundMaxTotalBet_bp;
         s.minPerBet_BP = minPerBet_bp;
@@ -102,7 +103,7 @@ ACTION gamemallards::newtable(uint64_t newtableId, name dealer, asset deposit, b
     });
 }
 
-ACTION gamemallards::edittable(uint64_t tableId, bool isPrivate, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_pair, asset minPerBet_pair)
+ACTION gamemallards::edittable(uint64_t tableId, bool isPrivate, bool isFree, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_pair, asset minPerBet_pair)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -137,6 +138,7 @@ ACTION gamemallards::edittable(uint64_t tableId, bool isPrivate, name code, stri
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.isPrivate = isPrivate;
+        s.isFree = isFree;
         s.oneRoundMaxTotalBet_BP = oneRoundMaxTotalBet_bp;
         s.minPerBet_BP = minPerBet_bp;
         s.oneRoundMaxTotalBet_Tie = oneRoundMaxTotalBet_tie;
@@ -179,9 +181,11 @@ ACTION gamemallards::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
     tableround.modify(existing, _self, [&](auto &s) {
         s.betStartTime = 0;
-        s.currRoundBetSum_BP = init_asset_empty;
+        s.currRoundBetSum_Banker = init_asset_empty;
+        s.currRoundBetSum_Player = init_asset_empty;
         s.currRoundBetSum_Tie = init_asset_empty;
-        s.currRoundBetSum_Pair = init_asset_empty;
+        s.currRoundBetSum_BankerPair = init_asset_empty;
+        s.currRoundBetSum_PlayerPair = init_asset_empty;
         s.dealerSeedHash = encodeSeed;
         s.serverSeedHash = hash;
         s.dealerSeed = "";
@@ -226,9 +230,11 @@ ACTION gamemallards::serverseed(uint64_t tableId, checksum256 encodeSeed)
         tableround.modify(existing, _self, [&](auto &s) {
             s.betStartTime = eosio::current_time_point().sec_since_epoch();
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
-            s.currRoundBetSum_BP = init_asset_empty;
+            s.currRoundBetSum_Banker = init_asset_empty;
+            s.currRoundBetSum_Player = init_asset_empty;
             s.currRoundBetSum_Tie = init_asset_empty;
-            s.currRoundBetSum_Pair = init_asset_empty;
+            s.currRoundBetSum_BankerPair = init_asset_empty;
+            s.currRoundBetSum_PlayerPair = init_asset_empty;
             s.dealerSeedHash = hash;
             s.serverSeedHash = encodeSeed;
             s.dealerSeed = "";
@@ -247,9 +253,11 @@ ACTION gamemallards::serverseed(uint64_t tableId, checksum256 encodeSeed)
         std::vector<card_info> emptyCards;
         asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
         tableround.modify(existing, _self, [&](auto &s) {
-            s.currRoundBetSum_BP = init_asset_empty;
+            s.currRoundBetSum_Banker = init_asset_empty;
+            s.currRoundBetSum_Player = init_asset_empty;
             s.currRoundBetSum_Tie = init_asset_empty;
-            s.currRoundBetSum_Pair = init_asset_empty;
+            s.currRoundBetSum_BankerPair = init_asset_empty;
+            s.currRoundBetSum_PlayerPair = init_asset_empty;
             s.serverSeedHash = encodeSeed;
             s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_BET;
             s.betStartTime = eosio::current_time_point().sec_since_epoch();
@@ -285,9 +293,11 @@ ACTION gamemallards::playerbet(uint64_t tableId, name player, asset betDealer, a
     if (betPlayerPair > init_asset_empty)
         eosio::check(betPlayerPair >= existing->minPerBet_Pair, "PlayerPair bet is too small!");
 
-    asset player_amount_sum_bp = existing->currRoundBetSum_BP;
+    asset player_amount_sum_banker = existing->currRoundBetSum_Banker;
+    asset player_amount_sum_player = existing->currRoundBetSum_Player;
     asset player_amount_sum_tie = existing->currRoundBetSum_Tie;
-    asset player_amount_sum_pair = existing->currRoundBetSum_Pair;
+    asset player_amount_sum_bankerPair = existing->currRoundBetSum_BankerPair;
+    asset player_amount_sum_playerPair = existing->currRoundBetSum_PlayerPair;
 
     bool flag = false;
     for (const auto &p : existing->playerInfo)
@@ -300,17 +310,19 @@ ACTION gamemallards::playerbet(uint64_t tableId, name player, asset betDealer, a
     }
 
     eosio::check(!flag, "Player can't bet more than once in one round!");
-    player_amount_sum_bp += betDealer;
-    player_amount_sum_bp += betPlayer;
-    eosio::check(player_amount_sum_bp <= existing->oneRoundMaxTotalBet_BP, "Over the peak of total bet_bp amount of this round!");
+    player_amount_sum_banker += betDealer;
+    player_amount_sum_player += betPlayer;
+    eosio::check(player_amount_sum_banker <= existing->oneRoundMaxTotalBet_BP, "Banker field is over the peak of total bet_bp amount of this round!");
+    eosio::check(player_amount_sum_player <= existing->oneRoundMaxTotalBet_BP, "Player field is over the peak of total bet_bp amount of this round!");
 
     player_amount_sum_tie += betTie;
     eosio::check(player_amount_sum_tie <= existing->oneRoundMaxTotalBet_Tie, "Over the peak of total bet_tie amount of this round!");
 
-    player_amount_sum_pair += betDealerPair;
-    player_amount_sum_pair += betPlayerPair;
-    eosio::check(player_amount_sum_pair <= existing->oneRoundMaxTotalBet_Pair, "Over the peak of total bet_pair amount of this round!");
-
+    player_amount_sum_bankerPair += betDealerPair;
+    player_amount_sum_playerPair += betPlayerPair;
+    eosio::check(player_amount_sum_bankerPair <= existing->oneRoundMaxTotalBet_Pair, "BankerPair field is over the peak of total bet_pair amount of this round!");
+    eosio::check(player_amount_sum_playerPair <= existing->oneRoundMaxTotalBet_Pair, "PlayerPair field is over the peak of total bet_pair amount of this round!");
+    
     asset depositAmount = (betDealer + betPlayer + betTie + betDealerPair + betPlayerPair);
     if (depositAmount > init_asset_empty)
     {
@@ -333,9 +345,11 @@ ACTION gamemallards::playerbet(uint64_t tableId, name player, asset betDealer, a
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.playerInfo.emplace_back(temp);
-        s.currRoundBetSum_BP = player_amount_sum_bp;
+        s.currRoundBetSum_Banker = player_amount_sum_banker;
+        s.currRoundBetSum_Player = player_amount_sum_player;
         s.currRoundBetSum_Tie = player_amount_sum_tie;
-        s.currRoundBetSum_Pair = player_amount_sum_pair;
+        s.currRoundBetSum_BankerPair = player_amount_sum_bankerPair;
+        s.currRoundBetSum_PlayerPair = player_amount_sum_playerPair;
     });
 }
 
@@ -370,7 +384,7 @@ ACTION gamemallards::verdealeseed(uint64_t tableId, string seed)
     });
 }
 // Server push defer 3' action, once got ROUND_REVEAL.
-ACTION gamemallards::verserveseed(uint64_t tableId, string seed, bool free)
+ACTION gamemallards::verserveseed(uint64_t tableId, string seed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -482,14 +496,14 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed, bool free)
         // Banker field
         if (roundResult[0] == '1')
         {
-            eosio::print("  【 free=", free, " 】 ");
-            if (!free)
+            if (!existing->isFree)
             {
                 pBonus.set_amount(playerBet.betDealer.amount * (1 + 0.95));
                 eosio::print("  【 1pBonus=", pBonus, " 】 ");
             }
             else
             {
+                eosio::print(" 【Free game.】 ");
                 if (sum_b_R == 6)
                 {
                     eosio::print("  【 sum_b_R=", sum_b_R, " 】 ");
@@ -753,7 +767,7 @@ ACTION gamemallards::upgrading(bool isupgrading)
 }
 
 ACTION gamemallards::import12data(uint64_t tableId, uint64_t tableStatus, uint64_t cardBoot, name dealer, bool trusteeship,
-                                  bool isPrivate, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP,
+                                  bool isPrivate, bool isFree, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP,
                                   asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Pair,
                                   asset minPerBet_Pair, asset oneRoundDealerMaxPay, asset minTableDeposit,
                                   double commission_rate_agent, double commission_rate_player, bool upgradingFlag,
@@ -769,6 +783,7 @@ ACTION gamemallards::import12data(uint64_t tableId, uint64_t tableStatus, uint64
         s.dealer = dealer;
         s.dealerBalance = dealerBalance;
         s.isPrivate = isPrivate;
+        s.isFree = isFree;
         s.trusteeship = trusteeship;
         s.oneRoundMaxTotalBet_BP = oneRoundMaxTotalBet_BP;
         s.minPerBet_BP = minPerBet_BP;
