@@ -34,9 +34,9 @@ const {EosTr} = require('../../libs/EOS/EOSTr.js');
 
 
 Global.EOSDevConfig = {//测试环境   SERVER的账号：useraaaaaaah---5JV9UNEpPKa4sqxSxvGWYPY9ZBTzAttyq7ShPvLUJSetwAeSXFW
-    keyProvider: ['5K463ynhZoCDDa4RDcr63cUwWLTnKqmdcoTKTHBjqoKfv4u5V7p'],//["5KNbKxyyqfGvLgEEr6MAwMvxFFv8AAmweSHqtNNcNMSKmt8Y9oy"],  // 配置私钥字符串  eoseoseoseos
-    keyPubProvider:['EOS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr'],//["EOS7yqWwcdR5GFQgdykZ73UiZEsPvTwGXxJkZ28xsfDQFdQWoK7EF"],  //公钥
-    httpEndpoint: 'http://127.0.0.1:8888',//'https://jungle.eosio.cr:443', //DEV开发链url与端口   rpc 地址 
+    keyProvider: ['5JUNYmkJ5wVmtVY8x9A1KKzYe9UWLZ4Fq1hzGZxfwfzJB8jkw6u'],//["5KNbKxyyqfGvLgEEr6MAwMvxFFv8AAmweSHqtNNcNMSKmt8Y9oy"],  // 配置私钥字符串  eoseoseoseos
+    keyPubProvider:['EOS7yBtksm8Kkg85r4in4uCbfN77uRwe82apM8jjbhFVDgEgz3w8S'],//["EOS7yqWwcdR5GFQgdykZ73UiZEsPvTwGXxJkZ28xsfDQFdQWoK7EF"],  //公钥
+    httpEndpoint: 'http://127.0.0.1:51043',//'https://jungle.eosio.cr:443', //DEV开发链url与端口   rpc 地址 
     chainId: "1c6ae7719a2a3b4ecb19584a30ff510ba1b6ded86e1fd8b8fc22f1179c622a32", // 通过cleos get info可以获取chainId
     mockTransactions: () => null, // 如果要广播，需要设为null
     // transactionHeaders: (expireInSeconds, callback) => {
