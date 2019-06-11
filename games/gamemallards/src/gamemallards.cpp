@@ -108,7 +108,7 @@ ACTION gamemallards::edittable(uint64_t tableId, bool isPrivate, bool isFree, na
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio::check(existing != tableround.end(), notableerr);
-    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The table can only be edited at the ROUND_END stage!");
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END || existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED, "The table can only be edited at the ROUND_END or PAUSED stage!");
 
     asset minPerBet_default_temp;
     extended_symbol cur_ex_sym = defaultSym;
