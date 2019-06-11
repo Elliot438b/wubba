@@ -516,5 +516,5 @@ private:
     const char *notableerr = "TableId isn't existing!";
     extended_symbol defaultSym = extended_symbol(symbol(symbol_code("SYS"), 4), "eosio.token"_n);
 
-    double comission_rate_platform_default = 0.005;
+    double comission_rate_platform_default = 0.001;
 };
