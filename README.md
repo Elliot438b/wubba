@@ -525,10 +525,10 @@ seedHash | result of hash seed
 ### Execute {get table} per second to get all tables' state data. Filter with:
 - ROUND_END&&trusteeship  || ROUND_START&&!trusteeship 
     - table-obj -> tableId, acquired local seed, hash seed. Insert {tableId, seed, seedHash} into localDB.
-    - call SC: serverseed(tableId，seedHash)
+    - call SC: serverseed(tableId, seedHash)
 - ROUND_REVEAL
     - table-obj -> tableId, data obj from localDB with tableId, acquired plaintext seed.
-    - call SC: verserveseed(tableId，seed)
+    - call SC: verserveseed(tableId, seed)
     - delete the data obj from localDB with the tableId handled.
 
 > If one of the seed servers was attacked, load balancer could switch another server automated . If the time point of attack was during bet stage(ROUND_BET), SC could't acquire serverseed when reveal stage. The result of this round is based on the dealerseed.
@@ -542,7 +542,10 @@ seedHash | result of hash seed
 - Adjust variate of the solution to obtain a best result.
 - Seed source.
 
+~~1. 限红改为五个格子分别限制, 庄闲分开不再共享。~~
+~~2. 庄不在线且未托管时, 暂停牌桌。~~
+~~3. 免佣字段加在状态表桌属性中, 去掉verifyseverseed的第三个参数。~~
 ## 测试阶段修改点列表：
-1. 限红改为五个格子分别限制，庄闲分开不再共享。
-2. 庄不在线且未托管时，暂停牌桌。
-3. 免佣字段加在状态表桌属性中，去掉verifyseverseed的第三个参数。
+1. 桌属性增加 commission_rate_player_spread, newtable, edittable, import12data 三个接口增加参数 commission_rate_player_spread
+2. playerbet接口增加参数name spreadAccount, playerbet结构体增加属性 spreadAccount, spreadaccountcommission
+3. verserveseed接口函数体中佣金的部分最后加上相关内容。

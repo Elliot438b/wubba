@@ -18,7 +18,7 @@ ACTION gamemallards::initsymbol(name code, string sym, asset minperbet)
     });
 }
 
-ACTION gamemallards::newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, bool isFree, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
+ACTION gamemallards::newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, bool isFree, name code, string sym, string commission_rate_agent, string commission_rate_player, string commission_rate_player_spread, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
                               asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
                               asset oneRoundMaxTotalBet_pair, asset minPerBet_pair)
 {
@@ -62,8 +62,10 @@ ACTION gamemallards::newtable(uint64_t newtableId, name dealer, asset deposit, b
     //auto temp_rate_platform = Round(comission_rate_platform_default, 4);
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
     auto temp_rate_player = Atof(commission_rate_player.c_str());
-    eosio::check(temp_rate_agent >= 0 && temp_rate_player >= 0, "Commission rate can't be set negtive!");
-    eosio::print(" temp_rate_platform:", comission_rate_platform_default, " temp_rate_agent:", temp_rate_agent, " temp_rate_player", temp_rate_player);
+    auto temp_rate_player_spread = Atof(commission_rate_player_spread.c_str());
+    eosio::check(temp_rate_agent >= 0 && temp_rate_player >= 0 && temp_rate_player_spread >= 0, "Commission rate can't be set negtive!");
+    eosio::check(temp_rate_agent >= temp_rate_player_spread, "Commission of spread account can't bigger than agent commission!");
+    eosio::print(" temp_rate_platform:", comission_rate_platform_default, " temp_rate_agent:", temp_rate_agent, " temp_rate_player", temp_rate_player, " temp_rate_player_spread", temp_rate_player_spread);
 
     asset oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_pair * 11 * 2 + max(oneRoundMaxTotalBet_bp * 1, oneRoundMaxTotalBet_tie * 8);
     eosio::print(" before====oneRoundDealerMaxPay_temp:", oneRoundDealerMaxPay_temp);
@@ -99,11 +101,12 @@ ACTION gamemallards::newtable(uint64_t newtableId, name dealer, asset deposit, b
         s.amountSymbol = cur_ex_sym;
         s.commission_rate_agent = temp_rate_agent;
         s.commission_rate_player = temp_rate_player;
+        s.commission_rate_player_spread = temp_rate_player_spread;
         s.upgradingFlag = false;
     });
 }
 
-ACTION gamemallards::edittable(uint64_t tableId, bool isPrivate, bool isFree, name code, string sym, string commission_rate_agent, string commission_rate_player, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_pair, asset minPerBet_pair)
+ACTION gamemallards::edittable(uint64_t tableId, bool isPrivate, bool isFree, name code, string sym, string commission_rate_agent, string commission_rate_player, string commission_rate_player_spread, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_pair, asset minPerBet_pair)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -129,8 +132,11 @@ ACTION gamemallards::edittable(uint64_t tableId, bool isPrivate, bool isFree, na
     //auto temp_rate_platform = Round(comission_rate_platform_default, 4);
     auto temp_rate_agent = Atof(commission_rate_agent.c_str());
     auto temp_rate_player = Atof(commission_rate_player.c_str());
+    auto temp_rate_player_spread = Atof(commission_rate_player_spread.c_str());
     // verify the {player, agent} rate can't be set <0
-    eosio::check(temp_rate_agent >= 0 && temp_rate_player >= 0, "Commission rate can't be set negtive!");
+    eosio::check(temp_rate_agent >= 0 && temp_rate_player >= 0 && temp_rate_player_spread >= 0, "Commission rate can't be set negtive!");
+    eosio::check(temp_rate_agent >= temp_rate_player_spread, "Commission of spread account can't bigger than agent commission!");
+    eosio::print(" temp_rate_platform:", comission_rate_platform_default, " temp_rate_agent:", temp_rate_agent, " temp_rate_player", temp_rate_player, " temp_rate_player_spread", temp_rate_player_spread);
 
     asset oneRoundDealerMaxPay_temp = oneRoundMaxTotalBet_pair * 11 * 2 + max(oneRoundMaxTotalBet_bp * 1, oneRoundMaxTotalBet_tie * 8);
     oneRoundDealerMaxPay_temp += (oneRoundMaxTotalBet_tie + oneRoundMaxTotalBet_bp + oneRoundMaxTotalBet_pair) * (comission_rate_platform_default + temp_rate_agent + temp_rate_player);
@@ -150,6 +156,7 @@ ACTION gamemallards::edittable(uint64_t tableId, bool isPrivate, bool isFree, na
         s.amountSymbol = cur_ex_sym;
         s.commission_rate_agent = temp_rate_agent;
         s.commission_rate_player = temp_rate_player;
+        s.commission_rate_player_spread = temp_rate_player_spread;
     });
 }
 
@@ -274,7 +281,7 @@ ACTION gamemallards::serverseed(uint64_t tableId, checksum256 encodeSeed)
     }
 }
 
-ACTION gamemallards::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPair, asset betPlayerPair, name agent, string nickname)
+ACTION gamemallards::playerbet(uint64_t tableId, name player, asset betDealer, asset betPlayer, asset betTie, asset betDealerPair, asset betPlayerPair, name agent, name spreadAccount, string nickname)
 {
     require_auth(player);
     require_auth(serveraccount);
@@ -342,6 +349,7 @@ ACTION gamemallards::playerbet(uint64_t tableId, name player, asset betDealer, a
     temp.pBonus = init_asset_empty;
     temp.dBonus = init_asset_empty;
     temp.agent = agent;
+    temp.spreadAccount = spreadAccount;
     temp.nickname = nickname;
 
     tableround.modify(existing, _self, [&](auto &s) {
@@ -461,16 +469,28 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed)
         }
         // agent
         asset agentotransfer = init_asset_empty;
+        asset spreadAccountotransfer = init_asset_empty;
         if (is_account(playerBet.agent))
         {
             agentotransfer = asset(depositAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
+            // spreadAccount, agent pay.
+            spreadAccountotransfer = asset(depositAmount.amount * existing->commission_rate_player_spread, existing->amountSymbol.get_symbol());
+            agentotransfer = agentotransfer - spreadAccountotransfer;
             eosio::print(" sum_bet_amount:", depositAmount, " agentotransfer:", agentotransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
+            eosio::print(" sum_bet_amount:", depositAmount, " spreadAccountotransfer:", spreadAccountotransfer, " commission_rate_player_spread:", existing->commission_rate_player_spread, " ");
             if (agentotransfer > init_asset_empty)
             {
                 INLINE_ACTION_SENDER(eosio::token, transfer)
                 (
                     existing->amountSymbol.get_contract(), {{_self, "active"_n}},
                     {_self, playerBet.agent, agentotransfer, std::string("agentcommission")});
+            }
+            if (spreadAccountotransfer > init_asset_empty)
+            {
+                INLINE_ACTION_SENDER(eosio::token, transfer)
+                (
+                    existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                    {_self, playerBet.spreadAccount, spreadAccountotransfer, std::string("spreadaccountcommission")});
             }
         }
         // player
@@ -486,6 +506,7 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed)
 
         playerBet.playercommission = playertotransfer;
         playerBet.agentcommission = agentotransfer;
+        playerBet.spreadaccountcommission = spreadAccountotransfer;
 
         asset commission_sum = platformtotransfer + agentotransfer + playertotransfer;
         dealerBalance_temp -= commission_sum;
@@ -757,7 +778,7 @@ ACTION gamemallards::import12data(uint64_t tableId, uint64_t tableStatus, uint64
                                   bool isPrivate, bool isFree, asset dealerBalance, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP,
                                   asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Pair,
                                   asset minPerBet_Pair, asset oneRoundDealerMaxPay, asset minTableDeposit,
-                                  double commission_rate_agent, double commission_rate_player, bool upgradingFlag,
+                                  double commission_rate_agent, double commission_rate_player, double commission_rate_player_spread, bool upgradingFlag,
                                   extended_symbol amountSymbol, std::vector<uint16_t> validCardVec)
 {
     require_auth(_self);
@@ -783,6 +804,7 @@ ACTION gamemallards::import12data(uint64_t tableId, uint64_t tableStatus, uint64
         s.amountSymbol = amountSymbol;
         s.commission_rate_agent = commission_rate_agent;
         s.commission_rate_player = commission_rate_player;
+        s.commission_rate_player_spread = commission_rate_player_spread;
         s.upgradingFlag = true;
     });
 }
