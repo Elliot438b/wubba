@@ -1,14 +1,17 @@
-gamemallards: 
+> gamemallards: 
+
 Private key: 5J4ZiJ2rYeziyzi2PQfPLXgHHra5rBaxxYYgBEWTRY6JPrnviZu
 Public key: EOS5uenwn1i3UXTrxnpnsjAGz7NWjMeW3e9XQ2sKqyvFgfCWUEfam
 
 jungle-chainid:e70aaab8997e1dfce58fbfac80cbbb8fecec7b99cf982a9444273cbc64c41473
 
-game12lizard:
+> game12lizard:
+
 Private key: 5KYDF8GUdxD5MBexhMrvMWEJkRheSgJRrR6iZ7MDjTUhK68XouK
 Public key: EOS5cnHuRqC6rjLZsSwVEoz2fCDmeXVpyiCAdfisWPeC5L2m4aG1b
 
-test accounts:
+> test accounts:
+
 账户: usereeeeeeeh
 私钥: 5JMQ7Q5oiMbsacxS5NevNq3eRHbodSZcaTqtrGfHsbwofrqpyTG
 公钥: EOS8jfRjerUzm3VweXPKfXnJ9LuWd1zF66CPkS1d54JWnwPyJbaQa
