@@ -369,9 +369,6 @@ ACTION gamemallards::endbet(uint64_t tableId)
     auto existing = tableround.find(tableId);
     eosio::check(existing != tableround.end(), notableerr);
     eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
-    uint64_t useTime = eosio::current_time_point().sec_since_epoch() - existing->betStartTime;
-    eosio::print("spend time : ", useTime, "s, need ", betPeriod, "s!");
-    eosio::check(useTime > betPeriod, "Bet time is not end eosio::current_time_point().sec_since_epoch, wait... ");
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_REVEAL;
     });
