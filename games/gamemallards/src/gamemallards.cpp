@@ -382,7 +382,6 @@ ACTION gamemallards::verdealeseed(uint64_t tableId, string seed)
     require_auth(existing->dealer);
     eosio::check(!existing->trusteeship, "Dealer is hosted.");
     eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
-    eosio::check((eosio::current_time_point().sec_since_epoch() - existing->betStartTime) > betPeriod, "It's not time to verify dealer seed yet.");
     assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerSeedHash));
     tableround.modify(existing, _self, [&](auto &s) {
         s.dSeedVerity = true;
@@ -396,7 +395,6 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed)
     auto existing = tableround.find(tableId);
     eosio::check(existing != tableround.end(), notableerr);
     eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "table status != reveal");
-    eosio::check((eosio::current_time_point().sec_since_epoch() - existing->betStartTime) > betPeriod, "It's not time to verify server seed yet.");
     // plaintext seed invaild（lost）
     if (0 == seed.compare(invaild_seed_flag))
     {
