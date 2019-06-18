@@ -287,6 +287,8 @@ ACTION gamemallards::playerbet(uint64_t tableId, name player, asset betDealer, a
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio::check(existing != tableround.end(), notableerr);
+    eosio::check(is_account(agent), "agent account is not exist!");
+    eosio::check(is_account(spreadAccount), "spreadAccount account is not exist!");
     eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_BET, "tableStatus != bet");
     eosio::check((eosio::current_time_point().sec_since_epoch() - existing->betStartTime) < betPeriod, "Timeout, can't bet!");
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
@@ -470,7 +472,7 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed)
         // agent
         asset agentotransfer = init_asset_empty;
         asset spreadAccountotransfer = init_asset_empty;
-        if (is_account(playerBet.agent))
+        if (is_account(playerBet.agent)&&is_account(playerBet.spreadAccount))
         {
             agentotransfer = asset(depositAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
             // spreadAccount, agent pay.
