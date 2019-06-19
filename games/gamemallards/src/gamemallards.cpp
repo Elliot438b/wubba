@@ -465,27 +465,30 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed)
         // agent
         asset agentotransfer = init_asset_empty;
         asset spreadAccountotransfer = init_asset_empty;
-        if (is_account(playerBet.agent)&&is_account(playerBet.spreadAccount))
+        if (is_account(playerBet.agent))
         {
             agentotransfer = asset(depositAmount.amount * existing->commission_rate_agent, existing->amountSymbol.get_symbol());
-            // spreadAccount, agent pay.
-            spreadAccountotransfer = asset(depositAmount.amount * existing->commission_rate_player_spread, existing->amountSymbol.get_symbol());
-            agentotransfer = agentotransfer - spreadAccountotransfer;
-            eosio::print(" sum_bet_amount:", depositAmount, " agentotransfer:", agentotransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
-            eosio::print(" sum_bet_amount:", depositAmount, " spreadAccountotransfer:", spreadAccountotransfer, " commission_rate_player_spread:", existing->commission_rate_player_spread, " ");
+            if (is_account(playerBet.spreadAccount))
+            {
+                // spreadAccount, agent pay.
+                spreadAccountotransfer = asset(depositAmount.amount * existing->commission_rate_player_spread, existing->amountSymbol.get_symbol());
+                agentotransfer = agentotransfer - spreadAccountotransfer;
+                eosio::print(" sum_bet_amount:", depositAmount, " spreadAccountotransfer:", spreadAccountotransfer, " commission_rate_player_spread:", existing->commission_rate_player_spread, " ");
+                if (spreadAccountotransfer > init_asset_empty)
+                {
+                    INLINE_ACTION_SENDER(eosio::token, transfer)
+                    (
+                        existing->amountSymbol.get_contract(), {{_self, "active"_n}},
+                        {_self, playerBet.spreadAccount, spreadAccountotransfer, std::string("spreadaccountcommission")});
+                }
+            }
             if (agentotransfer > init_asset_empty)
             {
+                eosio::print(" sum_bet_amount:", depositAmount, " agentotransfer:", agentotransfer, " commission_rate_agent:", existing->commission_rate_agent, " ");
                 INLINE_ACTION_SENDER(eosio::token, transfer)
                 (
                     existing->amountSymbol.get_contract(), {{_self, "active"_n}},
                     {_self, playerBet.agent, agentotransfer, std::string("agentcommission")});
-            }
-            if (spreadAccountotransfer > init_asset_empty)
-            {
-                INLINE_ACTION_SENDER(eosio::token, transfer)
-                (
-                    existing->amountSymbol.get_contract(), {{_self, "active"_n}},
-                    {_self, playerBet.spreadAccount, spreadAccountotransfer, std::string("spreadaccountcommission")});
             }
         }
         // player
