@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS T_TABLE_BAC_BAK;
 CREATE TABLE T_TABLE_BAC_BAK
 (
    id                   	INT(11) NOT NULL AUTO_INCREMENT,
-   validCardVec  			VARCHAR(512) COMMENT '有效牌数组，即除去每轮消耗的牌剩余的牌堆',
+   validCardVec  			VARCHAR(2048) COMMENT '有效牌数组，即除去每轮消耗的牌剩余的牌堆',
    tableId 				INT(11)  COMMENT '桌主键',
    cardBoot 				VARCHAR(64) COMMENT '靴牌次数',
    dealer 					VARCHAR(64) COMMENT '桌的拥有者，即庄',
@@ -12,10 +12,10 @@ CREATE TABLE T_TABLE_BAC_BAK
    dealerBalance 			VARCHAR(32) COMMENT '庄余额',
    oneRoundMaxTotalBet_BP 	VARCHAR(64) COMMENT '庄闲下注位置的一轮最高的总下注额',
    oneRoundMaxTotalBet_Tie VARCHAR(64) COMMENT '和下注位置的一轮最高的总下注额',
-   oneRoundMaxTotalBet_Push VARCHAR(64) COMMENT '庄闲对子下注位置的一轮最高的总下注额',
+   oneRoundMaxTotalBet_Pair VARCHAR(64) COMMENT '庄闲对子下注位置的一轮最高的总下注额',
    minPerBet_BP 			VARCHAR(64) COMMENT '庄闲下注位置的一轮中每次最小下注额',
    minPerBet_Tie 			VARCHAR(64) COMMENT '和下注位置的一轮中每次最小下注额',
-   minPerBet_Push 			VARCHAR(64) COMMENT '庄闲对子下注位置的一轮中每次最小下注额',
+   minPerBet_Pair 			VARCHAR(64) COMMENT '庄闲对子下注位置的一轮中每次最小下注额',
    oneRoundDealerMaxPay 	VARCHAR(64) COMMENT '根据庄设置的桌下注限制计算出的每轮庄最大的赔付额',
    minTableDeposit 			VARCHAR(64) COMMENT '根据庄设置的桌下注限制计算的开桌最小抵押额',
    amountSymbol 			VARCHAR(64) COMMENT '币种',

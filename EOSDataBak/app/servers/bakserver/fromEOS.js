@@ -42,12 +42,12 @@ FromEOS.InsertIntoLocalDB = function (tableMsg){
         for (let i=0;i<tableMsg.length;i++){
             sqls.push('INSERT INTO T_TABLE_BAC_BAK(tableId,tableStatus,cardBoot,dealer,trusteeship,isPrivate,dealerBalance,'+
                 'oneRoundMaxTotalBet_BP,minPerBet_BP,oneRoundMaxTotalBet_Tie,minPerBet_Tie,'+
-                'oneRoundMaxTotalBet_Push,minPerBet_Push,oneRoundDealerMaxPay,minTableDeposit,'+
+                'oneRoundMaxTotalBet_Pair,minPerBet_Pair,oneRoundDealerMaxPay,minTableDeposit,'+
                 'commission_rate_agent,commission_rate_player,upgradingFlag,amountSymbol,validCardVec,createtime) VALUES('+
                 tableMsg[i].tableId +',\''+tableMsg[i].tableStatus+'\',\''+tableMsg[i].cardBoot+'\',\''+tableMsg[i].dealer+'\',\''+
                 tableMsg[i].trusteeship+'\',\''+tableMsg[i].isPrivate+'\',\''+tableMsg[i].dealerBalance+'\',\''+tableMsg[i].oneRoundMaxTotalBet_BP+'\',\''+
                 tableMsg[i].minPerBet_BP+'\',\''+tableMsg[i].oneRoundMaxTotalBet_Tie+'\',\''+tableMsg[i].minPerBet_Tie+'\',\''+
-                tableMsg[i].oneRoundMaxTotalBet_Push+'\',\''+tableMsg[i].minPerBet_Push+'\',\''+tableMsg[i].oneRoundDealerMaxPay+'\',\''+
+                tableMsg[i].oneRoundMaxTotalBet_Pair+'\',\''+tableMsg[i].minPerBet_Pair+'\',\''+tableMsg[i].oneRoundDealerMaxPay+'\',\''+
                 tableMsg[i].minTableDeposit+'\',\''+tableMsg[i].commission_rate_agent+'\',\''+tableMsg[i].commission_rate_player+'\',\''+
                 tableMsg[i].upgradingFlag+'\',\''+JSON.stringify(tableMsg[i].amountSymbol)+'\',\''+tableMsg[i].validCardVec+'\',NOW())');
         }

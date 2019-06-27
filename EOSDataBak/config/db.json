@@ -13,7 +13,7 @@
         "port": 3306,
         "user": "root",
         "password": "wls",
-        "database": "test",
+        "database": "mysql",
         "charset": "utf8",
         "connectionLimit": 200
       }

@@ -105,22 +105,27 @@ getImport12DataStruct = function (tableMsg){
         } else {
             import12Datads.trusteeship=true;
         }
+        
         if (tableMsg[i].isPrivate==0){
             import12Datads.isPrivate=false;
         } else {
             import12Datads.isPrivate=true;
         }
+        
+        
+        import12Datads.isFree=false;
         import12Datads.dealerBalance=tableMsg[i].dealerBalance;
         import12Datads.oneRoundMaxTotalBet_BP=tableMsg[i].oneRoundMaxTotalBet_BP;
         import12Datads.minPerBet_BP=tableMsg[i].minPerBet_BP;
         import12Datads.oneRoundMaxTotalBet_Tie=tableMsg[i].oneRoundMaxTotalBet_Tie;
         import12Datads.minPerBet_Tie=tableMsg[i].minPerBet_Tie;
-        import12Datads.oneRoundMaxTotalBet_Push=tableMsg[i].oneRoundMaxTotalBet_Push;
-        import12Datads.minPerBet_Push=tableMsg[i].minPerBet_Push; 
+        import12Datads.oneRoundMaxTotalBet_Pair=tableMsg[i].oneRoundMaxTotalBet_Pair;
+        import12Datads.minPerBet_Pair=tableMsg[i].minPerBet_Pair; 
         import12Datads.oneRoundDealerMaxPay=tableMsg[i].oneRoundDealerMaxPay;
         import12Datads.minTableDeposit=tableMsg[i].minTableDeposit;
         import12Datads.commission_rate_agent=parseFloat(tableMsg[i].commission_rate_agent);
         import12Datads.commission_rate_player=parseFloat(tableMsg[i].commission_rate_player);
+        import12Datads.commission_rate_player_spread=0;
         if (tableMsg[i].upgradingFlag==0){
             import12Datads.upgradingFlag=false;
         } else {

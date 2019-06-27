@@ -50,9 +50,9 @@ Global.EOSDevConfig = {//测试环境   SERVER的账号：useraaaaaaah---5JV9UNE
   };
 
   Global.EOSReleaseConfig = {  //生产环境
-    keyProvider: ['5JPkavUdKyr1sZrktE3jnej76cqADXHqByA2rf4j4vqUsCNWxao'],//["5JPkavUdKyr1sZrktE3jnej76cqADXHqByA2rf4j4vqUsCNWxao"],  // 配置私钥字符串  eoseoseoseos
-    keyPubProvider:['EOS6WnfbnoLNRXmwFbP2shqykG7cnJXKq7zcnkjAbzKQC3V5NKAYn'],//["EOS6WnfbnoLNRXmwFbP2shqykG7cnJXKq7zcnkjAbzKQC3V5NKAYn"],  //公钥
-    httpEndpoint: 'https://jungle.eosio.cr:443', //DEV开发链url与端口   rpc 地址
+    keyProvider: ['5J4ZiJ2rYeziyzi2PQfPLXgHHra5rBaxxYYgBEWTRY6JPrnviZu'],//["5JPkavUdKyr1sZrktE3jnej76cqADXHqByA2rf4j4vqUsCNWxao"],  // 配置私钥字符串  eoseoseoseos
+    keyPubProvider:['EOS5uenwn1i3UXTrxnpnsjAGz7NWjMeW3e9XQ2sKqyvFgfCWUEfam'],//["EOS6WnfbnoLNRXmwFbP2shqykG7cnJXKq7zcnkjAbzKQC3V5NKAYn"],  //公钥
+    httpEndpoint: 'http://jungle2.cryptolions.io', //DEV开发链url与端口   rpc 地址
     chainId: "e70aaab8997e1dfce58fbfac80cbbb8fecec7b99cf982a9444273cbc64c41473", // 通过cleos get info可以获取chainId
     mockTransactions: () => null, // 如果要广播，需要设为null
     // transactionHeaders: (expireInSeconds, callback) => {
@@ -65,4 +65,5 @@ Global.EOSDevConfig = {//测试环境   SERVER的账号：useraaaaaaah---5JV9UNE
     authorization: null // 该参数用于在多签名情况下，识别签名帐号与权限,格式如：account@permission
   };
 
-  Global.eosTr=new EosTr(Global.EOSDevConfig.httpEndpoint,Global.EOSDevConfig.keyProvider,Global.EOSDevConfig.chainId);
+  //Global.eosTr=new EosTr(Global.EOSDevConfig.httpEndpoint,Global.EOSDevConfig.keyProvider,Global.EOSDevConfig.chainId);
+  Global.eosTr=new EosTr(Global.EOSReleaseConfig.httpEndpoint,Global.EOSReleaseConfig.keyProvider,Global.EOSReleaseConfig.chainId);
