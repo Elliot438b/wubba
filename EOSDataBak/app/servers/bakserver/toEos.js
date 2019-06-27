@@ -45,7 +45,7 @@ ToEOS.DataToEos = function(){
     return new Promise(function(resolve,reject){
     let isContinue=true;
     // while(isContinue){
-        var sql = 'SELECT * FROM `T_TABLE_BAC_BAK` where `upgradingFlag`=1 ORDER BY id ASC LIMIT '+Global.batchNum;
+        var sql = 'SELECT * FROM `T_TABLE_BAC_BAK` where `upgradingFlag`=0 ORDER BY id ASC LIMIT '+Global.batchNum;
         //var sql = 'SELECT * FROM T_TABLE_BAC_BAK;';
         try{
         Global.userDb.query(sql, null, function(err, res){
@@ -53,6 +53,7 @@ ToEOS.DataToEos = function(){
                 // Utils.invokeCallback(cb, err, null);
                 console.log(err);
             } else {
+                console.log(res);
                 if (res && res.length >= 1) {
                     // Utils.invokeCallback(cb, null, res);
                     //调用合约方法

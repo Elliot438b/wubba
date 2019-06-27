@@ -24,8 +24,6 @@ var IntervalName=Timer.setInterval(5000, function(){
     }
 });
 
-
-
 /**从EOS备份到本地数据库 */
 // (async () => {
 //         try {   

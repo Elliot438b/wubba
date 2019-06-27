@@ -26,3 +26,4 @@ CREATE TABLE T_TABLE_BAC_BAK
    upgradingFlag           	INT  COMMENT '缺省为0(从EOS上获取到本地),1(从本地备份回EOS)',
    PRIMARY KEY (id)
 );
+

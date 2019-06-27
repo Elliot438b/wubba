@@ -8,7 +8,6 @@
 #include <openssl/sha.h>
 using namespace std;
 
-
 struct card_info
 {
     uint8_t deck;
@@ -54,26 +53,26 @@ string to_hex_w(const char *d, uint32_t s)
 
 string sha256(const string str)
 {
-	char buf[2];
+    char buf[2];
     unsigned char hash[SHA256_DIGEST_LENGTH];
     SHA256_CTX sha256;
     int ret = SHA256_Init(&sha256);
     SHA256_Update(&sha256, str.c_str(), str.size());
     SHA256_Final(hash, &sha256);
     std::string NewString = "";
-    for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++)
     {
-        sprintf(buf,"%02x",hash[i]);
+        sprintf(buf, "%02x", hash[i]);
         NewString = NewString + buf;
     }
-	return NewString;
+    return NewString;
 }
 
 void reveal(string root_seed, std::vector<uint16_t> &validCardVec, std::vector<card_info> &playerHands, std::vector<card_info> &bankerHands, string &roundResult, int32_t &sum_b_R)
 {
-   // checksum256 hash = sha256(root_seed.c_str(), root_seed.size());
-    //auto hash_data = hash.extract_as_byte_array(); 
-    //string root_seed_64 = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
+    // checksum256 hash = sha256(root_seed.c_str(), root_seed.size());
+    // auto hash_data = hash.extract_as_byte_array();
+    // string root_seed_64 = to_hex_w(reinterpret_cast<const char *>(hash_data.data()), 32);
     string root_seed_64 = sha256(root_seed.c_str());
     // Split 6 seeds, parse card info.
     auto sum_p = 0;
@@ -193,27 +192,27 @@ void shuffleFun(std::vector<uint16_t> &cardVec_temp)
     }
 }
 
-void readseed(string filename, std::vector<string> & seedVec)
+void readseed(string filename, std::vector<string> &seedVec)
 {
     ifstream in(filename.c_str());
-	string line;
- 
-	if(in) // 有该文件
-	{
-		while (getline(in, line)) // line中不包括每行的换行符
-		{ 
+    string line;
+
+    if (in) // 有该文件
+    {
+        while (getline(in, line)) // line中不包括每行的换行符
+        {
             int len = line.size();
-            string data = line.substr(0,len-1);
-			seedVec.push_back(data);
+            string data = line.substr(0, len - 1);
+            seedVec.push_back(data);
             //seedVec.push_back(line);
-		}
-	}
-	else // 没有该文件
-	{
-		cout <<"no such file" << endl;
-	}
- 
-	return;
+        }
+    }
+    else // 没有该文件
+    {
+        cout << "no such file" << endl;
+    }
+
+    return;
 }
 
 int main()
@@ -228,18 +227,18 @@ int main()
     uint16_t bankerWin = 0;
     uint16_t playerWin = 0;
     uint16_t tieWin = 0;
-    uint16_t Bpair = 0; 
+    uint16_t Bpair = 0;
     uint16_t Ppair = 0;
 
     shuffleFun(validCardVec); //初始洗牌
 
     std::vector<string> dealerseed;
-    std::vector<string> serverseed; 
+    std::vector<string> serverseed;
     readseed("dealerseed.txt", dealerseed); //读入一个dealer种子
     readseed("serverseed.txt", serverseed); //读入对应的一个server种子
 
-    cout << "serverseed size is = "<< serverseed.size();    
-    for (int i = 0;i < serverseed.size(); i++)         //遍历dealer种子文件，按行数匹配dealer和server种子。
+    cout << "serverseed size is = " << serverseed.size();
+    for (int i = 0; i < serverseed.size(); i++) //遍历dealer种子文件，按行数匹配dealer和server种子。
     {
         string root_seed = serverseed[i] + salt + dealerseed[i];
         int32_t sum_b_R = 0;
@@ -247,61 +246,61 @@ int main()
         std::vector<card_info> playerHands;
         reveal(root_seed, validCardVec, playerHands, bankerHands, roundResult, sum_b_R);
         //roundResult结果统计。
-        if(0 == roundResult.compare("10000"))
+        if (0 == roundResult.compare("10000"))
         {
             bankerWin++;
         }
-        else if(0 == roundResult.compare("10001"))
+        else if (0 == roundResult.compare("10001"))
         {
             bankerWin++;
             Ppair++;
         }
-        else if(0 == roundResult.compare("10010"))
+        else if (0 == roundResult.compare("10010"))
         {
             bankerWin++;
             Bpair++;
         }
-        else if(0 == roundResult.compare("10011"))
+        else if (0 == roundResult.compare("10011"))
         {
             bankerWin++;
             Ppair++;
             Bpair++;
         }
-        else if(0 == roundResult.compare("01000"))
+        else if (0 == roundResult.compare("01000"))
         {
             playerWin++;
         }
-        else if(0 == roundResult.compare("01010"))
+        else if (0 == roundResult.compare("01010"))
         {
             playerWin++;
             Bpair++;
         }
-        else if(0 == roundResult.compare("01001"))
+        else if (0 == roundResult.compare("01001"))
         {
             playerWin++;
             Ppair++;
         }
-        else if(0 == roundResult.compare("01011"))
+        else if (0 == roundResult.compare("01011"))
         {
             playerWin++;
             Bpair++;
             Ppair++;
         }
-        else if(0 == roundResult.compare("00100"))
+        else if (0 == roundResult.compare("00100"))
         {
             tieWin++;
         }
-        else if(0 == roundResult.compare("00110"))
+        else if (0 == roundResult.compare("00110"))
         {
             tieWin++;
             Bpair++;
         }
-        else if(0 == roundResult.compare("00101"))
+        else if (0 == roundResult.compare("00101"))
         {
             tieWin++;
             Ppair++;
         }
-        else if(0 == roundResult.compare("00111"))
+        else if (0 == roundResult.compare("00111"))
         {
             tieWin++;
             Bpair++;
@@ -325,7 +324,7 @@ int main()
 
     cout << "result is:\n";
     cout << "bankerWin=" << bankerWin << "\n";
-    cout << "playerWin=" << playerWin << "\n" ;
+    cout << "playerWin=" << playerWin << "\n";
     cout << "tieWin=" << tieWin << "\n";
     cout << "Bpair=" << Bpair << "\n";
     cout << "Ppair=" << Ppair << "\n";
