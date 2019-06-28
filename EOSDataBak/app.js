@@ -8,19 +8,19 @@ var FromEOS = require('./app/servers/bakserver/fromEOS.js');
 Global.userDb = new DBDeal(Db.get('local127'));
 
 // /**从本地数据库备份到EOS */
-let DBRst=true;
-let i=0;
-var IntervalName=Timer.setInterval(5000, function(){
-    if (DBRst){
+let DBRst = true;
+let i = 0;
+var IntervalName = Timer.setInterval(5000, function () {
+    if (DBRst) {
         ToEOS.DataToEos()
-        .then(function(rst){
-            DBRst=rst;
-        })
-        .catch(function(err){
-            DBRst=false;
-            Timer.clearInterval(IntervalName);
-            return ;
-        });
+            .then(function (rst) {
+                DBRst = rst;
+            })
+            .catch(function (err) {
+                DBRst = false;
+                Timer.clearInterval(IntervalName);
+                return;
+            });
     }
 });
 
@@ -30,6 +30,6 @@ var IntervalName=Timer.setInterval(5000, function(){
 //             FromEOS.BakData();
 //         } catch (e) {
 //             console.log('Caught exception: ' + e);
-    
+
 //         }
 //    })();
