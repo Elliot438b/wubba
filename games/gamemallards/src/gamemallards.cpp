@@ -83,7 +83,7 @@ ACTION gamemallards::newtable(uint64_t newtableId, name dealer, asset deposit, b
     tableround.emplace(_self, [&](auto &s) {
         s.tableId = newtableId;
         s.cardBoot = 0;
-        s.trusteeship = false;
+        s.trusteeship = true; // fluency support
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_SHUFFLE;
         s.dealer = dealer;
         s.dealerBalance = deposit;
@@ -166,7 +166,8 @@ ACTION gamemallards::dealerseed(uint64_t tableId, checksum256 encodeSeed)
     auto existing = tableround.find(tableId);
     eosio::check(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
-    eosio::check(!existing->trusteeship, "Dealer is hosted.");
+    // fluency support
+    // eosio::check(!existing->trusteeship, "Dealer is hosted.");
     eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END,
                  "tableStatus != end");
     if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
@@ -214,7 +215,8 @@ ACTION gamemallards::serverseed(uint64_t tableId, checksum256 encodeSeed)
     eosio::check(existing != tableround.end(), notableerr);
     if (existing->trusteeship)
     {
-        eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't end!");
+        // fluency support
+        eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_START, "The currenct round isn't ROUND_START!");
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
             INLINE_ACTION_SENDER(gamemallards, pausetablesee)
@@ -242,7 +244,7 @@ ACTION gamemallards::serverseed(uint64_t tableId, checksum256 encodeSeed)
             s.currRoundBetSum_Tie = init_asset_empty;
             s.currRoundBetSum_BankerPair = init_asset_empty;
             s.currRoundBetSum_PlayerPair = init_asset_empty;
-            s.dealerSeedHash = hash;
+            // s.dealerSeedHash = hash;
             s.serverSeedHash = encodeSeed;
             s.dealerSeed = "";
             s.serverSeed = "";
@@ -380,7 +382,8 @@ ACTION gamemallards::verdealeseed(uint64_t tableId, string seed)
     auto existing = tableround.find(tableId);
     eosio::check(existing != tableround.end(), notableerr);
     require_auth(existing->dealer);
-    eosio::check(!existing->trusteeship, "Dealer is hosted.");
+    // fluency support
+    // eosio::check(!existing->trusteeship, "Dealer is hosted.");
     eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_REVEAL, "tableStatus != reveal");
     assert_sha256(seed.c_str(), seed.size(), ((*existing).dealerSeedHash));
     tableround.modify(existing, _self, [&](auto &s) {
@@ -419,23 +422,24 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed)
     });
     // root_seed.
     string root_seed = seed + salt;
-    if (existing->trusteeship)
-    {
-        eosio::print("Dealer trusteeship, don't need dealer seed.");
-    }
-    // non-trustee server, so table_round is waiting for ACTION::gamemallards::dealerseed until dealer reconnect.
-    // TODO Can be considered: auto trustee server until dealer reconnect and ACTION::gamemallards::exitruteship.
-    else if (!existing->dSeedVerity)
-    { // dealer disconnect notify
-        INLINE_ACTION_SENDER(gamemallards, disconnecthi)
-        (
-            _self, {{serveraccount, "active"_n}},
-            {existing->dealer, existing->tableId});
-    }
-    else if (existing->dSeedVerity)
-    { // dealer online and not trusteeship
-        root_seed += existing->dealerSeed;
-    }
+    // fluency support
+    // if (existing->trusteeship)
+    // {
+    //     eosio::print("Dealer trusteeship, don't need dealer seed.");
+    // }
+    // // non-trustee server, so table_round is waiting for ACTION::gamemallards::dealerseed until dealer reconnect.
+    // // TODO Can be considered: auto trustee server until dealer reconnect and ACTION::gamemallards::exitruteship.
+    // else if (!existing->dSeedVerity)
+    // { // dealer disconnect notify
+    //     INLINE_ACTION_SENDER(gamemallards, disconnecthi)
+    //     (
+    //         _self, {{serveraccount, "active"_n}},
+    //         {existing->dealer, existing->tableId});
+    // }
+    // else if (existing->dSeedVerity)
+    // { // dealer online and not trusteeship
+    //     root_seed += existing->dealerSeed;
+    // }
     int32_t sum_b_R = 0;
     string roundResult;
     std::vector<card_info> bankerHands;
