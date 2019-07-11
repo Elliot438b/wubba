@@ -216,7 +216,7 @@ ACTION gamemallards::serverseed(uint64_t tableId, checksum256 encodeSeed)
     if (existing->trusteeship)
     {
         // fluency support
-        eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_START, "The currenct round isn't ROUND_START!");
+        eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The currenct round isn't ROUND_END!");
         if (existing->dealerBalance < existing->oneRoundDealerMaxPay * 2)
         {
             INLINE_ACTION_SENDER(gamemallards, pausetablesee)
