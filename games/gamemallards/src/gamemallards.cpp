@@ -510,7 +510,7 @@ ACTION gamemallards::verserveseed(uint64_t tableId, string seed)
         playerBet.agentcommission = agentotransfer;
         playerBet.spreadaccountcommission = spreadAccountotransfer;
 
-        asset commission_sum = platformtotransfer + agentotransfer + playertotransfer;
+        asset commission_sum = platformtotransfer + agentotransfer + playertotransfer + spreadAccountotransfer;
         dealerBalance_temp -= commission_sum;
         // -------------------------------- commission end --------------------------------
 
