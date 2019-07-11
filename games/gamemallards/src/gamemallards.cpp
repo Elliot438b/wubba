@@ -691,7 +691,7 @@ ACTION gamemallards::closetable(uint64_t tableId)
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
     eosio::check(existing != tableround.end(), notableerr);
-    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END, "The round isn't end, can't close!");
+    eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_END || existing->tableStatus == (uint64_t)table_stats::status_fields::PAUSED, "The round isn't end or pause, can't close!");
 
     INLINE_ACTION_SENDER(eosio::token, transfer)
     (
