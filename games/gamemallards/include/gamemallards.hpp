@@ -505,8 +505,8 @@ private:
     currencyinfo_t tablecurrency;
     WBRNG wbrng;
 
-    name serveraccount = "useraaaaaaah"_n;
-    name platformaccount = "useraaaaaaae"_n;
+    name serveraccount = "b21v4swghvq2"_n;
+    name platformaccount = "5d45clzshtlk"_n;
 
     const uint16_t CardsMinLimit = 100;
     const uint32_t betPeriod = 32; //todo default 30 ,60 is test use
