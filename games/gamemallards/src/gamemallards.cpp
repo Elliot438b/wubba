@@ -718,10 +718,7 @@ ACTION gamemallards::closetable(uint64_t tableId)
         {_self, existing->dealer, existing->dealerBalance, std::string("closetable, withdraw all")});
 
     asset init_asset_empty = asset(0, existing->amountSymbol.get_symbol());
-    tableround.modify(existing, _self, [&](auto &s) {
-        s.tableStatus = (uint64_t)table_stats::status_fields::CLOSED;
-        s.dealerBalance = init_asset_empty;
-    });
+    tableround.erase(existing);
 }
 
 ACTION gamemallards::depositable(uint64_t tableId, asset deposit)

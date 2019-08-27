@@ -158,7 +158,7 @@ private:
             ROUND_REVEAL = 4,
             ROUND_SHUFFLE = 6,
             PAUSED = 3, // must be changed under ROUND_END status.
-            CLOSED = 5
+            CLOSED = 5 // Discarded, erase directly.
         };
         EOSLIB_SERIALIZE(table_stats, (validCardVec)(tableId)(tableStatus)(cardBoot)(dealer)(trusteeship)(isPrivate)(isFree)(dealerBalance)(oneRoundMaxTotalBet_BP)(minPerBet_BP)(oneRoundMaxTotalBet_Tie)(minPerBet_Tie)(oneRoundMaxTotalBet_Pair)(minPerBet_Pair)(oneRoundDealerMaxPay)(minTableDeposit)(amountSymbol)(commission_rate_agent)(commission_rate_player)(commission_rate_player_spread)(upgradingFlag)(redundancy)(redundancy1)(betStartTime)(currRoundBetSum_Banker)(currRoundBetSum_Player)(currRoundBetSum_Tie)(currRoundBetSum_BankerPair)(currRoundBetSum_PlayerPair)(dealerSeedHash)(serverSeedHash)(dealerSeed)(serverSeed)(dSeedVerity)(sSeedVerity)(playerInfo)(roundResult)(playerHands)(bankerHands))
     };
