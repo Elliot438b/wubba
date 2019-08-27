@@ -24,7 +24,9 @@ ACTION gamemallards::delsymbol(name code, string sym, asset minperbet)
     eosio::check(0 == minperbet.symbol.code().to_string().compare(sym), "The minperbet's symbol not match!");
     auto existing = tablecurrency.find(code.value);
     eosio::check(existing != tablecurrency.end(), "Symbol doesn't exsit!");
-    eosio::check(existing->sym == sym, "Symbol doesn't match!");
+    symbol symB = symbol(symbol_code(sym), 4);
+    eosio::check(existing->sym == symB, "Symbol doesn't match!");
+    eosio::print("------ delete symbol ------");
     tablecurrency.erase(existing);
 }
 

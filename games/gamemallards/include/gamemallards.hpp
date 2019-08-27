@@ -19,7 +19,7 @@ public:
         : contract(receiver, code, ds), tableround(receiver, receiver.value), tableshuffle(receiver, receiver.value), tablecurrency(receiver, receiver.value) {}
 
     ACTION initsymbol(name code, string sym, asset minperbet);
-    ACTION delsymbol(name code, string sym);
+    ACTION delsymbol(name code, string sym, asset minperbet);
     ACTION newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, bool isFree, name code, string sym, string commission_rate_agent, string commission_rate_player, string commission_rate_player_spread, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Pair, asset minPerBet_Pair);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
