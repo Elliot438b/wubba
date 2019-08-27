@@ -18,6 +18,16 @@ ACTION gamemallards::initsymbol(name code, string sym, asset minperbet)
     });
 }
 
+ACTION gamemallards::delsymbol(name code, string sym, asset minperbet)
+{
+    require_auth(_self);
+    eosio::check(0 == minperbet.symbol.code().to_string().compare(sym), "The minperbet's symbol not match!");
+    auto existing = tablecurrency.find(code.value);
+    eosio::check(existing != tablecurrency.end(), "Symbol doesn't exsit!");
+    eosio::check(existing->sym == sym, "Symbol doesn't match!");
+    tablecurrency.erase(existing);
+}
+
 ACTION gamemallards::newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, bool isFree, name code, string sym, string commission_rate_agent, string commission_rate_player, string commission_rate_player_spread, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp,
                               asset oneRoundMaxTotalBet_tie, asset minPerBet_tie,
                               asset oneRoundMaxTotalBet_pair, asset minPerBet_pair)
@@ -747,7 +757,7 @@ ACTION gamemallards::dealerwitdaw(uint64_t tableId, asset withdraw)
         s.dealerBalance -= withdraw;
     });
 }
-ACTION gamemallards::shuffle(uint64_t tableId)
+ACTION gamemallards::shuffle(uint64_t tableId, string seed)
 {
     require_auth(serveraccount);
     auto existing = tableround.find(tableId);
@@ -755,7 +765,7 @@ ACTION gamemallards::shuffle(uint64_t tableId)
     eosio::check(existing->tableStatus == (uint64_t)table_stats::status_fields::ROUND_SHUFFLE, "The round isn't shuffle, can't shuffle!");
 
     std::vector<uint16_t> cardVec_temp = existing->validCardVec;
-    shuffleFun(tableId, cardVec_temp);
+    shuffleFun(tableId, cardVec_temp, seed);
 
     tableround.modify(existing, _self, [&](auto &s) {
         s.tableStatus = (uint64_t)table_stats::status_fields::ROUND_END;

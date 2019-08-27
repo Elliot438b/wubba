@@ -19,6 +19,7 @@ public:
         : contract(receiver, code, ds), tableround(receiver, receiver.value), tableshuffle(receiver, receiver.value), tablecurrency(receiver, receiver.value) {}
 
     ACTION initsymbol(name code, string sym, asset minperbet);
+    ACTION delsymbol(name code, string sym);
     ACTION newtable(uint64_t newtableId, name dealer, asset deposit, bool isPrivate, bool isFree, name code, string sym, string commission_rate_agent, string commission_rate_player, string commission_rate_player_spread, asset oneRoundMaxTotalBet_BP, asset minPerBet_BP, asset oneRoundMaxTotalBet_Tie, asset minPerBet_Tie, asset oneRoundMaxTotalBet_Pair, asset minPerBet_Pair);
     ACTION dealerseed(uint64_t tableId, checksum256 encodeSeed);
     ACTION serverseed(uint64_t tableId, checksum256 encodeSeed);
@@ -36,7 +37,7 @@ public:
     ACTION closetable(uint64_t tableId);
     ACTION depositable(uint64_t tableId, asset deposit);
     ACTION dealerwitdaw(uint64_t tableId, asset withdraw);
-    ACTION shuffle(uint64_t tableId);
+    ACTION shuffle(uint64_t tableId, string seed);
     ACTION edittable(uint64_t tableId, bool isPrivate, bool isFree, name code, string sym, string commission_rate_agent, string commission_rate_player, string commission_rate_player_spread, asset oneRoundMaxTotalBet_bp, asset minPerBet_bp, asset oneRoundMaxTotalBet_tie, asset minPerBet_tie, asset oneRoundMaxTotalBet_pair, asset minPerBet_pair);
     ACTION upgrading(bool isupgrading);
     ACTION import12data(uint64_t tableId, uint64_t tableStatus, uint64_t cardBoot, name dealer, bool trusteeship,
@@ -44,6 +45,7 @@ public:
                         asset oneRoundMaxTotalBet_Pair, asset minPerBet_Pair, asset oneRoundDealerMaxPay, asset minTableDeposit, double commission_rate_agent, double commission_rate_player, double commission_rate_player_spread, bool upgradingFlag, extended_symbol amountSymbol, std::vector<uint16_t> validCardVec);
 
     using initsymbol_action = action_wrapper<"initsymbol"_n, &gamemallards::initsymbol>;
+    using delsymbol_action = action_wrapper<"delsymbol"_n, &gamemallards::delsymbol>;
     using newtable_action = action_wrapper<"newtable"_n, &gamemallards::newtable>;
     using dealerseed_action = action_wrapper<"dealerseed"_n, &gamemallards::dealerseed>;
     using serverseed_action = action_wrapper<"serverseed"_n, &gamemallards::serverseed>;
@@ -417,15 +419,16 @@ private:
             roundResult[4] = '1';
     }
 
-    void shuffleFun(uint64_t tableId, std::vector<uint16_t> & cardVec_temp)
+    void shuffleFun(uint64_t tableId, std::vector<uint16_t> & cardVec_temp, string seed)
     {
         cardVec_temp.clear();
         for (auto i = 0; i < initDecks * 52; i++)
         {
             cardVec_temp.emplace_back(i);
         }
-        // use timestamp as seed
-        string toDelPosSeed = to_string(eosio::current_time_point().sec_since_epoch());
+        // use timestamp plus seed provided as seed
+        string timePointSeed = to_string(eosio::current_time_point().sec_since_epoch());
+        string toDelPosSeed = timePointSeed + seed;
         eosio::print(" [toDelPosSeed: ", toDelPosSeed, "] ");
 
         checksum256 hash = sha256(toDelPosSeed.c_str(), toDelPosSeed.size());
