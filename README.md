@@ -1,4 +1,4 @@
-# Devlog [CURRENT](https://github.com/evsward/wubba#List of modification points in the test phase)
+# Devlog [CURRENT](https://github.com/evsward/wubba#spreadcode)
 ## v0.1-v0.3 BM_rand + round
 - v0.1 base BM_rand. 0-1, tag release.
     - ~~v0.1.2 workflow control. Timely and step dependency.~~
