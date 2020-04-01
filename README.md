@@ -1,4 +1,4 @@
-# Devlog [CURRENT](https://github.com/evsward/wubba#测试阶段修改点列表)
+# Devlog [CURRENT](https://github.com/evsward/wubba#List of modification points in the test phase)
 ## v0.1-v0.3 BM_rand + round
 - v0.1 base BM_rand. 0-1, tag release.
     - ~~v0.1.2 workflow control. Timely and step dependency.~~
@@ -62,7 +62,7 @@ flag | symbol | full name
     - banker_hands
 > Refer to the rules table:
 
-![image](https://github.com/evsward/wubba/blob/master/resource/cardapplyrules.jpg?raw=true)
+https://github.com/evsward/wubba/blob/master/resource/cardapplyrules.jpg?raw=true
 
 - who win? dealer, player, tie, dealerPush or playerPush? or multy win. 
 ```math
@@ -542,10 +542,10 @@ seedHash | result of hash seed
 - Adjust variate of the solution to obtain a best result.
 - Seed source.
 
-~~1. 限红改为五个格子分别限制, 庄闲分开不再共享。~~
-~~2. 庄不在线且未托管时, 暂停牌桌。~~
-~~3. 免佣字段加在状态表桌属性中, 去掉verifyseverseed的第三个参数。~~
-## 测试阶段修改点列表：
-1. 桌属性增加 commission_rate_player_spread, newtable, edittable, import12data 三个接口增加参数 commission_rate_player_spread
-2. playerbet接口增加参数name spreadAccount, playerbet结构体增加属性 spreadAccount, spreadaccountcommission
-3. verserveseed接口函数体中佣金的部分最后加上相关内容。
+~~1. The limit changed to five grid restrictions, dealer and player are separated.~~
+~~2. The card table is suspended when dealer is offline and not hosted.~~
+~~3. The free-agent field is added to the table properties of the status table, removing the third parameter of verifyseverseed.~~
+## List of modification points in the test phase:
+1. table field added: commission_rate_player_spread, newtable, edittable, import12data. The other 3 interfaces add params: commission_rate_player_spread
+2. playerbet add param name spreadAccount, playerbet add field spreadAccount, spreadaccountcommission
+3. verserveseed: The commission part of the interface body is added at the end.
