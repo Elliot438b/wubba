@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "ExBuffer": "^0.4.2",
-    "async": "^2.6.2",
+    "async": "^2.6.4",
     "commander": "^2.20.0",
     "eosjs": "^20.0.0",
     "js-yaml": "^3.13.1",
